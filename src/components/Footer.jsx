@@ -1,37 +1,36 @@
-import React from 'react';
-
 export default function Footer() {
     return (
         <footer className="footer">
             <div className="container">
-                <div className="footer-inner">
+                <div className="footer-grid">
                     <div>
-                        <h3>比較ラボ</h3>
-                        <p>あらゆる商品の価格・サービスを比較し、あなたにとって最適な選択をサポートします。</p>
+                        <h3>比較ラボとは</h3>
+                        <p>楽天市場・Amazonをはじめとする各ECサイトの価格を比較し、最安値・最適商品をご提案するサービスです。</p>
                     </div>
                     <div>
                         <h3>カテゴリ</h3>
                         <ul>
-                            <li><a href="#shopping-category">ショッピング</a></li>
-                            <li><a href="#money-category">マネー・資産運用</a></li>
-                            <li><a href="#life-category">生活</a></li>
-                            <li><a href="#popular-article">人気記事</a></li>
+                            <li><a href="#">スマートフォン</a></li>
+                            <li><a href="#">パソコン・タブレット</a></li>
+                            <li><a href="#">テレビ・映像機器</a></li>
+                            <li><a href="#">カメラ</a></li>
+                            <li><a href="#">イヤホン・ヘッドホン</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h3>その他</h3>
+                        <h3>サポート</h3>
                         <ul>
                             <li><a href="#">プライバシーポリシー</a></li>
                             <li><a href="#">利用規約</a></li>
+                            <li><a href="#">アフィリエイト開示</a></li>
                             <li><a href="#">お問い合わせ</a></li>
-                            <li><a href="#">運営会社</a></li>
                         </ul>
                     </div>
                 </div>
-                <div className="footer-bottom">
-                    <p>当サイトはアフィリエイトプログラムを利用しています。商品・サービスの購入等にあたっては、各サービスの利用規約をご確認ください。</p>
-                    <p style={{ marginTop: '10px' }}>© 2026 比較ラボ All Rights Reserved.</p>
+                <div className="footer-affiliate-note">
+                    ※ 当サイトは楽天アフィリエイト・Amazonアソシエイトプログラムに参加しています。商品リンクより購入された際に当サイトが収益を得る場合があります。
                 </div>
+                <div className="footer-copy">© 2026 比較ラボ All Rights Reserved.</div>
             </div>
         </footer>
     );

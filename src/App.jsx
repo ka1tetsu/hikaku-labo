@@ -1,104 +1,201 @@
-import React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
+import CategoryNav from './components/CategoryNav';
+import RankingSection from './components/RankingSection';
+import { searchRakutenItems, buildAmazonAffiliateUrl } from './api';
 import './index.css';
 
-const products = [
-  {
-    id: 1,
-    category: 'ショッピング',
-    title: 'Apple AirPods Pro (第2世代) ワイヤレスイヤホン',
-    price: '39,800',
-    originalPrice: '39,800',
-    image: 'https://images.unsplash.com/photo-1606220838315-056192d5e927?auto=format&fit=crop&q=80&w=400',
-    affiliateUrl: 'https://www.amazon.co.jp/s?k=AirPods+Pro'
-  },
-  {
-    id: 2,
-    category: '生活',
-    title: 'ダイソン V12 Detect Slim 掃除機',
-    price: '64,500',
-    originalPrice: '70,000',
-    image: 'https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&q=80&w=400',
-    affiliateUrl: 'https://www.amazon.co.jp/s?k=ダイソン+掃除機'
-  },
-  {
-    id: 3,
-    category: 'マネー・資産運用',
-    title: 'おすすめクレジットカード比較ガイド 2026年版',
-    price: '無料',
-    originalPrice: null,
-    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=400',
-    affiliateUrl: 'https://www.hikaku.com/'
-  },
-  {
-    id: 4,
-    category: 'ショッピング',
-    title: 'ネスカフェ ゴールドブレンド バリスタ',
-    price: '5,980',
-    originalPrice: '7,500',
-    image: 'https://images.unsplash.com/photo-1517487881594-2787f0146903?auto=format&fit=crop&q=80&w=400',
-    affiliateUrl: 'https://www.amazon.co.jp/s?k=ネスカフェ+バリスタ'
-  }
+const CATEGORIES = [
+  { label: 'スマートフォン', genreId: '101240', emoji: '📱' },
+  { label: 'パソコン', genreId: '501293', emoji: '💻' },
+  { label: 'カメラ', genreId: '201026', emoji: '📷' },
+  { label: 'テレビ', genreId: '213010', emoji: '📺' },
+  { label: 'イヤホン', genreId: '216131', emoji: '🎧' },
+  { label: '家電', genreId: '100804', emoji: '🏠' },
+  { label: 'ゲーム', genreId: '568453', emoji: '🎮' },
+  { label: 'ファッション', genreId: '100371', emoji: '👗' },
 ];
 
-function App() {
+export default function App() {
+  const [query, setQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [sortMode, setSortMode] = useState('popular');
+
+  const doSearch = useCallback(async (kw, genre, pg = 1) => {
+    if (!kw && !genre) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await searchRakutenItems(kw, genre, pg);
+      const items = (data.Items || []).map(({ Item }) => Item);
+      setProducts(items);
+      setTotalPages(Math.min(data.pageCount || 1, 100));
+      setPage(pg);
+    } catch (e) {
+      setError('商品データの取得に失敗しました。しばらくしてからもう一度お試しください。');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initial featured load
+  useEffect(() => {
+    doSearch('おすすめ 人気', '', 1);
+  }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+    setQuery(inputValue);
+    setActiveCategory(null);
+    doSearch(inputValue, '', 1);
+  };
+
+  const handleCategory = (cat) => {
+    setActiveCategory(cat);
+    setQuery('');
+    setInputValue('');
+    doSearch(cat.label, cat.genreId, 1);
+  };
+
+  const handlePage = (newPage) => {
+    doSearch(query, activeCategory?.genreId || '', newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const searchTitle = activeCategory
+    ? `${activeCategory.emoji} ${activeCategory.label}`
+    : query
+      ? `「${query}」の検索結果`
+      : '注目の人気商品';
+
   return (
     <div className="app-wrapper">
-      <Header />
-      
-      <main>
-        <section className="hero">
-          <div className="container">
-            <h1>あらゆる商品の価格・サービスの<br />総合比較サイト</h1>
-            <p>あなたの欲しい「最安値」と「最適」を見つけよう</p>
-            
-            <div className="search-bar">
-              <input type="text" placeholder="商品名、カテゴリ、ブランドで検索..." />
-              <button>検索する</button>
-            </div>
-          </div>
-        </section>
+      <Header
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        onSearch={handleSearch}
+      />
 
-        <section id="shopping-category" className="section container">
-          <div className="section-header">
-            <h2 className="section-title">注目の比較・おすすめ商品</h2>
+      <CategoryNav
+        categories={CATEGORIES}
+        activeCategory={activeCategory}
+        onSelect={handleCategory}
+      />
+
+      <main className="main-content container">
+        {/* Amazon quick link bar */}
+        <div className="amazon-bar">
+          <span>🛒 Amazonでも探す：</span>
+          {['スマートフォン', 'イヤホン', 'ノートPC', 'カメラ', 'ゲーム機'].map(kw => (
+            <a
+              key={kw}
+              href={buildAmazonAffiliateUrl(kw)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="amazon-tag"
+            >
+              {kw}
+            </a>
+          ))}
+        </div>
+
+        <div className="results-header">
+          <h2 className="results-title">{searchTitle}</h2>
+          {products.length > 0 && (
+            <div className="results-controls">
+              <select
+                value={sortMode}
+                onChange={e => setSortMode(e.target.value)}
+                className="sort-select"
+              >
+                <option value="popular">人気順</option>
+                <option value="price-asc">価格が安い順</option>
+                <option value="price-desc">価格が高い順</option>
+                <option value="review">レビュー評価順</option>
+              </select>
+              <div className="view-toggle">
+                <button
+                  className={viewMode === 'grid' ? 'active' : ''}
+                  onClick={() => setViewMode('grid')}
+                  title="グリッド表示"
+                >⊞</button>
+                <button
+                  className={viewMode === 'list' ? 'active' : ''}
+                  onClick={() => setViewMode('list')}
+                  title="リスト表示"
+                >☰</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {loading && (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>商品を検索中...</p>
           </div>
-          <div className="product-grid">
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+        )}
+
+        {error && <div className="error-box">{error}</div>}
+
+        {!loading && !error && products.length === 0 && (
+          <div className="empty-state">
+            <p>🔍 商品が見つかりませんでした。別のキーワードをお試しください。</p>
           </div>
-        </section>
-        
-        <section id="money-category" className="section container" style={{backgroundColor: '#f1f5f9', borderRadius: '12px', padding: '40px'}}>
-           <div className="section-header">
-            <h2 className="section-title">マネー・資産運用</h2>
-          </div>
-          <p style={{marginBottom: '20px'}}>クレジットカード、カードローン、証券会社、保険などの比較情報はこちら。</p>
-          <div className="product-grid">
-             <ProductCard product={{
-                category: 'マネー',
-                title: '初心者向けネット証券口座おすすめランキング',
-                price: '開設無料',
-                image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=400',
-                affiliateUrl: '#'
-             }} />
-             <ProductCard product={{
-                category: 'マネー',
-                title: 'ポイントが貯まるクレジットカード徹底比較',
-                price: '年会費無料',
-                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=400',
-                affiliateUrl: '#'
-             }} />
-          </div>
-        </section>
+        )}
+
+        {!loading && products.length > 0 && (
+          <>
+            <div className={`product-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
+              {products.map((item, i) => (
+                <ProductCard key={i} item={item} viewMode={viewMode} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => handlePage(page - 1)}
+                  className="page-btn"
+                >← 前へ</button>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const p = Math.max(1, page - 2) + i;
+                  if (p > totalPages) return null;
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => handlePage(p)}
+                      className={`page-btn ${page === p ? 'active' : ''}`}
+                    >{p}</button>
+                  );
+                })}
+                <button
+                  disabled={page >= totalPages}
+                  onClick={() => handlePage(page + 1)}
+                  className="page-btn"
+                >次へ →</button>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Ranking sidebar */}
+        <RankingSection />
       </main>
 
       <Footer />
     </div>
   );
 }
-
-export default App;
