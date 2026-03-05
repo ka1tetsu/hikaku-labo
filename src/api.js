@@ -1,34 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
-
-const RAKUTEN_APP_ID = 'ec65ace1-9e87-4d23-83e4-b54103335b56';
 const AMAZON_TAG = 'kuronekosanta-22';
 
-// Rakuten affiliate URL builder - just add affiliate tag to item URL
-function buildRakutenAffiliateUrl(item) {
-    // affiliateUrl is provided directly by Rakuten API if affiliate ID is set
-    // Otherwise, fallback to itemUrl (will still get commission if user auto-tracked)
-    return item.affiliateUrl || item.itemUrl;
+export { AMAZON_TAG };
+
+// Build Rakuten affiliate URL from item data
+export function buildRakutenAffiliateUrl(item) {
+    return item.affiliateUrl || item.itemUrl || '#';
 }
 
-function buildAmazonAffiliateUrl(keyword) {
+// Build Amazon search affiliate URL
+export function buildAmazonAffiliateUrl(keyword) {
     return `https://www.amazon.co.jp/s?k=${encodeURIComponent(keyword)}&tag=${AMAZON_TAG}`;
 }
 
+// Search products via our own /api/search proxy (server-side Rakuten call)
 export async function searchRakutenItems(keyword, genreId = '', page = 1) {
-    const params = new URLSearchParams({
-        format: 'json',
-        keyword,
-        applicationId: RAKUTEN_APP_ID,
-        hits: 20,
-        page,
-        sort: '-reviewCount',
-        imageFlag: 1,
-    });
+    const params = new URLSearchParams({ keyword, page });
     if (genreId) params.append('genreId', genreId);
 
-    const res = await fetch(`https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?${params}`);
-    if (!res.ok) throw new Error('Rakuten API error');
+    const res = await fetch(`/api/search?${params}`);
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`API error ${res.status}: ${err}`);
+    }
     return res.json();
 }
-
-export { buildRakutenAffiliateUrl, buildAmazonAffiliateUrl, AMAZON_TAG };
