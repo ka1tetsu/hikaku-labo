@@ -40,7 +40,12 @@ export default function RankingSection() {
                             <a href={buildRakutenAffiliateUrl(item)} target="_blank" rel="noopener noreferrer sponsored" className="rank-name">
                                 {(item.itemName || '').slice(0, 40)}…
                             </a>
-                            <span className="rank-price">¥{Number(item.itemPrice).toLocaleString()}</span>
+                            <div className="rank-price-row">
+                                <span className="rank-price">¥{Number(item.itemPrice).toLocaleString()}</span>
+                            </div>
+                            <a href={buildRakutenAffiliateUrl(item)} target="_blank" rel="noopener noreferrer sponsored" className="btn-rank-cta">
+                                最安値を調べる ▶
+                            </a>
                         </div>
                     </li>
                 ))}

@@ -1,0 +1,42 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f1f5f9;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+.shadow-soft {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.card {
+  border-radius: 0.75rem;
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.7rem;
+  background: #f97316;
+  color: white;
+}
+

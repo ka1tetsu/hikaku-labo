@@ -8,7 +8,6 @@ export default function CategoryNav({ categories, activeCategory, onSelect }) {
                         className={`cat-btn ${activeCategory?.label === cat.label ? 'active' : ''}`}
                         onClick={() => onSelect(cat)}
                     >
-                        <span className="cat-emoji">{cat.emoji}</span>
                         <span className="cat-label">{cat.label}</span>
                     </button>
                 ))}

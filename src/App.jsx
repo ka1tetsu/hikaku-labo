@@ -4,7 +4,8 @@ import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import CategoryNav from './components/CategoryNav';
 import RankingSection from './components/RankingSection';
-import { searchRakutenItems, buildAmazonAffiliateUrl } from './api';
+import ArticleSection from './components/ArticleSection';
+import { searchRakutenItems, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from './api';
 import './index.css';
 
 const CATEGORIES = [
@@ -27,7 +28,7 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortMode, setSortMode] = useState('popular');
 
   const doSearch = useCallback(async (kw, genre, pg = 1) => {
@@ -73,7 +74,7 @@ export default function App() {
   };
 
   const searchTitle = activeCategory
-    ? `${activeCategory.emoji} ${activeCategory.label}`
+    ? `「${activeCategory.label}」の人気商品・最安値`
     : query
       ? `「${query}」の検索結果`
       : '注目の人気商品';
@@ -93,20 +94,21 @@ export default function App() {
       />
 
       <main className="main-content container">
-        {/* Amazon quick link bar */}
-        <div className="amazon-bar">
-          <span>🛒 Amazonでも探す：</span>
-          {['スマートフォン', 'イヤホン', 'ノートPC', 'カメラ', 'ゲーム機'].map(kw => (
-            <a
-              key={kw}
-              href={buildAmazonAffiliateUrl(kw)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="amazon-tag"
-            >
-              {kw}
-            </a>
-          ))}
+        {/* Affiliate Quick search bar */}
+        <div className="affiliate-bar">
+          <div className="affiliate-bar-title">
+            🔥 今売れている商品の最安値を各モールで一発検索！
+          </div>
+          <div className="affiliate-bar-links">
+            {['スマートフォン', 'ノートPC', '液晶テレビ', 'ドラム式洗濯機'].map(kw => (
+              <div key={kw} className="affiliate-kw-group">
+                <span className="kw-label">{kw}：</span>
+                <a href={`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(kw)}/?v=3`} target="_blank" rel="noopener noreferrer sponsored" className="kw-link rakuten">楽天</a>
+                <a href={buildAmazonAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link amazon">Amazon</a>
+                <a href={buildYahooAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link yahoo">Yahoo</a>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="results-header">
@@ -190,6 +192,9 @@ export default function App() {
             )}
           </>
         )}
+
+        {/* SEO and Volume boosting section */}
+        <ArticleSection />
 
         {/* Ranking sidebar */}
         <RankingSection />
