@@ -2,7 +2,7 @@ import { PARTS } from '@/lib/toeicData'
 
 export default function StrategyPage() {
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '1rem' }}>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '.5rem' }}>🗺️ 攻略ガイド</h1>
         <p style={{ color: '#64748b' }}>データと分析に基づくTOEIC高得点攻略の完全マニュアル。スコア別学習プランも掲載。</p>

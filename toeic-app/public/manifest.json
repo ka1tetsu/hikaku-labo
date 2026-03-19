@@ -1,0 +1,43 @@
+{
+  "name": "Vivlica - TOEIC攻略アプリ",
+  "short_name": "Vivlica",
+  "description": "TOEICの傾向と対策を超研究した学習アプリ。高得点への最短ルートを掴め。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1a56db",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education"],
+  "lang": "ja",
+  "shortcuts": [
+    {
+      "name": "練習問題",
+      "url": "/practice/",
+      "description": "Part 5・6・7の模擬問題を解く"
+    },
+    {
+      "name": "語彙学習",
+      "url": "/vocabulary/",
+      "description": "TOEIC頻出語彙のフラッシュカード"
+    },
+    {
+      "name": "攻略ガイド",
+      "url": "/strategy/",
+      "description": "スコア別学習プランとPart別戦略"
+    }
+  ]
+}

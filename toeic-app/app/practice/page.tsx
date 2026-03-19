@@ -8,23 +8,19 @@ const sectionColors: Record<string, { bg: string; color: string; border: string 
 
 export default function PracticePage() {
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1rem' }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '.5rem' }}>📝 練習問題</h1>
-        <p style={{ color: '#64748b' }}>Part別に模擬問題を解いて実戦力を身につけよう。全問解説付き。</p>
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '1rem' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '.3rem' }}>📝 練習問題</h1>
+        <p style={{ color: '#64748b', fontSize: '.88rem' }}>Part別に模擬問題を解いて実戦力を身につけよう。全問解説付き。</p>
       </div>
 
       {/* Listening */}
-      <section style={{ marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1rem' }}>
-          <div style={{
-            background: '#e0f2fe', color: '#0369a1',
-            padding: '.4rem 1rem', borderRadius: 999,
-            fontWeight: 700, fontSize: '.9rem',
-          }}>🎧 Listening Section</div>
-          <span style={{ color: '#64748b', fontSize: '.85rem' }}>100問 / 約45分</span>
+      <section style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem' }}>
+          <div style={{ background: '#e0f2fe', color: '#0369a1', padding: '.3rem .85rem', borderRadius: 999, fontWeight: 700, fontSize: '.82rem' }}>🎧 Listening Section</div>
+          <span style={{ color: '#64748b', fontSize: '.78rem' }}>100問 / 約45分</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '.75rem' }}>
           {PARTS.slice(0, 4).map(part => (
             <PartCard key={part.id} part={part} section="listening" />
           ))}
@@ -33,15 +29,11 @@ export default function PracticePage() {
 
       {/* Reading */}
       <section>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1rem' }}>
-          <div style={{
-            background: '#d1fae5', color: '#065f46',
-            padding: '.4rem 1rem', borderRadius: 999,
-            fontWeight: 700, fontSize: '.9rem',
-          }}>📖 Reading Section</div>
-          <span style={{ color: '#64748b', fontSize: '.85rem' }}>100問 / 75分</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem' }}>
+          <div style={{ background: '#d1fae5', color: '#065f46', padding: '.3rem .85rem', borderRadius: 999, fontWeight: 700, fontSize: '.82rem' }}>📖 Reading Section</div>
+          <span style={{ color: '#64748b', fontSize: '.78rem' }}>100問 / 75分</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '.75rem' }}>
           {PARTS.slice(4).map(part => (
             <PartCard key={part.id} part={part} section="reading" />
           ))}

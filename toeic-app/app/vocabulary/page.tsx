@@ -46,7 +46,7 @@ export default function VocabularyPage() {
   const currentCard = set.words[cardIndex]
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '1rem' }}>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '.5rem' }}>📚 語彙学習</h1>
         <p style={{ color: '#64748b' }}>TOEIC頻出語彙を単語帳・フラッシュカードで効率的に習得しよう。</p>

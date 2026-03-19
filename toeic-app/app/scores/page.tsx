@@ -62,7 +62,7 @@ export default function ScoresPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '1rem' }}>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '.5rem' }}>📈 スコア記録</h1>
         <p style={{ color: '#64748b' }}>練習結果・模試スコアを記録して、学習の進捗を可視化しよう。</p>
