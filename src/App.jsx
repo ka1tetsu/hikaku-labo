@@ -6,6 +6,7 @@ import CategoryNav from './components/CategoryNav';
 import RankingSection from './components/RankingSection';
 import ArticleSection from './components/ArticleSection';
 import { searchRakutenItems, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from './api';
+import { addRecentSearch } from './searchUtils';
 import './index.css';
 
 const CATEGORIES = [
@@ -48,17 +49,65 @@ export default function App() {
     }
   }, []);
 
-  // Initial featured load
+  // URLクエリ・ページタイトルを検索状態に同期（共有・ブックマーク・クロール可能にする）
+  const syncUrlAndTitle = useCallback((kw, cat, pg) => {
+    const params = new URLSearchParams();
+    if (cat) params.set('cat', cat.genreId);
+    else if (kw) params.set('q', kw);
+    if (pg > 1) params.set('p', String(pg));
+    const qs = params.toString();
+    window.history.replaceState({}, '', qs ? `/?${qs}` : '/');
+
+    const label = cat ? cat.label : kw;
+    document.title = label
+      ? `${label}の価格比較・最安値ランキング${pg > 1 ? `（${pg}ページ）` : ''} | 比較ラボ`
+      : '比較ラボ - スマホ・PC・家電の価格比較＆最安値ランキング';
+  }, []);
+
+  // 初期表示：URLクエリがあればその検索を復元、なければ注目商品を表示
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    const cat = params.get('cat');
+    const pg = Math.max(1, parseInt(params.get('p') || '1', 10) || 1);
+
+    if (cat) {
+      const matched = CATEGORIES.find(c => c.genreId === cat);
+      if (matched) {
+        setActiveCategory(matched);
+        doSearch(matched.label, matched.genreId, pg);
+        syncUrlAndTitle(matched.label, matched, pg);
+        return;
+      }
+    }
+    if (q) {
+      setQuery(q);
+      setInputValue(q);
+      doSearch(q, '', pg);
+      syncUrlAndTitle(q, null, pg);
+      return;
+    }
     doSearch('おすすめ 人気', '', 1);
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
-    setQuery(inputValue);
+  // 文字列キーワード（サジェスト/履歴クリック）でもフォームsubmitでも検索できる共通ハンドラ
+  const handleSearch = (eOrKeyword) => {
+    let kw;
+    if (typeof eOrKeyword === 'string') {
+      kw = eOrKeyword;
+    } else {
+      eOrKeyword.preventDefault();
+      kw = inputValue;
+    }
+    kw = (kw || '').trim();
+    if (!kw) return;
+    setInputValue(kw);
+    setQuery(kw);
     setActiveCategory(null);
-    doSearch(inputValue, '', 1);
+    addRecentSearch(kw);
+    doSearch(kw, '', 1);
+    syncUrlAndTitle(kw, null, 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCategory = (cat) => {
@@ -66,10 +115,12 @@ export default function App() {
     setQuery('');
     setInputValue('');
     doSearch(cat.label, cat.genreId, 1);
+    syncUrlAndTitle(cat.label, cat, 1);
   };
 
   const handlePage = (newPage) => {
     doSearch(query, activeCategory?.genreId || '', newPage);
+    syncUrlAndTitle(activeCategory ? activeCategory.label : query, activeCategory, newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

@@ -1,0 +1,5 @@
+# 比較ラボ robots.txt
+User-agent: *
+Allow: /
+
+Sitemap: https://hikaku-labo.example.com/sitemap.xml
