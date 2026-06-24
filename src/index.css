@@ -1345,6 +1345,124 @@ a:hover {
   line-height: 1.4;
 }
 
+/* ===== Filter Bar (絞り込み) ===== */
+.filter-bar {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.filter-bar-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.filter-bar-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.filter-result-count {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+.filter-result-count strong {
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.filter-reset {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: #0033cc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.filter-reset:hover {
+  background: #f0f4ff;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.filter-price-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-price-input {
+  width: 90px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.filter-price-input:focus,
+.filter-select:focus {
+  border-color: var(--primary);
+}
+
+.filter-price-sep {
+  color: var(--text-muted);
+}
+
+.filter-price-unit {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+.filter-select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .filter-controls {
+    gap: 12px;
+  }
+  .filter-price-input {
+    width: 72px;
+  }
+}
+
 /* ===== Search Suggestions (検索性向上) ===== */
 .search-suggestions {
   position: absolute;

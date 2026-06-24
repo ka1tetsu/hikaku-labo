@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { buildRakutenAffiliateUrl, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
+import { trackAffiliateClick } from '../analytics';
 
 function StarRating({ score }) {
     const stars = Math.round((score || 0) * 2) / 2;
@@ -14,7 +15,7 @@ function StarRating({ score }) {
     );
 }
 
-export default function ProductCard({ item, viewMode }) {
+export default function ProductCard({ item, viewMode, position }) {
     const itemName = item.itemName || '商品名不明';
     const basePrice = Number(item.itemPrice) || 0;
     const shopName = item.shopName || '';
@@ -63,6 +64,10 @@ export default function ProductCard({ item, viewMode }) {
     if (reviewAverage >= 4.3 && reviewCount >= 10) trustBadges.push({ cls: 'rating', text: '⭐ 高評価' });
     if (reviewCount >= 100) trustBadges.push({ cls: 'reviews', text: `🗣 レビュー${reviewCount}件` });
 
+    // アフィリエイトクリック計測（成果計測・改善の基盤）
+    const handleAffClick = (platform) =>
+        trackAffiliateClick({ platform, itemName, price: finalPrice, position });
+
     return (
         <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}`}>
             <div className="product-image-col">
@@ -71,7 +76,7 @@ export default function ProductCard({ item, viewMode }) {
                         🏅 {kakakuRank}位
                     </div>
                 )}
-                <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link">
+                <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link" onClick={() => handleAffClick('rakuten')}>
                     {imageUrl ? (
                         <img src={imageUrl} alt={itemName} className="product-image" loading="lazy" />
                     ) : (
@@ -90,7 +95,7 @@ export default function ProductCard({ item, viewMode }) {
                 )}
 
                 <h3 className="product-title">
-                    <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link">
+                    <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link" onClick={() => handleAffClick('rakuten')}>
                         {itemName}
                     </a>
                 </h3>
@@ -173,7 +178,7 @@ export default function ProductCard({ item, viewMode }) {
                     )}
                 </div>
 
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta dynamic-yield">
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta dynamic-yield" onClick={() => handleAffClick(winnerPlatform)}>
                     最安ルートで購入する ▶<br />
                     <span className="dy-tooltip">
                         Dynamic Yield最適化済 (経由ASP: {winnerPlatform === 'rakuten' ? '楽天' : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo'})
@@ -186,10 +191,10 @@ export default function ProductCard({ item, viewMode }) {
                 </div>
 
                 <div className="sub-actions">
-                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small">
+                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small" onClick={() => handleAffClick('amazon')}>
                         Amazonで探す
                     </a>
-                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small">
+                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small" onClick={() => handleAffClick('yahoo')}>
                         Yahoo!で探す
                     </a>
                 </div>

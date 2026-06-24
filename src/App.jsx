@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import CategoryNav from './components/CategoryNav';
+import FilterBar from './components/FilterBar';
 import RankingSection from './components/RankingSection';
 import ArticleSection from './components/ArticleSection';
 import { searchRakutenItems, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from './api';
@@ -31,6 +32,11 @@ export default function App() {
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortMode, setSortMode] = useState('popular');
+  const [filters, setFilters] = useState({ priceMin: '', priceMax: '', minRating: 0, minReviews: 0 });
+
+  const resetFilters = useCallback(() => {
+    setFilters({ priceMin: '', priceMax: '', minRating: 0, minReviews: 0 });
+  }, []);
 
   const doSearch = useCallback(async (kw, genre, pg = 1) => {
     if (!kw && !genre) return;
@@ -104,6 +110,7 @@ export default function App() {
     setInputValue(kw);
     setQuery(kw);
     setActiveCategory(null);
+    resetFilters();
     addRecentSearch(kw);
     doSearch(kw, '', 1);
     syncUrlAndTitle(kw, null, 1);
@@ -114,6 +121,7 @@ export default function App() {
     setActiveCategory(cat);
     setQuery('');
     setInputValue('');
+    resetFilters();
     doSearch(cat.label, cat.genreId, 1);
     syncUrlAndTitle(cat.label, cat, 1);
   };
@@ -124,9 +132,19 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 並び替え: 選択されたモードに応じて表示順を入れ替える（人気順はAPIの返却順=おすすめ順を維持）
+  // 絞り込み＋並び替え: 条件で絞った上で表示順を入れ替える
   const sortedProducts = useMemo(() => {
-    const list = [...products];
+    const min = filters.priceMin === '' ? 0 : Number(filters.priceMin);
+    const max = filters.priceMax === '' ? Infinity : Number(filters.priceMax);
+
+    const list = products.filter(p => {
+      const price = Number(p.itemPrice) || 0;
+      if (price < min || price > max) return false;
+      if (filters.minRating > 0 && (p.reviewAverage || 0) < filters.minRating) return false;
+      if (filters.minReviews > 0 && (p.reviewCount || 0) < filters.minReviews) return false;
+      return true;
+    });
+
     switch (sortMode) {
       case 'price-asc':
         return list.sort((a, b) => (Number(a.itemPrice) || 0) - (Number(b.itemPrice) || 0));
@@ -141,7 +159,7 @@ export default function App() {
       default:
         return list;
     }
-  }, [products, sortMode]);
+  }, [products, sortMode, filters]);
 
   const searchTitle = activeCategory
     ? `「${activeCategory.label}」の人気商品・最安値`
@@ -228,11 +246,26 @@ export default function App() {
 
         {!loading && products.length > 0 && (
           <>
-            <div className={`product-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
-              {sortedProducts.map((item, i) => (
-                <ProductCard key={i} item={item} viewMode={viewMode} />
-              ))}
-            </div>
+            <FilterBar
+              filters={filters}
+              setFilters={setFilters}
+              resultCount={sortedProducts.length}
+              totalCount={products.length}
+              onReset={resetFilters}
+            />
+
+            {sortedProducts.length === 0 ? (
+              <div className="empty-state">
+                <p>🔍 条件に合う商品がありませんでした。絞り込み条件を緩めてお試しください。</p>
+                <button type="button" className="page-btn" onClick={resetFilters}>条件をクリアする</button>
+              </div>
+            ) : (
+              <div className={`product-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
+                {sortedProducts.map((item, i) => (
+                  <ProductCard key={i} item={item} viewMode={viewMode} position={i + 1} />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
