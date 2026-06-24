@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hikaku-labo.example.com/sitemap.xml
+Sitemap: https://hikaku-labo.vercel.app/sitemap.xml

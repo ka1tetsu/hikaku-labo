@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hikaku-labo.example.com/</loc>
+    <loc>https://hikaku-labo.vercel.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%82%B9%E3%83%9E%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%B3</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%82%B9%E3%83%9E%E3%83%BC%E3%83%88%E3%83%95%E3%82%A9%E3%83%B3</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%83%91%E3%82%BD%E3%82%B3%E3%83%B3</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%83%91%E3%82%BD%E3%82%B3%E3%83%B3</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%82%AB%E3%83%A1%E3%83%A9</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%82%AB%E3%83%A1%E3%83%A9</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%83%86%E3%83%AC%E3%83%93</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%83%86%E3%83%AC%E3%83%93</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%82%A4%E3%83%A4%E3%83%9B%E3%83%B3</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%82%A4%E3%83%A4%E3%83%9B%E3%83%B3</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E5%AE%B6%E9%9B%BB</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E5%AE%B6%E9%9B%BB</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%82%B2%E3%83%BC%E3%83%A0</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%82%B2%E3%83%BC%E3%83%A0</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hikaku-labo.example.com/?q=%E3%83%95%E3%82%A1%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3</loc>
+    <loc>https://hikaku-labo.vercel.app/?q=%E3%83%95%E3%82%A1%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>

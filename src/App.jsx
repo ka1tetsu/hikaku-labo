@@ -182,7 +182,7 @@ export default function App() {
         </div>
 
         <div className="results-header">
-          <h2 className="results-title">{searchTitle}</h2>
+          <h1 className="results-title">{searchTitle}</h1>
           {products.length > 0 && (
             <div className="results-controls">
               <select
