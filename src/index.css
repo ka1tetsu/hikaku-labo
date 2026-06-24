@@ -1244,3 +1244,95 @@ a:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ===== Conversion Boosters (CRO) ===== */
+
+/* 信頼バッジ（社会的証明） */
+.trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.trust-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.trust-badge.rank {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #7a4f00;
+}
+
+.trust-badge.rating {
+  background: #fff4e0;
+  color: #c47800;
+  border: 1px solid #ffd596;
+}
+
+.trust-badge.reviews {
+  background: #eef4ff;
+  color: #2a5bd7;
+  border: 1px solid #c5d8ff;
+}
+
+/* ポイント還元の可視化 */
+.points-back {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #c47800;
+  margin-top: 3px;
+}
+
+.points-back strong {
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+/* 買い時シグナル */
+.buy-timing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.buy-timing.good {
+  background: #e9f8ee;
+  color: #0a7a35;
+  border: 1px solid #b6e6c6;
+}
+
+.buy-timing.warn {
+  background: #fff3e6;
+  color: #b85c00;
+  border: 1px solid #ffd7ab;
+}
+
+.buy-timing-icon {
+  font-size: 0.95rem;
+}
+
+/* CTA下のベネフィット訴求 */
+.cta-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.cta-benefits span {
+  line-height: 1.4;
+}

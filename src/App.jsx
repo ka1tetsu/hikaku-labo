@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
@@ -72,6 +72,25 @@ export default function App() {
     doSearch(query, activeCategory?.genreId || '', newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // 並び替え: 選択されたモードに応じて表示順を入れ替える（人気順はAPIの返却順=おすすめ順を維持）
+  const sortedProducts = useMemo(() => {
+    const list = [...products];
+    switch (sortMode) {
+      case 'price-asc':
+        return list.sort((a, b) => (Number(a.itemPrice) || 0) - (Number(b.itemPrice) || 0));
+      case 'price-desc':
+        return list.sort((a, b) => (Number(b.itemPrice) || 0) - (Number(a.itemPrice) || 0));
+      case 'review':
+        return list.sort((a, b) =>
+          (b.reviewAverage || 0) - (a.reviewAverage || 0) ||
+          (b.reviewCount || 0) - (a.reviewCount || 0)
+        );
+      case 'popular':
+      default:
+        return list;
+    }
+  }, [products, sortMode]);
 
   const searchTitle = activeCategory
     ? `「${activeCategory.label}」の人気商品・最安値`
@@ -159,7 +178,7 @@ export default function App() {
         {!loading && products.length > 0 && (
           <>
             <div className={`product-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
-              {products.map((item, i) => (
+              {sortedProducts.map((item, i) => (
                 <ProductCard key={i} item={item} viewMode={viewMode} />
               ))}
             </div>
