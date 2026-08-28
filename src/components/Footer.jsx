@@ -18,12 +18,22 @@ export default function Footer() {
                         </ul>
                     </div>
                     <div>
+                        <h3>購買ガイド</h3>
+                        <ul>
+                            <li><a href="/guide/">選び方ガイド一覧</a></li>
+                            <li><a href="/guide/smartphone/">スマートフォンの選び方</a></li>
+                            <li><a href="/guide/pc/">パソコンの選び方</a></li>
+                            <li><a href="/guide/earphone/">イヤホンの選び方</a></li>
+                        </ul>
+                    </div>
+                    <div>
                         <h3>サポート</h3>
                         <ul>
-                            <li><a href="#">プライバシーポリシー</a></li>
-                            <li><a href="#">利用規約</a></li>
-                            <li><a href="#">アフィリエイト開示</a></li>
-                            <li><a href="#">お問い合わせ</a></li>
+                            <li><a href="/about/">運営者情報</a></li>
+                            <li><a href="/privacy/">プライバシーポリシー</a></li>
+                            <li><a href="/terms/">利用規約</a></li>
+                            <li><a href="/disclosure/">アフィリエイト開示</a></li>
+                            <li><a href="/contact/">お問い合わせ</a></li>
                         </ul>
                     </div>
                 </div>

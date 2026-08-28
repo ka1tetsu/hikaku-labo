@@ -15,7 +15,7 @@ export default function RankingSection() {
 
     return (
         <aside className="ranking-section">
-            <h3 className="ranking-title">🏆 人気ランキング</h3>
+            <h3 className="ranking-title">🔎 注目キーワードの検索結果</h3>
             <div className="ranking-tabs">
                 {RANKING_KEYWORDS.map(kw => (
                     <button

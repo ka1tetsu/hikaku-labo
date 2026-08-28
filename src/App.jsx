@@ -48,7 +48,7 @@ export default function App() {
       setProducts(items);
       setTotalPages(Math.min(data.pageCount || 1, 100));
       setPage(pg);
-    } catch (e) {
+    } catch {
       setError('商品データの取得に失敗しました。しばらくしてからもう一度お試しください。');
     } finally {
       setLoading(false);
@@ -66,8 +66,8 @@ export default function App() {
 
     const label = cat ? cat.label : kw;
     document.title = label
-      ? `${label}の価格比較・最安値ランキング${pg > 1 ? `（${pg}ページ）` : ''} | 比較ラボ`
-      : '比較ラボ - スマホ・PC・家電の価格比較＆最安値ランキング';
+      ? `${label}の価格比較${pg > 1 ? `（${pg}ページ）` : ''} | 比較ラボ`
+      : '比較ラボ - スマホ・PC・家電の価格比較';
   }, []);
 
   // 初期表示：URLクエリがあればその検索を復元、なければ注目商品を表示
@@ -162,10 +162,10 @@ export default function App() {
   }, [products, sortMode, filters]);
 
   const searchTitle = activeCategory
-    ? `「${activeCategory.label}」の人気商品・最安値`
+    ? `「${activeCategory.label}」の価格比較`
     : query
       ? `「${query}」の検索結果`
-      : '注目の人気商品';
+      : '注目の商品';
 
   return (
     <div className="app-wrapper">
@@ -185,7 +185,7 @@ export default function App() {
         {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
           <div className="affiliate-bar-title">
-            🔥 今売れている商品の最安値を各モールで一発検索！
+            🔍 人気キーワードを各モールでまとめて検索
           </div>
           <div className="affiliate-bar-links">
             {['スマートフォン', 'ノートPC', '液晶テレビ', 'ドラム式洗濯機'].map(kw => (

@@ -1,5 +1,3 @@
-import { generateMockKakakuData } from './mockData';
-
 const AMAZON_TAG = 'kuronekosanta-22';
 const YAHOO_SID = '3506307';
 const YAHOO_PID = '888496181';
@@ -14,10 +12,10 @@ export { AMAZON_TAG };
 // 記号や煽り文句を除いたうえでブランド＋型番相当の語を残す。
 export function buildSearchKeyword(itemName = '') {
     const cleaned = String(itemName)
-        .replace(/[【\[(（].*?[】\])）]/g, ' ')       // 【送料無料】[123] などを除去
+        .replace(/[【[(（].*?[】\])）]/g, ' ')       // 【送料無料】[123] などを除去
         .replace(/送料無料|ポイント\d*倍|最安値?|新品|未使用|正規品|即納|あす楽/g, ' ')
-        .replace(/[\/|｜,、]/g, ' ')
-        .replace(/[　\s]+/g, ' ')
+        .replace(/[/|｜,、]/g, ' ')
+        .replace(/[\u3000\s]+/g, ' ')
         .trim();
     // 先頭4語程度に絞る（長すぎると検索ヒットが0になるため）
     const words = cleaned.split(' ').filter(Boolean).slice(0, 4);
@@ -59,35 +57,14 @@ export async function searchRakutenItems(keyword, genreId = '', page = 1) {
         if (!res.ok) throw new Error('Failed');
         const data = await res.json();
 
-        if (!data.Items || data.Items.length === 0) throw new Error('Empty');
+        if (!data.Items || data.Items.length === 0) return { Items: [], pageCount: 0, hits: 0 };
 
-        // 本物のAPIデータを活かしつつ、AI要約や店舗数などの付加情報を融合して
-        // 比較しやすいUIを構成する（価格・リンクなど収益に関わる値は実データを優先）
-        const mockTemplate = generateMockKakakuData(keyword || 'おすすめ', page);
-
-        data.Items = data.Items.map((container, i) => {
-            const realItem = container.Item;
-            const mockEquivalent = mockTemplate.Items[i % mockTemplate.Items.length].Item;
-
-            return {
-                Item: {
-                    ...realItem,
-                    kakakuSpecs: mockEquivalent.kakakuSpecs,
-                    kakakuRank: (page - 1) * 20 + i + 1,
-                    kakakuShops: mockEquivalent.kakakuShops,
-                    kakakuTrendUp: mockEquivalent.kakakuTrendUp,
-                    kakakuRelease: mockEquivalent.kakakuRelease,
-                    aiSummary: mockEquivalent.aiSummary,
-                    tradeInPrice: mockEquivalent.tradeInPrice,
-                    insurancePrice: realItem.itemPrice * 0.05,
-                }
-            };
-        });
-
+        // 取得した実データをそのまま返す。
+        // 順位・店舗数・AI要約などの根拠のない情報を合成すると優良誤認になるため行わない。
         return data;
-    } catch {
-        // Fallback to our ultra-realistic Kakaku generator if completely offline
-        return generateMockKakakuData(keyword || 'おすすめ', page);
+    } catch (err) {
+        // 取得に失敗した場合は架空の商品を見せず、エラーとして扱う
+        throw err instanceof Error ? err : new Error('検索に失敗しました');
     }
 }
 

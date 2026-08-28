@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-static-pages.mjs && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:articles": "node scripts/generate-articles.mjs"
+    "generate:articles": "node scripts/generate-articles.mjs",
+    "generate:pages": "node scripts/generate-static-pages.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
