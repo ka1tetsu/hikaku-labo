@@ -1,9 +1,13 @@
 // Vercel Serverless API Route - proxies requests to Rakuten openapi
 // Adds required Referer/Origin headers that Rakuten openapi requires
 
-const RAKUTEN_APP_ID = 'ec65ace1-9e87-4d23-83e4-b54103335b56';
-const RAKUTEN_ACCESS_KEY = 'pk_thp8WuFagFNOQh9VnsoWHJ8mAQhhRsHt4NWvW4wUA4q';
-const SITE_URL = 'https://hikaku-labo.vercel.app';
+// 認証情報は環境変数を優先（未設定時は従来値にフォールバックして動作を維持）
+const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || 'ec65ace1-9e87-4d23-83e4-b54103335b56';
+const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || 'pk_thp8WuFagFNOQh9VnsoWHJ8mAQhhRsHt4NWvW4wUA4q';
+// ★売上の要： affiliateId を渡さないとレスポンスに affiliateUrl が入らず、
+//   リンクが通常URL扱いになって報酬が一切発生しない。
+const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '';
+const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,6 +26,7 @@ export default async function handler(req, res) {
         imageFlag: 1,
     });
     if (genreId) params.append('genreId', genreId);
+    if (RAKUTEN_AFFILIATE_ID) params.append('affiliateId', RAKUTEN_AFFILIATE_ID);
 
     const url = `https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`;
 
@@ -42,6 +47,10 @@ export default async function handler(req, res) {
         }
 
         res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+        // アフィリエイトID未設定は「報酬ゼロ」の状態なのでレスポンスヘッダで警告を出す
+        if (!RAKUTEN_AFFILIATE_ID) {
+            res.setHeader('X-Affiliate-Warning', 'RAKUTEN_AFFILIATE_ID is not set; links earn no commission');
+        }
         return res.status(200).send(text);
     } catch (err) {
         return res.status(500).json({ error: err.message });

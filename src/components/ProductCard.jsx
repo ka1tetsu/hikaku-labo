@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { buildRakutenAffiliateUrl, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
+import { buildRakutenAffiliateUrl, buildAmazonAffiliateUrl, buildYahooAffiliateUrl, buildSearchKeyword } from '../api';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
 import { trackAffiliateClick } from '../analytics';
 
@@ -22,7 +22,9 @@ export default function ProductCard({ item, viewMode, position }) {
     const reviewAverage = item.reviewAverage || 0;
     const reviewCount = item.reviewCount || 0;
     const imageUrl = (item.mediumImageUrls?.[0]?.imageUrl || '').replace('_ex=128x128', '_ex=300x300');
-    const keyword = itemName.split(/[ 　]/)[0];
+    // ブランド名だけ(例:「Apple」)で検索させると汎用一覧に飛んで成約しないため、
+    // 商品名から意味のある検索キーワードを組み立てる
+    const keyword = buildSearchKeyword(itemName);
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
     const yahooUrl = buildYahooAffiliateUrl(keyword);
     const rakutenUrl = buildRakutenAffiliateUrl(item);
@@ -45,7 +47,8 @@ export default function ProductCard({ item, viewMode, position }) {
         return getOptimizedAffiliateRoute(item, keyword, basePrice);
     }, [item, keyword, basePrice]);
 
-    const { bestUrl, winnerPlatform, expectedReward } = optimizeData;
+    const { bestUrl, winnerPlatform, isDeepLink } = optimizeData;
+    const storeLabel = winnerPlatform === 'rakuten' ? '楽天市場' : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
 
     // --- コンバージョン後押し用の派生データ ---
     // ポイント還元相当額（おおよそ1%）を可視化して「実質おトク感」を訴求
@@ -179,9 +182,9 @@ export default function ProductCard({ item, viewMode, position }) {
                 </div>
 
                 <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta dynamic-yield" onClick={() => handleAffClick(winnerPlatform)}>
-                    最安ルートで購入する ▶<br />
+                    {storeLabel}で購入する ▶<br />
                     <span className="dy-tooltip">
-                        Dynamic Yield最適化済 (経由ASP: {winnerPlatform === 'rakuten' ? '楽天' : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo'})
+                        {isDeepLink ? 'この商品のページへ直接移動します' : `${storeLabel}で商品を探す`}
                     </span>
                 </a>
                 <div className="cta-benefits">

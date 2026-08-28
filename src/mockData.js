@@ -55,12 +55,16 @@ export function generateMockKakakuData(keyword, page = 1) {
             titleSuffix = ` ${keyword}`;
         }
 
+        const itemName = `${brand} 最新モデル ${series} ${modelYear}年発売 SIMフリー${titleSuffix} [${variation}]`;
+        // リンク切れ('#')はクリックされても収益ゼロなので、必ず実在する検索URLを持たせる
+        const searchUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(`${brand} ${series}`)}/`;
+
         return {
             Item: {
-                itemName: `${brand} 最新モデル ${series} ${modelYear}年発売 SIMフリー${titleSuffix} [${variation}]`,
+                itemName,
                 itemPrice: price,
-                itemUrl: '#',
-                affiliateUrl: '#',
+                itemUrl: searchUrl,
+                affiliateUrl: '',
                 mediumImageUrls: [{ imageUrl: getImg(i) }],
                 shopName: `${brand} 公式ストア`,
                 reviewAverage: Number(reviewAvg),

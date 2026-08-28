@@ -10,11 +10,11 @@ export default function Footer() {
                     <div>
                         <h3>カテゴリ</h3>
                         <ul>
-                            <li><a href="#">スマートフォン</a></li>
-                            <li><a href="#">パソコン・タブレット</a></li>
-                            <li><a href="#">テレビ・映像機器</a></li>
-                            <li><a href="#">カメラ</a></li>
-                            <li><a href="#">イヤホン・ヘッドホン</a></li>
+                            <li><a href="/?cat=101240">スマートフォン</a></li>
+                            <li><a href="/?cat=501293">パソコン・タブレット</a></li>
+                            <li><a href="/?cat=213010">テレビ・映像機器</a></li>
+                            <li><a href="/?cat=201026">カメラ</a></li>
+                            <li><a href="/?cat=216131">イヤホン・ヘッドホン</a></li>
                         </ul>
                     </div>
                     <div>
