@@ -1,75 +1,99 @@
-import { buildAmazonAffiliateUrl, buildRakutenAffiliateUrl, buildYahooAffiliateUrl } from './api';
+import {
+    buildAmazonAffiliateUrl,
+    buildRakutenAffiliateUrl,
+    buildRakutenSearchAffiliateUrl,
+    buildYahooAffiliateUrl,
+    hasRakutenAffiliate,
+} from './api';
 
 // --------------------------------------------------------------------------
-// 🚀 Dynamic Yield Affiliate Routing Engine (最高益ルーティングエンジン)
-// 各種ASP（アフィリエイトプロバイダ）の現在のキャンペーンや利率を
-// リアルタイムに比較し、手取り報酬が最も高くなるリンクを動的に生成します。
+// 🚀 Affiliate Routing Engine (楽天ファースト版)
+//
+// 方針: 楽天アフィリエイトを最優先で送客する。
+// 楽天リンクが「実際に成果計測される」限り、常に楽天を選ぶ。
+// 計測できない場合（アフィリエイトID未設定かつAPIがaffiliateUrlを返さない）だけ、
+// クリックを無駄にしないため Amazon / Yahoo に逃がす。
 // --------------------------------------------------------------------------
-export function getOptimizedAffiliateRoute(item, keyword, price) {
-    const numPrice = Number(price) || 0;
 
-    // リアルタイムの各社基本利率（本番ではA8.netやValueCommerceのAPIから取得）
-    let rates = {
-        amazon: 0.02,  // 基本 2%
-        rakuten: 0.03, // 基本 3%
-        yahoo: 0.01    // 基本 1%
-    };
+// 参考料率。あくまで内部の見込み計算用で、ユーザーに事実として表示しないこと。
+// 楽天APIが affiliateRate を返す場合はそちら（実料率）を優先して使う。
+const REFERENCE_RATES = {
+    rakuten: 0.03, // 楽天アフィリエイト 標準 3%
+    amazon: 0.02,  // Amazonアソシエイト 商品カテゴリにより変動
+    yahoo: 0.01,   // バリューコマース 標準 1%
+};
 
-    // --- カテゴリによる単価の最適化 ---
+// カテゴリ別の実勢に近い補正（ガジェット系はAmazonの料率が大きく下がる）
+function getReferenceRates(keyword = '') {
+    const rates = { ...REFERENCE_RATES };
     const isSmartphone = keyword.includes('スマホ') || keyword.includes('iPhone');
     const isPC = keyword.includes('パソコン') || keyword.includes('PC') || keyword.includes('Mac');
 
     if (isSmartphone || isPC) {
-        rates.amazon = 0.005; // Amazonのガジェット系は上限や利率が低い
-        rates.yahoo = 0.04;   // Yahooはガジェット系に強いキャンペーンが多い
+        rates.amazon = 0.005; // Amazonのガジェット系は上限・料率ともに低い
+        rates.yahoo = 0.04;
     }
+    return rates;
+}
 
-    // --- 日付や時間帯による動的キャンペーンの上乗せ（シミュレーション） ---
-    const today = new Date().getDate();
-    if (today % 5 === 0) rates.yahoo += 0.04; // Yahoo 5のつく日（+4%）
-    if (today === 18) rates.rakuten += 0.03;  // 楽天ご愛顧感謝デー（+3%）
+export function getOptimizedAffiliateRoute(item, keyword, price) {
+    const numPrice = Number(price) || 0;
+    const rates = getReferenceRates(keyword || '');
 
-    // タイムセール等突発的なブーストをシミュレート
-    const randomBoost = Math.random();
-    if (randomBoost > 0.8) rates.amazon += 0.02; // Amazonタイムセール祭り
-    else if (randomBoost > 0.6) rates.rakuten += 0.05; // 楽天お買い物マラソン
+    // 楽天APIが返す実料率(affiliateRate は % 単位)があれば最優先で採用
+    const apiRate = Number(item?.affiliateRate);
+    if (apiRate > 0) rates.rakuten = apiRate / 100;
 
-    // --- 最終的なアフィリエイト予想報酬額の計算 ---
     const expectedRewards = {
-        amazon: Math.floor(numPrice * rates.amazon),
         rakuten: Math.floor(numPrice * rates.rakuten),
+        amazon: Math.floor(numPrice * rates.amazon),
         yahoo: Math.floor(numPrice * rates.yahoo),
     };
 
-    // 最も報酬が高いプラットフォームを選出
-    let winner = 'rakuten';
-    let maxReward = expectedRewards.rakuten;
+    const rakutenUrl = buildRakutenAffiliateUrl(item, keyword);
+    const rakutenTracked = hasRakutenAffiliate(item);
 
-    if (expectedRewards.amazon > maxReward) {
-        winner = 'amazon';
-        maxReward = expectedRewards.amazon;
-    }
-    if (expectedRewards.yahoo > maxReward) {
-        winner = 'yahoo';
-        maxReward = expectedRewards.yahoo;
+    // --- 楽天ファースト: 計測できるなら理由を問わず楽天に送る ---
+    if (rakutenTracked) {
+        return {
+            winnerPlatform: 'rakuten',
+            bestUrl: rakutenUrl,
+            expectedReward: expectedRewards.rakuten,
+            rakutenTracked: true,
+            // 料率は推定値。UI上で確定値として見せないこと。
+            estimatedRates: formatRates(rates),
+        };
     }
 
-    // 勝利したプラットフォームのURLを生成
-    const baseRakutenUrl = buildRakutenAffiliateUrl(item);
-    const urls = {
+    // --- フォールバック: 楽天が計測不能なときだけ他ASPを比較 ---
+    const fallback = expectedRewards.amazon >= expectedRewards.yahoo ? 'amazon' : 'yahoo';
+    const fallbackUrls = {
         amazon: buildAmazonAffiliateUrl(keyword),
-        rakuten: baseRakutenUrl !== '#' ? baseRakutenUrl : `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`,
-        yahoo: buildYahooAffiliateUrl(keyword)
+        yahoo: buildYahooAffiliateUrl(keyword),
     };
 
+    if (import.meta.env?.DEV) {
+        console.warn(
+            '[optimizationEngine] 楽天リンクが計測不能のため %s へ退避しました。' +
+            'VITE_RAKUTEN_AFFILIATE_ID / RAKUTEN_AFFILIATE_ID を設定してください。',
+            fallback
+        );
+    }
+
     return {
-        winnerPlatform: winner, // 'amazon' | 'rakuten' | 'yahoo'
-        bestUrl: urls[winner],
-        expectedReward: maxReward,
-        ratesEnforced: {
-            amazon: `${(rates.amazon * 100).toFixed(1)}%`,
-            rakuten: `${(rates.rakuten * 100).toFixed(1)}%`,
-            yahoo: `${(rates.yahoo * 100).toFixed(1)}%`
-        }
+        winnerPlatform: fallback,
+        bestUrl: fallbackUrls[fallback],
+        expectedReward: expectedRewards[fallback],
+        rakutenTracked: false,
+        rakutenFallbackUrl: buildRakutenSearchAffiliateUrl(keyword),
+        estimatedRates: formatRates(rates),
+    };
+}
+
+function formatRates(rates) {
+    return {
+        rakuten: `${(rates.rakuten * 100).toFixed(1)}%`,
+        amazon: `${(rates.amazon * 100).toFixed(1)}%`,
+        yahoo: `${(rates.yahoo * 100).toFixed(1)}%`,
     };
 }

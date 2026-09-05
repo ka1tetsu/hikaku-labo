@@ -1072,13 +1072,14 @@ a:hover {
   color: #cc0000;
 }
 
-.btn-primary-cta.dynamic-yield {
-  background: linear-gradient(135deg, #cc0000 0%, #ff4d4d 100%);
+/* 楽天ファーストCTA（楽天ブランドカラー系のクリムゾン） */
+.btn-primary-cta.rakuten-first {
+  background: linear-gradient(135deg, #bf0000 0%, #ff4d4d 100%);
   position: relative;
   border: 1px solid #aa0000;
 }
 
-.btn-primary-cta.dynamic-yield:hover {
+.btn-primary-cta.rakuten-first:hover {
   background: linear-gradient(135deg, #aa0000 0%, #cc0000 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(204, 0, 0, 0.4);

@@ -61,6 +61,8 @@ export function generateMockKakakuData(keyword, page = 1) {
                 itemPrice: price,
                 itemUrl: '#',
                 affiliateUrl: '#',
+                postageFlag: i % 3 === 0 ? 1 : 0,
+                pointRate: [1, 1, 2, 5, 10][i % 5],
                 mediumImageUrls: [{ imageUrl: getImg(i) }],
                 shopName: `${brand} 公式ストア`,
                 reviewAverage: Number(reviewAvg),

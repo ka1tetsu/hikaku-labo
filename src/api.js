@@ -4,14 +4,53 @@ const AMAZON_TAG = 'kuronekosanta-22';
 const YAHOO_SID = '3506307';
 const YAHOO_PID = '888496181';
 
+// 💰 楽天アフィリエイトID。.env に VITE_RAKUTEN_AFFILIATE_ID を設定してください。
+// （楽天アフィリエイト管理画面の「アフィリエイトID」。g00xxxxx.xxxxxxxx.g00xxxxx.xxxxxxxx 形式）
+// 未設定だと楽天リンクは非アフィリエイトになり成果が発生しません。
+const RAKUTEN_AFFILIATE_ID = import.meta.env?.VITE_RAKUTEN_AFFILIATE_ID || '';
+
 const ARTICLE_ENDPOINT = '/api/article';
 const REVIEW_SUMMARY_ENDPOINT = '/api/reviewSummary';
 
-export { AMAZON_TAG };
+export { AMAZON_TAG, RAKUTEN_AFFILIATE_ID };
 
-// Build Rakuten affiliate URL from item data
-export function buildRakutenAffiliateUrl(item) {
-    return item.affiliateUrl || item.itemUrl || '#';
+// 実際に遷移できる http(s) URL かどうか（'#' や空文字を弾く）
+function isRealUrl(url) {
+    return typeof url === 'string' && /^https?:\/\//.test(url);
+}
+
+// 素の楽天URLを楽天アフィリエイトの計測リンク(hb.afl.rakuten.co.jp)に包む
+function wrapWithRakutenAffiliate(rawUrl) {
+    if (!RAKUTEN_AFFILIATE_ID || !isRealUrl(rawUrl)) return null;
+    const enc = encodeURIComponent(rawUrl);
+    return `https://hb.afl.rakuten.co.jp/hgc/${RAKUTEN_AFFILIATE_ID}/?pc=${enc}&m=${enc}`;
+}
+
+// 楽天市場の検索結果への計測付きリンク（商品URLが取れないときの最終手段）
+export function buildRakutenSearchAffiliateUrl(keyword) {
+    const searchUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword || '')}/`;
+    return wrapWithRakutenAffiliate(searchUrl) || searchUrl;
+}
+
+// この商品の楽天リンクが実際に成果につながる（計測される）かどうか
+export function hasRakutenAffiliate(item) {
+    if (isRealUrl(item?.affiliateUrl)) return true;          // APIが計測URLを返している
+    if (RAKUTEN_AFFILIATE_ID) return true;                    // 自前で計測URLを組み立てられる
+    return false;                                             // どちらも無い＝踏まれても収益ゼロ
+}
+
+// 楽天アフィリエイトURLを組み立てる。
+// 成果が発生しない素のitemUrlをそのまま返さないことが重要（旧実装の収益漏れ箇所）。
+export function buildRakutenAffiliateUrl(item, keyword = '') {
+    if (isRealUrl(item?.affiliateUrl)) return item.affiliateUrl;
+
+    const wrapped = wrapWithRakutenAffiliate(item?.itemUrl);
+    if (wrapped) return wrapped;
+
+    if (RAKUTEN_AFFILIATE_ID) return buildRakutenSearchAffiliateUrl(keyword || item?.itemName || '');
+
+    // アフィリエイトIDが未設定のときだけ、やむを得ず非計測URLを返す
+    return isRealUrl(item?.itemUrl) ? item.itemUrl : '#';
 }
 
 // Build Amazon search affiliate URL

@@ -24,7 +24,7 @@ export default function ProductCard({ item, viewMode }) {
     const keyword = itemName.split(/[ 　]/)[0];
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
     const yahooUrl = buildYahooAffiliateUrl(keyword);
-    const rakutenUrl = buildRakutenAffiliateUrl(item);
+    const rakutenUrl = buildRakutenAffiliateUrl(item, keyword);
 
     const kakakuSpecs = item.kakakuSpecs || [];
     const kakakuRank = item.kakakuRank;
@@ -32,6 +32,10 @@ export default function ProductCard({ item, viewMode }) {
     const aiSummary = item.aiSummary;
     const tradeInPrice = item.tradeInPrice || 0;
     const insurancePrice = item.insurancePrice || 0;
+
+    // 楽天APIの実データに基づく特徴タグ（postageFlag: 0=送料込み / pointRate: 倍率）
+    const isFreeShipping = item.postageFlag === 0;
+    const pointRate = Number(item.pointRate) || 0;
 
     // --- State: Attachments (保険・下取り) をユーザーが選んだ場合のインタラクティブな価格計算 ---
     const [useTradeIn, setUseTradeIn] = useState(tradeInPrice > 0);
@@ -44,7 +48,8 @@ export default function ProductCard({ item, viewMode }) {
         return getOptimizedAffiliateRoute(item, keyword, basePrice);
     }, [item, keyword, basePrice]);
 
-    const { bestUrl, winnerPlatform, expectedReward } = optimizeData;
+    const { bestUrl, winnerPlatform, rakutenTracked } = optimizeData;
+    const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場' : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
 
     return (
         <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}`}>
@@ -103,8 +108,8 @@ export default function ProductCard({ item, viewMode }) {
                     )}
                 </div>
                 <div className="product-features">
-                    <span className="feature-tag">送料無料</span>
-                    <span className="feature-tag point">ポイント高還元</span>
+                    {isFreeShipping && <span className="feature-tag">送料無料</span>}
+                    {pointRate > 1 && <span className="feature-tag point">ポイント{pointRate}倍</span>}
                 </div>
                 <div className="product-detail-tabs">
                     <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="detail-tab">スペック</a>
@@ -139,10 +144,10 @@ export default function ProductCard({ item, viewMode }) {
                     )}
                 </div>
 
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta dynamic-yield">
-                    最安ルートで購入する ▶<br />
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first">
+                    {platformLabel}で購入する ▶<br />
                     <span className="dy-tooltip">
-                        Dynamic Yield最適化済 (経由ASP: {winnerPlatform === 'rakuten' ? '楽天' : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo'})
+                        {rakutenTracked ? '楽天市場の商品ページへ' : `楽天の在庫が確認できないため${platformLabel}へ`}
                     </span>
                 </a>
 
