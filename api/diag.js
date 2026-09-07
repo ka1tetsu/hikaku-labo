@@ -15,17 +15,13 @@ function mask(value) {
     return { set: true, length: value.length, head: value.slice(0, 4) + '…' };
 }
 
-async function probe(name, url) {
+// 楽天は登録済みサイトURLからのリクエストかを Referer で検証する (HTTP_REFERRER_NOT_ALLOWED)。
+// どのヘッダーの組み合わせなら通るのかは実際に叩かないと分からないため、
+// 候補を順に試して結果を並べる。
+async function probe(label, url, headers) {
     const started = Date.now();
     try {
-        const res = await fetch(url, {
-            headers: {
-                'Referer': SITE_URL + '/',
-                'Origin': SITE_URL,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
-                'Accept': 'application/json',
-            },
-        });
+        const res = await fetch(url, { headers: { 'Accept': 'application/json', ...headers } });
         const text = await res.text();
         let parsed = null;
         try { parsed = JSON.parse(text); } catch { /* JSONでない場合は生テキストを見る */ }
@@ -33,7 +29,9 @@ async function probe(name, url) {
         const first = parsed?.Items?.[0]?.Item ?? parsed?.Items?.[0] ?? null;
 
         return {
-            endpoint: name,
+            variant: label,
+            sentReferer: headers.Referer ?? '(送信なし)',
+            sentOrigin: headers.Origin ?? '(送信なし)',
             httpStatus: res.status,
             ok: res.ok,
             elapsedMs: Date.now() - started,
@@ -42,11 +40,10 @@ async function probe(name, url) {
             affiliateUrlReturned: Boolean(first?.affiliateUrl),
             sampleAffiliateUrl: first?.affiliateUrl ? first.affiliateUrl.slice(0, 60) + '…' : null,
             sampleItemName: first?.itemName ?? null,
-            // 失敗時は楽天からのエラー本文をそのまま見せる（原因がここに書いてある）
-            errorBody: res.ok ? null : text.slice(0, 500),
+            rakutenError: res.ok ? null : (parsed?.errors?.errorMessage ?? text.slice(0, 200)),
         };
     } catch (err) {
-        return { endpoint: name, ok: false, elapsedMs: Date.now() - started, fetchError: err.message };
+        return { variant: label, ok: false, elapsedMs: Date.now() - started, fetchError: err.message };
     }
 }
 
@@ -82,7 +79,24 @@ export default async function handler(req, res) {
         });
     }
 
-    const probes = [await probe('openapi (openapi.rakuten.co.jp)', `${OPENAPI_ENDPOINT}?${withKey}`)];
+    const url = `${OPENAPI_ENDPOINT}?${withKey}`;
+    const selfUrl = `https://${req.headers.host}`;
+
+    // 通る組み合わせを特定するための候補
+    const variants = [
+        ['登録URL + Origin (現行)', { Referer: SITE_URL + '/', Origin: SITE_URL }],
+        ['登録URL のみ (Originなし)', { Referer: SITE_URL + '/' }],
+        ['登録URL 末尾スラッシュなし', { Referer: SITE_URL }],
+        ['Refererを送らない', {}],
+        ['このデプロイ自身のURL', { Referer: selfUrl + '/' }],
+    ];
+
+    const probes = [];
+    for (const [label, headers] of variants) {
+        const result = await probe(label, url, headers);
+        probes.push(result);
+        if (result.ok) break; // 通ったらそれ以上試さない
+    }
 
     const working = probes.find(p => p.ok);
 
@@ -95,10 +109,12 @@ export default async function handler(req, res) {
             siteUrl: SITE_URL,
         },
         probes,
+        deployedAs: `https://${req.headers.host}`,
         verdict: !working
-            ? '❌ どのエンドポイントも失敗。上の errorBody に楽天からの理由が入っています。'
+            ? '❌ どの組み合わせでも失敗。probes の rakutenError を確認してください。'
+            + ' HTTP_REFERRER_NOT_ALLOWED が並ぶ場合は、楽天アプリ登録のサイトURLと送信Refererが一致していません。'
             : working.affiliateUrlReturned
-                ? '✅ 商品取得・アフィリエイト計測ともに正常です。'
+                ? `✅ 商品取得・アフィリエイト計測ともに正常です。有効だった組み合わせ: 「${working.variant}」`
                 : '⚠️ 商品は取得できますが affiliateUrl が返っていません。affiliateId がアフィリエイト未承認か、IDの形式が誤っている可能性があります（この状態では成果は発生しません）。',
     });
 }
