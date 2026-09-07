@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 export default function Header({ inputValue, setInputValue, onSearch }) {
     return (
         <header className="header">

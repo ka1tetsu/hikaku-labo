@@ -85,10 +85,23 @@ export default function App() {
     }
   }, []);
 
-  // Initial featured load
+  // 初回ロード。?keyword= / ?genreId= が付いていればそれを検索する
+  // （フッターのカテゴリリンクからの遷移に対応）
   useEffect(() => {
-    doSearch('おすすめ 人気', '', 1);
-  }, []);
+    const params = new URLSearchParams(window.location.search);
+    const kw = params.get('keyword') || '';
+    const genre = params.get('genreId') || '';
+
+    if (kw || genre) {
+      setInputValue(kw);
+      setQuery(kw);
+      const matched = CATEGORIES.find(c => c.genreId === genre);
+      if (matched) setActiveCategory(matched);
+      doSearch(kw || matched?.label || '', genre, 1);
+    } else {
+      doSearch('おすすめ 人気', '', 1);
+    }
+  }, [doSearch]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -187,7 +200,16 @@ export default function App() {
           </div>
         )}
 
-        {error && <div className="error-box">{error}</div>}
+        {error && (
+          <div className="error-box">
+            <strong>商品データを取得できませんでした。</strong>
+            <p className="error-detail">{error}</p>
+            <p className="error-hint">
+              原因の切り分けは <a href="/api/diag" target="_blank" rel="noopener noreferrer">/api/diag</a> で確認できます。
+              楽天APIのHTTPステータスとエラー本文、アフィリエイト計測の有無が表示されます。
+            </p>
+          </div>
+        )}
 
         {!loading && !error && products.length === 0 && (
           <div className="empty-state">
