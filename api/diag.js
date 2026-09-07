@@ -74,6 +74,11 @@ export default async function handler(req, res) {
                 accessKey: mask(RAKUTEN_ACCESS_KEY),
                 siteUrl: SITE_URL,
             },
+            runtime: {
+                vercelEnv: process.env.VERCEL_ENV ?? '(不明)',
+                branch: process.env.VERCEL_GIT_COMMIT_REF ?? '(不明)',
+                commit: (process.env.VERCEL_GIT_COMMIT_SHA ?? '').slice(0, 7) || '(不明)',
+            },
             probes: [],
             verdict: `❌ 設定の不整合により楽天APIを呼び出せません。\n${detected.reason}`,
         });
@@ -107,6 +112,12 @@ export default async function handler(req, res) {
             affiliateId: mask(RAKUTEN_AFFILIATE_ID),
             accessKey: mask(RAKUTEN_ACCESS_KEY),
             siteUrl: SITE_URL,
+        },
+        // 環境変数がどのVercel環境に紐づいているかの切り分け用
+        runtime: {
+            vercelEnv: process.env.VERCEL_ENV ?? '(不明)',
+            branch: process.env.VERCEL_GIT_COMMIT_REF ?? '(不明)',
+            commit: (process.env.VERCEL_GIT_COMMIT_SHA ?? '').slice(0, 7) || '(不明)',
         },
         probes,
         deployedAs: `https://${req.headers.host}`,
