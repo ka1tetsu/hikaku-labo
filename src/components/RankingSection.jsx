@@ -8,9 +8,11 @@ export default function RankingSection() {
     const [activeKw, setActiveKw] = useState(RANKING_KEYWORDS[0]);
 
     useEffect(() => {
+        let cancelled = false;
         searchRakutenItems(activeKw, '', 1)
-            .then(data => setItems((data.Items || []).slice(0, 5).map(({ Item }) => Item)))
-            .catch(() => { });
+            .then(data => { if (!cancelled) setItems(data.items.slice(0, 5)); })
+            .catch(() => { if (!cancelled) setItems([]); });
+        return () => { cancelled = true; };
     }, [activeKw]);
 
     return (
@@ -27,24 +29,21 @@ export default function RankingSection() {
             </div>
             <ol className="ranking-list">
                 {items.map((item, i) => (
-                    <li key={i} className="ranking-item">
+                    <li key={item.itemCode} className="ranking-item">
                         <span className={`rank-badge rank-${i + 1}`}>{i + 1}</span>
-                        <a href={buildRakutenAffiliateUrl(item)} target="_blank" rel="noopener noreferrer sponsored">
-                            <img
-                                src={(item.mediumImageUrls?.[0]?.imageUrl || '').replace('_ex=128x128', '_ex=64x64')}
-                                alt={item.itemName}
-                                className="rank-img"
-                            />
+                        <a href={buildRakutenAffiliateUrl(item, item.itemName)} target="_blank" rel="noopener noreferrer sponsored">
+                            <img src={item.imageUrl} alt={item.itemName} className="rank-img" loading="lazy" />
                         </a>
                         <div className="rank-info">
-                            <a href={buildRakutenAffiliateUrl(item)} target="_blank" rel="noopener noreferrer sponsored" className="rank-name">
-                                {(item.itemName || '').slice(0, 40)}…
+                            <a href={buildRakutenAffiliateUrl(item, item.itemName)} target="_blank" rel="noopener noreferrer sponsored" className="rank-name">
+                                {item.itemName.slice(0, 40)}…
                             </a>
                             <div className="rank-price-row">
-                                <span className="rank-price">¥{Number(item.itemPrice).toLocaleString()}</span>
+                                <span className="rank-price">¥{item.itemPrice.toLocaleString()}</span>
+                                {item.pointRate > 1 && <span className="rank-point">P{item.pointRate}倍</span>}
                             </div>
-                            <a href={buildRakutenAffiliateUrl(item)} target="_blank" rel="noopener noreferrer sponsored" className="btn-rank-cta">
-                                最安値を調べる ▶
+                            <a href={buildRakutenAffiliateUrl(item, item.itemName)} target="_blank" rel="noopener noreferrer sponsored" className="btn-rank-cta">
+                                楽天市場で見る ▶
                             </a>
                         </div>
                     </li>

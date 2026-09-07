@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import CategoryNav from './components/CategoryNav';
 import RankingSection from './components/RankingSection';
 import ArticleSection from './components/ArticleSection';
+import ComparisonTable from './components/ComparisonTable';
 import { searchRakutenItems, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from './api';
 import './index.css';
 
@@ -30,6 +31,38 @@ export default function App() {
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortMode, setSortMode] = useState('popular');
+  const [compareList, setCompareList] = useState([]);
+
+  const MAX_COMPARE = 4;
+
+  const toggleCompare = useCallback((item) => {
+    setCompareList(prev => {
+      const exists = prev.some(p => p.itemCode === item.itemCode);
+      if (exists) return prev.filter(p => p.itemCode !== item.itemCode);
+      if (prev.length >= MAX_COMPARE) return prev;
+      return [...prev, item];
+    });
+  }, []);
+
+  // 並び替えを実際に適用する（従来 sortMode は保持されるだけで未使用だった）
+  const sortedProducts = useMemo(() => {
+    const list = [...products];
+    switch (sortMode) {
+      case 'price-asc': return list.sort((a, b) => a.itemPrice - b.itemPrice);
+      case 'price-desc': return list.sort((a, b) => b.itemPrice - a.itemPrice);
+      case 'effective-asc': return list.sort((a, b) => a.effectivePrice - b.effectivePrice);
+      case 'review': return list.sort((a, b) =>
+        b.reviewAverage - a.reviewAverage || b.reviewCount - a.reviewCount);
+      case 'review-count': return list.sort((a, b) => b.reviewCount - a.reviewCount);
+      default: return list; // 人気順 = 楽天APIの返却順
+    }
+  }, [products, sortMode]);
+
+  // 実質価格が最安の商品（同額なら先頭）
+  const cheapestCode = useMemo(() => {
+    if (products.length === 0) return null;
+    return products.reduce((min, p) => (p.effectivePrice < min.effectivePrice ? p : min)).itemCode;
+  }, [products]);
 
   const doSearch = useCallback(async (kw, genre, pg = 1) => {
     if (!kw && !genre) return;
@@ -37,12 +70,16 @@ export default function App() {
     setError(null);
     try {
       const data = await searchRakutenItems(kw, genre, pg);
-      const items = (data.Items || []).map(({ Item }) => Item);
-      setProducts(items);
-      setTotalPages(Math.min(data.pageCount || 1, 100));
+      setProducts(data.items);
+      setTotalPages(Math.min(data.pageCount, 100));
       setPage(pg);
+      if (data.items.length > 0 && !data.affiliateActive) {
+        console.warn('[hikaku-labo] 楽天APIが affiliateUrl を返していません。affiliateId の設定を確認してください。');
+      }
     } catch (e) {
-      setError('商品データの取得に失敗しました。しばらくしてからもう一度お試しください。');
+      // モックで取り繕わず、実際の失敗を伝える（偽の商品で比較させないため）
+      setError(e.message || '商品データの取得に失敗しました。');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -120,10 +157,12 @@ export default function App() {
                 onChange={e => setSortMode(e.target.value)}
                 className="sort-select"
               >
-                <option value="popular">人気順</option>
+                <option value="popular">楽天の標準順</option>
+                <option value="effective-asc">実質価格が安い順（ポイント還元後）</option>
                 <option value="price-asc">価格が安い順</option>
                 <option value="price-desc">価格が高い順</option>
                 <option value="review">レビュー評価順</option>
+                <option value="review-count">レビュー件数順</option>
               </select>
               <div className="view-toggle">
                 <button
@@ -156,11 +195,26 @@ export default function App() {
           </div>
         )}
 
+        {compareList.length > 0 && (
+          <ComparisonTable
+            items={compareList}
+            onRemove={(code) => setCompareList(prev => prev.filter(p => p.itemCode !== code))}
+            onClear={() => setCompareList([])}
+          />
+        )}
+
         {!loading && products.length > 0 && (
           <>
             <div className={`product-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
-              {products.map((item, i) => (
-                <ProductCard key={i} item={item} viewMode={viewMode} />
+              {sortedProducts.map((item) => (
+                <ProductCard
+                  key={item.itemCode}
+                  item={item}
+                  viewMode={viewMode}
+                  isSelected={compareList.some(p => p.itemCode === item.itemCode)}
+                  onToggleCompare={toggleCompare}
+                  isCheapest={item.itemCode === cheapestCode}
+                />
               ))}
             </div>
 

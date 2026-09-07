@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { buildRakutenAffiliateUrl, buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
+import { useMemo } from 'react';
+import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
 
 function StarRating({ score }) {
@@ -14,54 +14,33 @@ function StarRating({ score }) {
     );
 }
 
-export default function ProductCard({ item, viewMode }) {
-    const itemName = item.itemName || '商品名不明';
-    const basePrice = Number(item.itemPrice) || 0;
-    const shopName = item.shopName || '';
-    const reviewAverage = item.reviewAverage || 0;
-    const reviewCount = item.reviewCount || 0;
-    const imageUrl = (item.mediumImageUrls?.[0]?.imageUrl || '').replace('_ex=128x128', '_ex=300x300');
-    const keyword = itemName.split(/[ 　]/)[0];
+export default function ProductCard({ item, viewMode, isSelected, onToggleCompare, isCheapest }) {
+    // 半角・全角スペース区切りの先頭語を他モール検索のキーワードにする
+    const keyword = item.itemName.split(/[ \u3000]/)[0];
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
     const yahooUrl = buildYahooAffiliateUrl(keyword);
-    const rakutenUrl = buildRakutenAffiliateUrl(item, keyword);
 
-    const kakakuSpecs = item.kakakuSpecs || [];
-    const kakakuRank = item.kakakuRank;
-    const kakakuShops = item.kakakuShops;
-    const aiSummary = item.aiSummary;
-    const tradeInPrice = item.tradeInPrice || 0;
-    const insurancePrice = item.insurancePrice || 0;
-
-    // 楽天APIの実データに基づく特徴タグ（postageFlag: 0=送料込み / pointRate: 倍率）
-    const isFreeShipping = item.postageFlag === 0;
-    const pointRate = Number(item.pointRate) || 0;
-
-    // --- State: Attachments (保険・下取り) をユーザーが選んだ場合のインタラクティブな価格計算 ---
-    const [useTradeIn, setUseTradeIn] = useState(tradeInPrice > 0);
-    const [useInsurance, setUseInsurance] = useState(false);
-
-    const finalPrice = basePrice + (useInsurance ? insurancePrice : 0) - (useTradeIn ? tradeInPrice : 0);
-
-    // --- Dynamic Yield Routing: 最適化エンジンの計算結果をキャッシュ ---
-    const optimizeData = useMemo(() => {
-        return getOptimizedAffiliateRoute(item, keyword, basePrice);
-    }, [item, keyword, basePrice]);
-
-    const { bestUrl, winnerPlatform, rakutenTracked } = optimizeData;
-    const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場' : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
+    // --- 楽天ファーストのルーティング結果をキャッシュ ---
+    const { bestUrl, winnerPlatform, rakutenTracked } = useMemo(
+        () => getOptimizedAffiliateRoute(item, keyword, item.itemPrice),
+        [item, keyword]
+    );
+    const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場'
+        : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
 
     return (
-        <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}`}>
+        <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}${isSelected ? ' selected' : ''}`}>
             <div className="product-image-col">
-                {kakakuRank && (
-                    <div className="kakaku-rank-badge">
-                        🏅 {kakakuRank}位
+                {isCheapest && (
+                    // 楽天APIは送料額を返さないため、送料別の商品が実質最安になった場合は
+                    // 「送料を含まない比較」であることをバッジ自体に明示する
+                    <div className={`cheapest-badge ${item.isFreeShipping ? '' : 'with-caveat'}`}>
+                        {item.isFreeShipping ? '実質最安' : '実質最安（送料別）'}
                     </div>
                 )}
-                <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link">
-                    {imageUrl ? (
-                        <img src={imageUrl} alt={itemName} className="product-image" loading="lazy" />
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link">
+                    {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.itemName} className="product-image" loading="lazy" />
                     ) : (
                         <div className="product-image no-image">No Image</div>
                     )}
@@ -70,79 +49,62 @@ export default function ProductCard({ item, viewMode }) {
 
             <div className="product-info-col">
                 <h3 className="product-title">
-                    <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link">
-                        {itemName}
+                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link">
+                        {item.itemName}
                     </a>
                 </h3>
 
-                {kakakuSpecs.length > 0 && (
-                    <div className="kakaku-specs">
-                        {kakakuSpecs.map((spec, idx) => (
-                            <span key={idx} className="spec-item">{spec}</span>
-                        ))}
-                    </div>
-                )}
-
-                {aiSummary && (
-                    <div className="ai-summary-box">
-                        <div className="ai-summary-title">✨ AIレビュー3行要約</div>
-                        <div className="ai-summary-content">
-                            <p className="ai-pro">✅ メリット: {aiSummary.pros.join(' / ')}</p>
-                            <p className="ai-con">⚠️ デメリット: {aiSummary.cons.join(' / ')}</p>
-                            <p className="ai-target">🎯 こんな人に: {aiSummary.target}</p>
-                        </div>
-                    </div>
-                )}
-
                 <div className="product-meta">
                     <p className="product-shop">
-                        <span className="shop-icon">🏬</span> {shopName}
+                        <span className="shop-icon">🏬</span> {item.shopName}
                     </p>
-                    {reviewCount > 0 && (
+                    {item.reviewCount > 0 ? (
                         <div className="product-review">
-                            <StarRating score={reviewAverage} />
-                            <span className="review-count">
-                                <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored">({reviewCount}件のレビュー)</a>
-                            </span>
+                            <StarRating score={item.reviewAverage} />
+                            <span className="review-count">({item.reviewCount.toLocaleString()}件のレビュー)</span>
                         </div>
+                    ) : (
+                        <div className="product-review no-review">レビューなし</div>
                     )}
                 </div>
+
                 <div className="product-features">
-                    {isFreeShipping && <span className="feature-tag">送料無料</span>}
-                    {pointRate > 1 && <span className="feature-tag point">ポイント{pointRate}倍</span>}
+                    <span className={`feature-tag ${item.isFreeShipping ? '' : 'muted'}`}>
+                        {item.isFreeShipping ? '送料無料' : '送料別'}
+                    </span>
+                    {item.pointRate > 1 && (
+                        <span className="feature-tag point">ポイント{item.pointRate}倍</span>
+                    )}
+                    {item.asurakuFlag === 1 && <span className="feature-tag">あす楽</span>}
                 </div>
-                <div className="product-detail-tabs">
-                    <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="detail-tab">スペック</a>
-                    <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="detail-tab">クチコミ <span className="tab-count">({reviewCount})</span></a>
-                    <a href={rakutenUrl} target="_blank" rel="noopener noreferrer sponsored" className="detail-tab">価格推移</a>
-                </div>
+
+                {item.itemCaption && (
+                    <p className="product-caption">{item.itemCaption.slice(0, 110)}…</p>
+                )}
             </div>
 
             <div className="product-action-col">
                 <div className="price-box">
-                    <span className="price-label">実質価格(税込):</span>
+                    <span className="price-label">商品価格(税込):</span>
                     <div className="product-price-row">
-                        <span className="product-price">¥{Math.max(0, finalPrice).toLocaleString()}</span>
+                        <span className="product-price">¥{item.itemPrice.toLocaleString()}</span>
                     </div>
-                    {kakakuShops && <div className="shop-count-label">価格比較：<span className="shops-link">{kakakuShops}店舗</span></div>}
+                    <div className="effective-price">
+                        実質 <strong>¥{item.effectivePrice.toLocaleString()}</strong>
+                        <span className="effective-note">
+                            （ポイント {item.pointBack.toLocaleString()}円相当を差引{item.isFreeShipping ? '' : '／送料別'}）
+                        </span>
+                    </div>
                 </div>
 
-                <div className="attachments-list">
-                    {tradeInPrice > 0 && (
-                        <label className={`attachment-checkbox ${useTradeIn ? 'active' : ''}`}>
-                            <input type="checkbox" checked={useTradeIn} onChange={(e) => setUseTradeIn(e.target.checked)} />
-                            📦 古い端末を下取りに出す<br />
-                            <span className="attachment-price trade-in">最大 ¥{tradeInPrice.toLocaleString()} 還元</span>
-                        </label>
-                    )}
-                    {insurancePrice > 0 && (
-                        <label className={`attachment-checkbox ${useInsurance ? 'active' : ''}`}>
-                            <input type="checkbox" checked={useInsurance} onChange={(e) => setUseInsurance(e.target.checked)} />
-                            🛡️ 3年自動延長保証<br />
-                            <span className="attachment-price">+ ¥{Math.floor(insurancePrice).toLocaleString()}</span>
-                        </label>
-                    )}
-                </div>
+                <label className={`compare-check ${isSelected ? 'active' : ''}`}>
+                    <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => onToggleCompare(item)}
+                    />
+                    比較に追加
+                </label>
 
                 <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first">
                     {platformLabel}で購入する ▶<br />
