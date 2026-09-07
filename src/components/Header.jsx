@@ -1,3 +1,5 @@
+import { buildRakutenSearchAffiliateUrl } from '../api';
+
 export default function Header({ inputValue, setInputValue, onSearch }) {
     return (
         <header className="header">
@@ -22,7 +24,7 @@ export default function Header({ inputValue, setInputValue, onSearch }) {
                 </form>
 
                 <div className="header-links">
-                    <a href="https://www.rakuten.co.jp/" target="_blank" rel="noopener noreferrer" className="header-badge rakuten-badge">楽天</a>
+                    <a href={buildRakutenSearchAffiliateUrl(inputValue || '人気')} target="_blank" rel="noopener noreferrer sponsored" className="header-badge rakuten-badge">楽天</a>
                     <a href="https://www.amazon.co.jp/?tag=kuronekosanta-22" target="_blank" rel="noopener noreferrer" className="header-badge amazon-badge">Amazon</a>
                 </div>
             </div>

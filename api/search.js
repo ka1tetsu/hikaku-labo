@@ -1,6 +1,8 @@
 // Vercel Serverless API Route - proxies requests to Rakuten Ichiba Item Search
 // Adds required Referer/Origin headers that Rakuten openapi requires
 
+import { detectPlatform, LEGACY_ENDPOINT, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
+
 // --- 認証情報 ---------------------------------------------------------------
 // いずれも環境変数を優先。未設定時は下記の既定値にフォールバックします。
 const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || 'a4bab65a-01f3-4a12-becc-728ead3fa3e7';
@@ -12,12 +14,7 @@ const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
 const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '432a9f67.243910f6.432a9f68.e28a199a';
 
 // ⚠️ accessKey はシークレットのためソースに埋め込みません。
-// 未設定の場合は applicationId だけで通る app.rakuten.co.jp を使用します。
 const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || '';
-
-// accessKey が要る新ゲートウェイと、applicationId だけで通る従来エンドポイント
-const OPENAPI_ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601';
-const LEGACY_ENDPOINT = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601';
 
 function buildParams({ keyword, genreId, page, withAccessKey }) {
     const params = new URLSearchParams({
@@ -53,12 +50,23 @@ export default async function handler(req, res) {
     const { keyword = '', genreId = '', page = 1 } = req.query;
     const opts = { keyword, genreId, page };
 
-    // accessKey があれば新ゲートウェイを試し、認証で弾かれたら従来エンドポイントへ退避する。
-    // accessKey が無ければ最初から従来エンドポイントを使う。
-    const attempts = RAKUTEN_ACCESS_KEY
+    // applicationId の形式から、叩くべきエンドポイントを決める。
+    // 形式に合わないエンドポイントを叩いても "specify valid applicationId" になるだけなので、
+    // 呼び出す前に設定の不整合を検出して理由を返す。
+    const detected = detectPlatform(RAKUTEN_APP_ID, RAKUTEN_ACCESS_KEY);
+
+    if (!detected.ok) {
+        res.setHeader('X-Rakuten-Config', 'invalid');
+        return res.status(500).json({
+            error: detected.reason,
+            platform: detected.platform,
+            hint: '/api/diag で現在の設定と楽天からの応答を確認できます。',
+        });
+    }
+
+    const attempts = detected.usesAccessKey
         ? [
             { name: 'openapi', url: `${OPENAPI_ENDPOINT}?${buildParams({ ...opts, withAccessKey: true })}` },
-            { name: 'legacy', url: `${LEGACY_ENDPOINT}?${buildParams({ ...opts, withAccessKey: false })}` },
         ]
         : [
             { name: 'legacy', url: `${LEGACY_ENDPOINT}?${buildParams({ ...opts, withAccessKey: false })}` },
@@ -82,14 +90,11 @@ export default async function handler(req, res) {
 
             lastStatus = rakutenRes.status;
             lastBody = text;
-
-            // 認証・権限以外のエラー（404やレート制限など）は退避しても直らないので即返す
-            if (![401, 403].includes(rakutenRes.status)) break;
         } catch (err) {
             lastStatus = 500;
             lastBody = err.message;
         }
     }
 
-    return res.status(lastStatus).json({ error: lastBody });
+    return res.status(lastStatus).json({ error: lastBody, platform: detected.platform });
 }

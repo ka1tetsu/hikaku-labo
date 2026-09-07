@@ -1551,3 +1551,9 @@ a:hover {
   line-height: 1.7;
   opacity: 0.85;
 }
+
+.ranking-empty {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: #999;
+}

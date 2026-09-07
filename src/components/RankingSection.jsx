@@ -27,6 +27,9 @@ export default function RankingSection() {
                     >{kw}</button>
                 ))}
             </div>
+            {items.length === 0 && (
+                <p className="ranking-empty">商品を取得できませんでした。</p>
+            )}
             <ol className="ranking-list">
                 {items.map((item, i) => (
                     <li key={item.itemCode} className="ranking-item">
