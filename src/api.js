@@ -4,10 +4,11 @@ const AMAZON_TAG = 'kuronekosanta-22';
 const YAHOO_SID = '3506307';
 const YAHOO_PID = '888496181';
 
-// 💰 楽天アフィリエイトID。.env に VITE_RAKUTEN_AFFILIATE_ID を設定してください。
-// （楽天アフィリエイト管理画面の「アフィリエイトID」。g00xxxxx.xxxxxxxx.g00xxxxx.xxxxxxxx 形式）
-// 未設定だと楽天リンクは非アフィリエイトになり成果が発生しません。
-const RAKUTEN_AFFILIATE_ID = import.meta.env?.VITE_RAKUTEN_AFFILIATE_ID || '';
+// 💰 楽天アフィリエイトID。アフィリエイトリンクのURLに現れる公開値。
+// APIが affiliateUrl を返さなかった場合に、クライアント側で計測リンクを
+// 組み立てるために使う。上書きしたい場合は .env の VITE_RAKUTEN_AFFILIATE_ID で。
+const RAKUTEN_AFFILIATE_ID =
+    import.meta.env?.VITE_RAKUTEN_AFFILIATE_ID || '432a9f67.243910f6.432a9f68.e28a199a';
 
 const ARTICLE_ENDPOINT = '/api/article';
 const REVIEW_SUMMARY_ENDPOINT = '/api/reviewSummary';
