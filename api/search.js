@@ -1,11 +1,11 @@
 // Vercel Serverless API Route - proxies requests to Rakuten Ichiba Item Search
 // Adds required Referer/Origin headers that Rakuten openapi requires
 
-import { detectPlatform, LEGACY_ENDPOINT, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
+import { detectPlatform, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
 
 // --- 認証情報 ---------------------------------------------------------------
 // いずれも環境変数を優先。未設定時は下記の既定値にフォールバックします。
-const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '1084839662549534567';
+const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || 'a4bab65a-01f3-4a12-becc-728ead3fa3e7';
 const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
 
 // 💰 収益の生命線。affiliateId を送らないと楽天APIは affiliateUrl / affiliateRate を
@@ -64,37 +64,21 @@ export default async function handler(req, res) {
         });
     }
 
-    const attempts = detected.usesAccessKey
-        ? [
-            { name: 'openapi', url: `${OPENAPI_ENDPOINT}?${buildParams({ ...opts, withAccessKey: true })}` },
-        ]
-        : [
-            { name: 'legacy', url: `${LEGACY_ENDPOINT}?${buildParams({ ...opts, withAccessKey: false })}` },
-        ];
+    const url = `${OPENAPI_ENDPOINT}?${buildParams({ ...opts, withAccessKey: true })}`;
 
-    let lastStatus = 500;
-    let lastBody = 'no attempt executed';
+    try {
+        const rakutenRes = await fetchRakuten(url);
+        const text = await rakutenRes.text();
 
-    for (const attempt of attempts) {
-        try {
-            const rakutenRes = await fetchRakuten(attempt.url);
-            const text = await rakutenRes.text();
-
-            if (rakutenRes.ok) {
-                res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
-                res.setHeader('X-Rakuten-Endpoint', attempt.name);
-                // アフィリエイトIDが効いているかフロント/運用側から確認できるようにする
-                res.setHeader('X-Rakuten-Affiliate', RAKUTEN_AFFILIATE_ID ? 'on' : 'off');
-                return res.status(200).send(text);
-            }
-
-            lastStatus = rakutenRes.status;
-            lastBody = text;
-        } catch (err) {
-            lastStatus = 500;
-            lastBody = err.message;
+        if (!rakutenRes.ok) {
+            return res.status(rakutenRes.status).json({ error: text });
         }
-    }
 
-    return res.status(lastStatus).json({ error: lastBody, platform: detected.platform });
+        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+        // アフィリエイトIDが効いているかフロント/運用側から確認できるようにする
+        res.setHeader('X-Rakuten-Affiliate', RAKUTEN_AFFILIATE_ID ? 'on' : 'off');
+        return res.status(200).send(text);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 }

@@ -2,9 +2,9 @@
 // 本番で「なぜ商品が取れないのか」を切り分けるためのもの。
 // シークレット(accessKey)そのものは絶対に返さず、設定の有無と長さだけを返す。
 
-import { detectPlatform, LEGACY_ENDPOINT, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
+import { detectPlatform, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
 
-const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '1084839662549534567';
+const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || 'a4bab65a-01f3-4a12-becc-728ead3fa3e7';
 const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '432a9f67.243910f6.432a9f68.e28a199a';
 const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || '';
 const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
@@ -73,7 +73,6 @@ export default async function handler(req, res) {
             checkedAt: new Date().toISOString(),
             config: {
                 applicationId: mask(RAKUTEN_APP_ID),
-                applicationIdFormat: detected.platform === 'developers' ? 'UUID (Rakuten Developers)' : '不明な形式',
                 affiliateId: mask(RAKUTEN_AFFILIATE_ID),
                 accessKey: mask(RAKUTEN_ACCESS_KEY),
                 siteUrl: SITE_URL,
@@ -83,10 +82,7 @@ export default async function handler(req, res) {
         });
     }
 
-    // 形式に合うエンドポイントだけを叩く（合わない方は必ず wrong_parameter になる）
-    const probes = detected.usesAccessKey
-        ? [await probe('openapi (openapi.rakuten.co.jp)', `${OPENAPI_ENDPOINT}?${withKey}`)]
-        : [await probe('legacy (app.rakuten.co.jp)', `${LEGACY_ENDPOINT}?${base}`)];
+    const probes = [await probe('openapi (openapi.rakuten.co.jp)', `${OPENAPI_ENDPOINT}?${withKey}`)];
 
     const working = probes.find(p => p.ok);
 

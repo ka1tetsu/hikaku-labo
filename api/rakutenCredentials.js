@@ -1,62 +1,59 @@
-// 楽天には認証方式の異なる2つのAPI基盤があり、applicationId の形式で見分けられる。
+// 楽天市場APIの認証設定を検証する。
 //
-//   従来（楽天ウェブサービス / webservice.rakuten.co.jp で発行）
-//     applicationId: 19桁前後の数字   accessKey: 不要
-//     endpoint: app.rakuten.co.jp
+// 従来版の市場API (app.rakuten.co.jp/services/api/IchibaItem/...) は
+// 2026-02-09 に廃止された。現在有効なのは openapi.rakuten.co.jp のみで、
+// 認証には Rakuten Web Service で発行される次の2つが必要:
 //
-//   新（Rakuten Developers で発行）
-//     applicationId: UUID形式         accessKey: 必須 (pk_ で始まる)
-//     endpoint: openapi.rakuten.co.jp
+//   Application ID : UUID形式
+//   Access Key     : pk_ で始まる文字列（シークレット。ソースに埋め込まない）
 //
-// 形式に合わないエンドポイントを叩くと
-// {"error":"wrong_parameter","error_description":"specify valid applicationId"} が返る。
+// 発行元: https://webservice.rakuten.co.jp/app/list
 
 export const OPENAPI_ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601';
-export const LEGACY_ENDPOINT = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const LEGACY_ID_RE = /^\d{17,20}$/;
 
+const APP_LIST_URL = 'https://webservice.rakuten.co.jp/app/list';
+
 export function detectPlatform(applicationId, accessKey) {
-    if (UUID_RE.test(applicationId)) {
-        return accessKey
-            ? {
-                platform: 'developers',
-                endpoint: OPENAPI_ENDPOINT,
-                usesAccessKey: true,
-                ok: true,
-            }
-            : {
-                platform: 'developers',
-                endpoint: OPENAPI_ENDPOINT,
-                usesAccessKey: true,
-                ok: false,
-                // accessKey が無いと新基盤は通らず、従来基盤はUUIDを受け付けない。
-                // 退避先が存在しないので、無駄な通信をせず理由を返す。
-                reason:
-                    'applicationId が UUID 形式（Rakuten Developers 発行）ですが、RAKUTEN_ACCESS_KEY が未設定です。' +
-                    'この組み合わせでは楽天APIを呼び出せません。' +
-                    'Rakuten Developers で発行した accessKey (pk_ で始まる文字列) を環境変数 RAKUTEN_ACCESS_KEY に設定するか、' +
-                    '楽天ウェブサービス (webservice.rakuten.co.jp) で19桁の applicationId を発行して RAKUTEN_APP_ID に設定してください。',
-            };
-    }
+    const base = { endpoint: OPENAPI_ENDPOINT, usesAccessKey: true };
 
     if (LEGACY_ID_RE.test(applicationId)) {
         return {
-            platform: 'webservice',
-            endpoint: LEGACY_ENDPOINT,
-            usesAccessKey: false,
-            ok: true,
+            ...base,
+            platform: 'legacy-shutdown',
+            ok: false,
+            reason:
+                `RAKUTEN_APP_ID が19桁の数字（従来版のアプリID）です。` +
+                `従来版の楽天市場APIは2026-02-09に廃止されており、このIDでは接続できません。` +
+                `${APP_LIST_URL} で発行される UUID 形式の Application ID を使用してください。`,
         };
     }
 
-    return {
-        platform: 'unknown',
-        endpoint: LEGACY_ENDPOINT,
-        usesAccessKey: Boolean(accessKey),
-        ok: false,
-        reason:
-            'applicationId が既知のどちらの形式にも一致しません。' +
-            '楽天ウェブサービスなら19桁の数字、Rakuten Developers なら UUID 形式である必要があります。',
-    };
+    if (!UUID_RE.test(applicationId)) {
+        return {
+            ...base,
+            platform: 'unknown',
+            ok: false,
+            reason:
+                `RAKUTEN_APP_ID が UUID 形式ではありません。` +
+                `${APP_LIST_URL} の Application ID をそのまま設定してください。`,
+        };
+    }
+
+    if (!accessKey) {
+        return {
+            ...base,
+            platform: 'rakuten-webservice',
+            ok: false,
+            reason:
+                `RAKUTEN_ACCESS_KEY が未設定です。楽天市場APIは Application ID と Access Key の両方を要求します。` +
+                `${APP_LIST_URL} の Access Key（pk_ で始まる文字列）を、Vercel の ` +
+                `Settings → Environment Variables に RAKUTEN_ACCESS_KEY として追加してください。` +
+                `シークレットのためソースには含めていません。`,
+        };
+    }
+
+    return { ...base, platform: 'rakuten-webservice', ok: true };
 }
