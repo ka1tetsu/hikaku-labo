@@ -4,7 +4,7 @@
 
 import { detectPlatform, LEGACY_ENDPOINT, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
 
-const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || 'a4bab65a-01f3-4a12-becc-728ead3fa3e7';
+const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '1084839662549534567';
 const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '432a9f67.243910f6.432a9f68.e28a199a';
 const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || '';
 const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
