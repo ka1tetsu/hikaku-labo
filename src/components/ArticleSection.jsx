@@ -1,63 +1,51 @@
+// このサイトが実際にやっていることだけを書くセクション。
+// 以前あった「月間1000万PV突破」「数百万件を常時モニタリング」「独自のAI価格推移予測エンジン」
+// 「専門家による独自レビュー」は、いずれも実体がなく景表法上の優良誤認にあたるため削除した。
 export default function ArticleSection() {
-    const articles = [
-        {
-            title: "【2024年最新】絶対に失敗しないスマートフォンおすすめ徹底比較！iPhone vs Android",
-            category: "スマートフォン",
-            image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=200&fit=crop",
-            date: "2024.03.05",
-            views: "1.2M",
-            desc: "最新のiPhone 15から高コスパAndroidまで、カメラ性能・バッテリー・価格を徹底比較。あなたにぴったりの1台が必ず見つかります。"
-        },
-        {
-            title: "【コスパ最強】プロが選ぶ！仕事もゲームも快適なノートパソコン・ランキング",
-            category: "パソコン",
-            image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=200&fit=crop",
-            date: "2024.03.01",
-            views: "850K",
-            desc: "リモートワークや動画編集、PCゲームまで。用途別の推奨スペックと、今最も「買い」なモデルを価格順にリストアップ！"
-        },
-        {
-            title: "ノイズキャンセリング搭載ワイヤレスイヤホン全40機種・実機レビュー",
-            category: "イヤホン",
-            image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=200&fit=crop",
-            date: "2024.02.28",
-            views: "640K",
-            desc: "AirPods Pro、Sony、Boseから高コスパAnkerまで。実際に電車内やカフェで使って分かった「本当のノイズキャンセル力」を評価。"
-        }
-    ];
-
     return (
         <div className="article-section">
             <h2 className="section-title">
-                <span className="section-icon">📖</span> 専門家による「徹底比較」記事・購買ガイド解説
-                <span className="seo-subtitle">（月間1000万PV突破！賢いお買い物をサポートします）</span>
+                <span className="section-icon">📖</span> 当サイトの価格比較について
             </h2>
-            <div className="article-grid">
-                {articles.map((article, idx) => (
-                    <a href="#article" className="article-card" key={idx}>
-                        <div className="article-img-wrapper">
-                            <span className="article-category">{article.category}</span>
-                            <img src={article.image} alt={article.title} className="article-img" loading="lazy" />
-                        </div>
-                        <div className="article-content">
-                            <div className="article-meta">
-                                <span className="article-date">{article.date}</span>
-                                <span className="article-views">👁️ {article.views} PV</span>
-                            </div>
-                            <h3 className="article-title">{article.title}</h3>
-                            <p className="article-desc">{article.desc}</p>
-                            <span className="article-readmore">記事を読む ▶</span>
-                        </div>
-                    </a>
-                ))}
-            </div>
 
-            <div className="seo-text-block">
-                <h3>比較ラボが「価格.com」を超える圧倒的な情報量を提供する理由</h3>
-                <p>
-                    当サイトでは、Amazon、楽天市場、Yahoo!ショッピングをはじめ、全国の主要な家電量販店や専門ショップの<strong>リアルタイム在庫・価格データ数百万件</strong>を常時モニタリングしています。<br />
-                    さらに、独自のAI価格推移予測エンジンと、専門家による独自レビューを組み合わせることで、「今買うべきか」「どこが一番お得か」をかつてない精度で導き出します。
-                </p>
+            <div className="about-grid">
+                <div className="about-card">
+                    <h3>データの出どころ</h3>
+                    <p>
+                        掲載している商品名・価格・ポイント倍率・送料区分・レビュー評価は、
+                        すべて<strong>楽天市場の商品検索APIから取得した実データ</strong>です。
+                        表示時点の値であり、当サイトが独自に価格を推定・予測することはありません。
+                    </p>
+                </div>
+
+                <div className="about-card">
+                    <h3>実質価格の計算方法</h3>
+                    <p>
+                        <code>実質価格 = 商品価格 − ポイント還元相当額</code><br />
+                        ポイント還元相当額は楽天APIが返すポイント倍率から算出しています。
+                        キャンペーンやSPUによる加算は反映されません。
+                    </p>
+                </div>
+
+                <div className="about-card">
+                    <h3>送料の扱い</h3>
+                    <p>
+                        楽天APIは送料の<strong>金額</strong>を返さないため、実質価格に送料は含めていません。
+                        「送料別」の商品はその分だけ安く表示されるので、
+                        バッジと注記でその旨を明示しています。
+                    </p>
+                </div>
+
+                <div className="about-card">
+                    <h3>収益について</h3>
+                    <p>
+                        当サイトは楽天アフィリエイト・Amazonアソシエイト・バリューコマースに参加しており、
+                        商品リンク経由で購入された場合に手数料を受け取ります。
+                        購入ボタンの遷移先は<strong>楽天市場を優先</strong>しています。
+                        表示している価格・ポイント・レビューの数値自体は、
+                        楽天APIの取得値をそのまま出しており加工していません。
+                    </p>
+                </div>
             </div>
         </div>
     );

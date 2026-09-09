@@ -6,6 +6,14 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
   { ignores: ['dist'] },
+  // api/ と scripts/ は Vercel のサーバーサイド実行なので Node のグローバルを許可する
+  {
+    files: ['api/**/*.js', 'scripts/**/*.mjs'],
+    languageOptions: {
+      globals: globals.node,
+      parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+    },
+  },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
@@ -29,6 +37,8 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      // このプロジェクトは PropTypes を使わない方針のため無効化
+      'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
