@@ -9,7 +9,9 @@
 //
 // 発行元: https://webservice.rakuten.co.jp/app/list
 
-export const OPENAPI_ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601';
+// バージョンは楽天のAPIテストフォームが生成するものに合わせる。
+// 20220601 は古い。テストフォームは 20260701 を使用している。
+export const OPENAPI_ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const LEGACY_ID_RE = /^\d{17,20}$/;

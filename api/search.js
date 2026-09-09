@@ -64,21 +64,40 @@ export default async function handler(req, res) {
         });
     }
 
-    const url = `${OPENAPI_ENDPOINT}?${buildParams({ ...opts, withAccessKey: true })}`;
+    // affiliateId を付けると楽天アフィリエイト側のサイト登録が照合され、
+    // 未登録だと HTTP_REFERRER_NOT_ALLOWED で全体が失敗する。
+    // 商品が1件も出ないよりは、成果計測なしでも表示できる方を優先し、
+    // 失敗した場合は affiliateId を外して再試行する。
+    const paramsWithAffiliate = buildParams({ ...opts, withAccessKey: true });
+    const paramsWithout = new URLSearchParams(paramsWithAffiliate);
+    paramsWithout.delete('affiliateId');
 
-    try {
-        const rakutenRes = await fetchRakuten(url);
-        const text = await rakutenRes.text();
+    const attempts = RAKUTEN_AFFILIATE_ID
+        ? [['on', paramsWithAffiliate], ['off', paramsWithout]]
+        : [['off', paramsWithout]];
 
-        if (!rakutenRes.ok) {
-            return res.status(rakutenRes.status).json({ error: text });
+    let lastStatus = 500;
+    let lastBody = 'no attempt executed';
+
+    for (const [affiliateState, params] of attempts) {
+        try {
+            const rakutenRes = await fetchRakuten(`${OPENAPI_ENDPOINT}?${params}`);
+            const text = await rakutenRes.text();
+
+            if (rakutenRes.ok) {
+                res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+                // 成果計測が効いているかを運用側から確認できるようにする
+                res.setHeader('X-Rakuten-Affiliate', affiliateState);
+                return res.status(200).send(text);
+            }
+
+            lastStatus = rakutenRes.status;
+            lastBody = text;
+        } catch (err) {
+            lastStatus = 500;
+            lastBody = err.message;
         }
-
-        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
-        // アフィリエイトIDが効いているかフロント/運用側から確認できるようにする
-        res.setHeader('X-Rakuten-Affiliate', RAKUTEN_AFFILIATE_ID ? 'on' : 'off');
-        return res.status(200).send(text);
-    } catch (err) {
-        return res.status(500).json({ error: err.message });
     }
+
+    return res.status(lastStatus).json({ error: lastBody });
 }

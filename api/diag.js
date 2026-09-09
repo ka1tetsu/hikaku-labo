@@ -84,26 +84,24 @@ export default async function handler(req, res) {
         });
     }
 
-    const url = `${OPENAPI_ENDPOINT}?${withKey}`;
+    // 楽天のAPIテストフォームは affiliateId を付けずに成功する。
+    // affiliateId を付けたときだけ HTTP_REFERRER_NOT_ALLOWED になるなら、
+    // 照合対象はアプリ登録URLではなく「楽天アフィリエイトのサイト登録」である。
+    const withoutAffiliate = new URLSearchParams(withKey);
+    withoutAffiliate.delete('affiliateId');
 
-    // 判明したこと:
-    //   Origin あり -> HTTP_REFERRER_NOT_ALLOWED (値を見て拒否)
-    //   Origin なし -> REQUEST_CONTEXT_BODY_HTTP_REFERRER_MISSING (存在しない扱い)
-    // つまり楽天は Referer ではなく Origin をリファラとして読んでいる。
-    // 登録URLは末尾スラッシュ付きのため、その差異を中心に総当たりする。
     const variants = [
-        ['Origin=末尾スラッシュあり', { Origin: SITE_URL + '/', Referer: SITE_URL + '/' }],
-        ['Origin=末尾スラッシュなし', { Origin: SITE_URL, Referer: SITE_URL + '/' }],
-        ['Origin=ホスト名のみ', { Origin: new URL(SITE_URL).host, Referer: SITE_URL + '/' }],
+        ['affiliateIdあり + Origin', `${OPENAPI_ENDPOINT}?${withKey}`, { Origin: SITE_URL, Referer: SITE_URL + '/' }],
+        ['affiliateIdあり + ヘッダーなし', `${OPENAPI_ENDPOINT}?${withKey}`, {}],
+        ['affiliateIdなし + ヘッダーなし', `${OPENAPI_ENDPOINT}?${withoutAffiliate}`, {}],
+        ['affiliateIdなし + Origin', `${OPENAPI_ENDPOINT}?${withoutAffiliate}`, { Origin: SITE_URL, Referer: SITE_URL + '/' }],
     ];
 
     // 連続で叩くと 429 (Rate limit) に当たり結果が判定不能になるため間隔を空ける
     const probes = [];
-    for (const [i, [label, headers]] of variants.entries()) {
+    for (const [i, [label, u, headers]] of variants.entries()) {
         if (i > 0) await new Promise(r => setTimeout(r, 1200));
-        const result = await probe(label, url, headers);
-        probes.push(result);
-        if (result.ok) break; // 通ったらそれ以上試さない
+        probes.push(await probe(label, u, headers));
     }
 
     const working = probes.find(p => p.ok);
@@ -126,9 +124,10 @@ export default async function handler(req, res) {
         deployedAs: `https://${req.headers.host}`,
         verdict: !working
             ? '❌ どの組み合わせでも失敗。probes の rakutenError を確認してください。'
-            + ' HTTP_REFERRER_NOT_ALLOWED が並ぶ場合は、楽天アプリ登録のサイトURLと送信Refererが一致していません。'
             : working.affiliateUrlReturned
                 ? `✅ 商品取得・アフィリエイト計測ともに正常です。有効だった組み合わせ: 「${working.variant}」`
-                : '⚠️ 商品は取得できますが affiliateUrl が返っていません。affiliateId がアフィリエイト未承認か、IDの形式が誤っている可能性があります（この状態では成果は発生しません）。',
+                : `⚠️ 商品は取得できますが affiliateUrl が空です（この状態では成果は発生しません）。`
+                + ` 成功した組み合わせ: 「${working.variant}」。`
+                + ' affiliateIdあり だけが失敗している場合は、楽天アフィリエイト側でこのサイトURLが未登録です。',
     });
 }
