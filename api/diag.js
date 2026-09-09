@@ -85,7 +85,6 @@ export default async function handler(req, res) {
     }
 
     const url = `${OPENAPI_ENDPOINT}?${withKey}`;
-    const selfUrl = `https://${req.headers.host}`;
 
     // 判明したこと:
     //   Origin あり -> HTTP_REFERRER_NOT_ALLOWED (値を見て拒否)
@@ -94,19 +93,14 @@ export default async function handler(req, res) {
     // 登録URLは末尾スラッシュ付きのため、その差異を中心に総当たりする。
     const variants = [
         ['Origin=末尾スラッシュあり', { Origin: SITE_URL + '/', Referer: SITE_URL + '/' }],
-        ['Origin=末尾スラッシュあり (Refererなし)', { Origin: SITE_URL + '/' }],
-        ['Origin=末尾スラッシュなし (Refererなし)', { Origin: SITE_URL }],
-        ['Origin/Referer ともに末尾スラッシュなし', { Origin: SITE_URL, Referer: SITE_URL }],
-        ['Origin=このデプロイ自身', { Origin: selfUrl, Referer: selfUrl + '/' }],
-        ['Origin=末尾スラッシュあり + UA', {
-            Origin: SITE_URL + '/',
-            Referer: SITE_URL + '/',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
-        }],
+        ['Origin=末尾スラッシュなし', { Origin: SITE_URL, Referer: SITE_URL + '/' }],
+        ['Origin=ホスト名のみ', { Origin: new URL(SITE_URL).host, Referer: SITE_URL + '/' }],
     ];
 
+    // 連続で叩くと 429 (Rate limit) に当たり結果が判定不能になるため間隔を空ける
     const probes = [];
-    for (const [label, headers] of variants) {
+    for (const [i, [label, headers]] of variants.entries()) {
+        if (i > 0) await new Promise(r => setTimeout(r, 1200));
         const result = await probe(label, url, headers);
         probes.push(result);
         if (result.ok) break; // 通ったらそれ以上試さない
