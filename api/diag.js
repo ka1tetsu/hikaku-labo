@@ -87,13 +87,22 @@ export default async function handler(req, res) {
     const url = `${OPENAPI_ENDPOINT}?${withKey}`;
     const selfUrl = `https://${req.headers.host}`;
 
-    // 通る組み合わせを特定するための候補
+    // 判明したこと:
+    //   Origin あり -> HTTP_REFERRER_NOT_ALLOWED (値を見て拒否)
+    //   Origin なし -> REQUEST_CONTEXT_BODY_HTTP_REFERRER_MISSING (存在しない扱い)
+    // つまり楽天は Referer ではなく Origin をリファラとして読んでいる。
+    // 登録URLは末尾スラッシュ付きのため、その差異を中心に総当たりする。
     const variants = [
-        ['登録URL + Origin (現行)', { Referer: SITE_URL + '/', Origin: SITE_URL }],
-        ['登録URL のみ (Originなし)', { Referer: SITE_URL + '/' }],
-        ['登録URL 末尾スラッシュなし', { Referer: SITE_URL }],
-        ['Refererを送らない', {}],
-        ['このデプロイ自身のURL', { Referer: selfUrl + '/' }],
+        ['Origin=末尾スラッシュあり', { Origin: SITE_URL + '/', Referer: SITE_URL + '/' }],
+        ['Origin=末尾スラッシュあり (Refererなし)', { Origin: SITE_URL + '/' }],
+        ['Origin=末尾スラッシュなし (Refererなし)', { Origin: SITE_URL }],
+        ['Origin/Referer ともに末尾スラッシュなし', { Origin: SITE_URL, Referer: SITE_URL }],
+        ['Origin=このデプロイ自身', { Origin: selfUrl, Referer: selfUrl + '/' }],
+        ['Origin=末尾スラッシュあり + UA', {
+            Origin: SITE_URL + '/',
+            Referer: SITE_URL + '/',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+        }],
     ];
 
     const probes = [];
