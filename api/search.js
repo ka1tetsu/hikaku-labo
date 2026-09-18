@@ -5,7 +5,7 @@ import { detectPlatform, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
 
 // --- 認証情報 ---------------------------------------------------------------
 // いずれも環境変数を優先。未設定時は下記の既定値にフォールバックします。
-const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || 'a4bab65a-01f3-4a12-becc-728ead3fa3e7';
+const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '4c29f89d-b874-4910-a38b-1d8e0314c2a3';
 const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
 
 // 💰 収益の生命線。affiliateId を送らないと楽天APIは affiliateUrl / affiliateRate を
