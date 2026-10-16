@@ -10,6 +10,8 @@ export default defineConfig({
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
         tools: fileURLToPath(new URL('./tools/index.html', import.meta.url)),
         travel: fileURLToPath(new URL('./travel/index.html', import.meta.url)),
+        'guide-travel-budget': fileURLToPath(new URL('./guides/travel-budget/index.html', import.meta.url)),
+        'guide-website-tools': fileURLToPath(new URL('./guides/website-tools/index.html', import.meta.url)),
       },
     },
   },
