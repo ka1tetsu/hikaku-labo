@@ -1,3 +1,4 @@
+import { recordOutboundClick } from '../shared/outboundClient.js';
 import { useMemo, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import { calculateTravelBudget, DESTINATIONS } from './budget.js';
@@ -9,12 +10,17 @@ const yen = (value) => '¥' + value.toLocaleString('ja-JP');
 const AD_READY = travelAffiliateEnabled(import.meta.env);
 
 function BookingAd({ variant }) {
+  const onAdClick = (event) => {
+    if (event.target.closest('a[href^="https://px.a8.net/"]')) {
+      recordOutboundClick({ section: 'travel', merchant: 'yahoo-travel', placement: variant, sponsored: true });
+    }
+  };
   if (!AD_READY) return <div className="tv-ad-placeholder">
     <span className="tv-ad-label">宿泊プランを調べる</span>
     <p>最新の宿泊料金やポイント条件は予約サイトでご確認ください。</p>
     <a href="https://travel.yahoo.co.jp/" target="_blank" rel="noopener noreferrer">Yahoo!トラベルの公式サイト ↗</a>
   </div>;
-  return <div className="tv-affiliate-ad" aria-label="Yahoo!トラベル アフィリエイト広告">
+  return <div className="tv-affiliate-ad" aria-label="Yahoo!トラベル アフィリエイト広告" onClick={onAdClick}>
     <span className="tv-ad-label">PR・広告 / Yahoo!トラベル</span>
     <div dangerouslySetInnerHTML={{ __html: YAHOO_TRAVEL_A8_CREATIVES[variant] }} />
   </div>;
