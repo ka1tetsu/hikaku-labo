@@ -16,4 +16,10 @@ console.log(JSON.stringify({
   actualConversions: 'unknown; requires A8.net and advertiser settlement reports',
   actualRevenue: 'unknown; requires A8.net and advertiser settlement reports',
 }, null, 2));
-if (validDirect.length + a8.length === 0) console.log('NOT MONETIZED: tool comparison has no configured referral or A8.net ad placements.');
+if (validDirect.length + a8.length === 0) {
+  console.log('NOT MONETIZED: tool comparison has no configured referral or A8.net ad placements.');
+  if (process.argv.includes('--require-placements')) process.exitCode = 2;
+}
+if (process.argv.includes('--require-placements') && missing.length > 0) {
+  console.log('WARNING: Some service cards have no configured monetized placement.');
+}
