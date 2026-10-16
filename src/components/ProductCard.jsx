@@ -1,3 +1,4 @@
+import { recordOutboundClick } from '../shared/outboundClient.js';
 import { useMemo } from 'react';
 import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
@@ -28,6 +29,8 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
     const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場'
         : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
 
+    const recordMerchant = (placement, merchant = winnerPlatform) => recordOutboundClick({ section: 'products', merchant: merchant === 'yahoo' ? 'yahoo-shopping' : merchant, placement, sponsored: true });
+
     return (
         <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}${isSelected ? ' selected' : ''}`}>
             <div className="product-image-col">
@@ -38,7 +41,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                         {item.isFreeShipping ? '実質最安' : '実質最安（送料別）'}
                     </div>
                 )}
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link">
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link" onClick={() => recordMerchant('product-image')}>
                     {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.itemName} className="product-image" loading="lazy" />
                     ) : (
@@ -49,7 +52,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
 
             <div className="product-info-col">
                 <h3 className="product-title">
-                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link">
+                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link" onClick={() => recordMerchant('product-title')}>
                         {item.itemName}
                     </a>
                 </h3>
@@ -106,7 +109,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     比較に追加
                 </label>
 
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first">
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first" onClick={() => recordMerchant('product-primary')}>
                     {platformLabel}で購入する ▶<br />
                     <span className="dy-tooltip">
                         {rakutenTracked ? '楽天市場の商品ページへ' : `楽天の在庫が確認できないため${platformLabel}へ`}
@@ -114,10 +117,10 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                 </a>
 
                 <div className="sub-actions">
-                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small">
+                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small" onClick={() => recordMerchant('product-secondary', 'amazon')}>
                         Amazonで探す
                     </a>
-                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small">
+                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small" onClick={() => recordMerchant('product-secondary', 'yahoo-shopping')}>
                         Yahoo!で探す
                     </a>
                 </div>
