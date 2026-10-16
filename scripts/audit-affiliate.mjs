@@ -15,7 +15,7 @@ console.log(JSON.stringify({
   a8VerbatimAdCodeCount: a8.length,
   servicesWithoutMonetizedPlacements: missing,
   yahooTravelCreativesSaved: Object.keys(YAHOO_TRAVEL_A8_CREATIVES).length,
-  yahooTravelProductionAdPermission: 'not confirmed; requires registered A8.net site, advertiser approval, and Vercel production build flags',
+  yahooTravelProductionAdPermission: 'site registration confirmed by owner; program participation evidenced by original A8 ad HTML; advertiser-specific restrictions not independently verified',
   yahooTravelAdsEnabledByDefault: travelAffiliateEnabled({}),
   actualConversions: 'unknown; requires A8.net and advertiser settlement reports',
   actualRevenue: 'unknown; requires A8.net and advertiser settlement reports',
