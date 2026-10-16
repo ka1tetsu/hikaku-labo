@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CATEGORIES, LAST_REVIEWED } from './catalog.js';
 import { rankServices } from './score.js';
 import { outboundLink, recordOutbound } from './affiliate.js';
+import { A8_AD_PLACEMENTS } from './a8Placements.js';
 import './tools.css';
 
 const BUDGETS = [
@@ -73,6 +74,12 @@ function PlanCard({ service, index, selected, toggle }) {
       </div>
       <div className="tl-card-actions">
         <OfficialLink service={service} />
+        {typeof A8_AD_PLACEMENTS[service.id] === 'string' && A8_AD_PLACEMENTS[service.id].trim() && (
+          <div className="tl-a8-placement" aria-label="A8.netアフィリエイト広告">
+            <span className="tl-a8-label">広告・PR（A8.net）</span>
+            <div dangerouslySetInnerHTML={{ __html: A8_AD_PLACEMENTS[service.id] }} />
+          </div>
+        )}
         <button
           className={'tl-compare-toggle ' + (selected ? 'is-active' : '')}
           type="button"
