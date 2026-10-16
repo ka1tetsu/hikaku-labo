@@ -26,6 +26,7 @@ jobs:
           npm run lint
           npm run build
       - name: Check production site via real HTTP
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         env:
           PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
