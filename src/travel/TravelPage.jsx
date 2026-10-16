@@ -57,7 +57,7 @@ export default function TravelPage() {
           <h1>旅の予算を整えて、<br/><em>自分らしい</em>宿選び。</h1>
           <p>宿泊費だけではなく、交通費や食費も。旅行に必要なお金をまとめて整理してから、納得できる宿泊プランを探そう。</p>
           <div className="tv-hero-actions"><a className="tv-primary-button" href="#planner">旅費を計算してみる ↗</a><a href="#guide" className="tv-secondary-button">比較のポイントを見る</a></div>
-          <span className="tv-hero-minor">✓ 無料・会員登録不要　　 ✓ 入力した予算をその場で計算</span>
+          <span className="tv-hero-minor">✓ 無料・会員登録不要   ✓ 入力した予算をその場で計算</span>
         </div>
         <div className="tv-art" aria-hidden="true"><div className="tv-sun"/><div className="tv-mountain tv-mountain-back"/><div className="tv-mountain tv-mountain-front"/>
           <div className="tv-art-ticket"><small>YOUR NEXT GETAWAY</small><strong>次の旅を、<br/>もう少し身近に。</strong><div><b>TRIP / 01</b><span>↗</span></div></div>
