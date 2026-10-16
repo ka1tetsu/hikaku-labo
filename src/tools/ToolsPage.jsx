@@ -194,7 +194,7 @@ export default function ToolsPage() {
                 <button type="button" disabled={selectedIds.length === 0} onClick={() => setOnlySelection(v => !v)}>{onlySelection ? 'すべて表示' : '選択した候補のみ表示'}（{selectedIds.length}/3）</button>
               </div>
               <div className="tl-cards">
-                {displayed.map((service, index) => <PlanCard key={service.id} service={service} index={ranking.findIndex(x => x.id === service.id)} selected={selectedIds.includes(service.id)} toggle={toggle}/>)}
+                {displayed.map((service) => <PlanCard key={service.id} service={service} index={ranking.findIndex(x => x.id === service.id)} selected={selectedIds.includes(service.id)} toggle={toggle}/>)}
               </div>
               {displayed.length === 0 && <div className="tl-empty">比較するサービスを選択してください。</div>}
               <p className="tl-note">掲載料金は取得・確認時点の参考情報です。キャンペーン、契約期間、税区分、決済手数料などは異なります。最終申込前に必ず公式サイトをご確認ください。</p>
