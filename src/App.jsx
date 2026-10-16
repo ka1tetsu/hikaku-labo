@@ -1,3 +1,4 @@
+import { recordOutboundClick } from './shared/outboundClient.js';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import SectionDirectory from './shared/SectionDirectory.jsx';
@@ -157,9 +158,9 @@ export default function App() {
             {['スマートフォン', 'ノートPC', '液晶テレビ', 'ドラム式洗濯機'].map(kw => (
               <div key={kw} className="affiliate-kw-group">
                 <span className="kw-label">{kw}：</span>
-                <a href={`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(kw)}/?v=3`} target="_blank" rel="noopener noreferrer sponsored" className="kw-link rakuten">楽天</a>
-                <a href={buildAmazonAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link amazon">Amazon</a>
-                <a href={buildYahooAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link yahoo">Yahoo</a>
+                <a href={`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(kw)}/?v=3`} target="_blank" rel="noopener noreferrer sponsored" className="kw-link rakuten" onClick={() => recordOutboundClick({ section: 'products', merchant: 'rakuten', placement: 'quick-search', sponsored: false })}>楽天</a>
+                <a href={buildAmazonAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link amazon" onClick={() => recordOutboundClick({ section: 'products', merchant: 'amazon', placement: 'quick-search', sponsored: true })}>Amazon</a>
+                <a href={buildYahooAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link yahoo" onClick={() => recordOutboundClick({ section: 'products', merchant: 'yahoo-shopping', placement: 'quick-search', sponsored: true })}>Yahoo</a>
               </div>
             ))}
           </div>
