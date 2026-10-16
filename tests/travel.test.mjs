@@ -22,11 +22,10 @@ test('travel budgets sanitize negative and impossible inputs', () => {
   assert.ok(Number.isFinite(result.total));
 });
 
-test('ad rendering stays disabled until both A8 permissions are verified', () => {
-  assert.equal(travelAffiliateEnabled({}), false);
-  assert.equal(travelAffiliateEnabled({VITE_A8_TRAVEL_SITE_REGISTERED: 'true'}), false);
-  assert.equal(travelAffiliateEnabled({VITE_A8_TRAVEL_PROGRAM_ALLOWED: 'true'}), false);
-  assert.equal(travelAffiliateEnabled({VITE_A8_TRAVEL_SITE_REGISTERED: 'true', VITE_A8_TRAVEL_PROGRAM_ALLOWED: 'true'}), true);
+test('ad rendering is active after owner confirms site registration and can be disabled', () => {
+  assert.equal(travelAffiliateEnabled({}), true);
+  assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'false' }), true);
+  assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'true' }), false);
 });
 
 test('supplied A8 ad materials have matching tracking IDs and untouched view pixels', () => {

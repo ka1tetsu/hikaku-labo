@@ -101,6 +101,6 @@ export default function TravelPage() {
         <details><summary>比較ラボで直接予約できますか？</summary><p>できません。比較ラボは旅行予算の計画を支援するサイトです。予約・支払・キャンセル手続きは旅行予約サイトでお願いします。</p></details>
       </section>
     </main>
-    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボ / travel</strong><p>旅の計画をもっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。広告表示は掲載許可とサイト登録を確認した場合のみ有効になります。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
+    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボ / travel</strong><p>旅の計画をもっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.netに登録済みのサイトとして広告を掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
   </div>;
 }
