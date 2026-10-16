@@ -1557,3 +1557,13 @@ a:hover {
   font-size: 0.78rem;
   color: #999;
 }
+
+
+/* ITツール診断への誘導。レガシー商品比較の他のスタイルとは独立 */
+.tools-home-banner { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 26px; padding: 27px 29px; border-radius: 12px; background: linear-gradient(115deg, #133b2c, #246b4b); color: #fff; }
+.tools-home-banner h2 { font-size: 21px; margin: 5px 0 7px; line-height: 1.4; letter-spacing: -.03em; }
+.tools-home-banner p { font-size: 12px; color: #e1eee2; }
+.tools-home-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #c7e9a9; }
+.tools-home-link { white-space: nowrap; background: #d7edb7; border-radius: 9px; padding: 12px 18px; color: #173d2d !important; font-weight: 900; font-size: 12px; }
+.header .tools-badge { background: #116c4f; border: 1px solid #bbebd3; }
+@media (max-width: 700px) { .tools-home-banner { flex-direction: column; align-items: stretch; padding: 20px; gap: 17px; } .tools-home-banner h2 { font-size: 17px; } .tools-home-link { text-align: center; } }
