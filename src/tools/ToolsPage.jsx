@@ -116,6 +116,7 @@ export default function ToolsPage() {
         <div className="tl-wrap tl-nav">
           <a href="/" className="tl-logo" aria-label="比較ラボのトップへ"><span className="tl-logo-icon">✳</span>比較ラボ<span className="tl-logo-light"> / tools</span></a>
           <div className="tl-nav-end">
+            <a href="/travel/" className="tl-back">宿泊予算ガイド ↗</a>
             <a href="/" className="tl-back">商品価格比較へ ↗</a>
             <a href="#selector" className="tl-nav-action">無料で診断する <span aria-hidden="true">→</span></a>
           </div>
