@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate:articles": "node scripts/generate-articles.mjs",
-    "test:tools": "node --test tests/tools.test.mjs"
+    "test:tools": "node --test tests/tools.test.mjs",
+    "test:travel": "node --test tests/travel.test.mjs",
+    "test:all": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

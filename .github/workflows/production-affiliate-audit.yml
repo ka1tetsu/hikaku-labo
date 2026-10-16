@@ -22,16 +22,17 @@ jobs:
       - name: Install, unit-test, lint and build
         run: |
           npm ci
-          npm run test:tools
+          npm run test:all
           npm run lint
           npm run build
       - name: Check production site via real HTTP
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         env:
           PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
         run: |
           set -euo pipefail
-          for path in "/" "/tools/"; do
+          for path in "/" "/tools/" "/travel/"; do
             printf '\n=== Checking %s%s ===\n' "$PUBLIC_SITE_URL" "$path"
             status=$(curl -L -sS --max-time 30 --retry 2 -o /tmp/hikaku-check.html -w '%{http_code}' "$PUBLIC_SITE_URL$path")
             echo "HTTP status: $status"
@@ -41,6 +42,12 @@ jobs:
               echo
               echo "::error::Production endpoint $path returned HTTP $status. Check Vercel domains, deployed output, and deployment protection."
               exit 1
+            fi
+            if [ "$path" = "/travel/" ]; then
+              grep -q '旅行予算シミュレーター' /tmp/hikaku-check.html || {
+                echo "::error::Travel page not served at /travel/."
+                exit 1
+              }
             fi
             if [ "$path" = "/tools/" ]; then
               grep -q '無料ITツール診断' /tmp/hikaku-check.html || {

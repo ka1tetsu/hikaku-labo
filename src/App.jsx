@@ -154,6 +154,14 @@ export default function App() {
           <a href="/tools/" className="tools-home-link">ITツールを診断する →</a>
         </section>
 
+        <section className="travel-home-banner">
+          <div>
+            <span className="travel-home-eyebrow">NEW / TRAVEL PLANNING</span>
+            <h2>旅の予算を計算して、宿泊プラン選びをもっと簡単に。</h2>
+            <p>旅行人数・泊数・交通費を入力するだけ。費用の目安と宿泊前のチェックポイントがわかります。</p>
+          </div>
+          <a href="/travel/" className="travel-home-link">無料で旅行予算を計算 →</a>
+        </section>
         {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
           <div className="affiliate-bar-title">

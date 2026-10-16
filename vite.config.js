@@ -9,6 +9,7 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
         tools: fileURLToPath(new URL('./tools/index.html', import.meta.url)),
+        travel: fileURLToPath(new URL('./travel/index.html', import.meta.url)),
       },
     },
   },
