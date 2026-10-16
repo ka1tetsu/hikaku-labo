@@ -2,7 +2,7 @@ name: Production and affiliate readiness audit
 
 on:
   push:
-    branches: [main, audit/production-affiliate-readiness]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -52,3 +52,6 @@ jobs:
       - name: Check advertising setup (not actual revenue)
         if: always()
         run: node scripts/audit-affiliate.mjs
+      - name: Require approved ads before claiming monetization
+        if: always() && github.event_name == 'workflow_dispatch'
+        run: node scripts/audit-affiliate.mjs --require-placements
