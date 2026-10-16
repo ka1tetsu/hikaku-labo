@@ -1,0 +1,61 @@
+/* Shared consulting interface applied to the IT service decision page.
+   Existing comparison logic, sponsored ad HTML and external links remain unchanged. */
+.tl-page{--ink:#182f29;--muted:#526a5d;--surface:#fff;--border:#dbe7de;background:#f5f7f5;color:#172e27;font-family:'Noto Sans JP',system-ui,sans-serif;font-size:15px;line-height:1.8}
+.tl-page .hl-chrome{position:relative;z-index:50}
+.tl-page button:focus-visible,.tl-page a:focus-visible,.tl-page select:focus-visible{outline:3px solid #157b58;outline-offset:3px}
+.tl-page .tl-hero{background:linear-gradient(117deg,#152f29 5%,#154c3b 56%,#1b6550)}
+.tl-page .tl-hero-grid{max-width:1160px}
+.tl-page .tl-hero h1{font-size:clamp(34px,4vw,55px);letter-spacing:-.045em;line-height:1.42}
+.tl-page .tl-hero h1 em{color:#e1efac}
+.tl-page .tl-hero-copy>p{font-size:15px;line-height:2;max-width:600px;color:#d9ede2}
+.tl-page .tl-eyebrow{font-size:11px;color:#d5e7cd}
+.tl-page .tl-hero-button{border-radius:10px;background:#e5eeb7;color:#1b432f;font-size:13px;font-weight:900;min-height:48px;display:inline-flex;align-items:center}
+.tl-page .tl-hero-cta>span,.tl-page .tl-trust{color:#d9ebdc;font-size:12px}
+.tl-page .tl-visual-card{background:#fff;border-radius:14px;box-shadow:0 22px 55px #0a282d35}
+.tl-page .tl-visual-line{font-size:13px}
+.tl-page .tl-steps{background:#fff;border:1px solid #e0eae3;border-radius:14px;box-shadow:0 7px 17px #09281e0a;margin-top:21px;margin-bottom:10px;padding:13px 20px}
+.tl-page .tl-steps b{font-size:14px}
+.tl-page .tl-steps p{font-size:12px;color:#596e5c}
+.tl-page .tl-work{padding-top:65px}
+.tl-page .tl-section-head h2,.tl-page .tl-method-heading h2{font-size:clamp(26px,3vw,38px);line-height:1.5;letter-spacing:-.04em;color:#18342b}
+.tl-page .tl-section-head p{font-size:14px;line-height:1.9;color:#546a5e}
+.tl-page .tl-overline{font-size:11px;letter-spacing:.13em;color:#1d7d5a}
+.tl-page .tl-counter{font-size:12px;color:#2d644c}
+.tl-page .tl-form,.tl-page .tl-results,.tl-page .tl-method-grid article,.tl-page .tl-card{border:1px solid #dce5dc;border-radius:15px;box-shadow:0 5px 19px #172d180b;background:#fff}
+.tl-page .tl-form{padding:25px}
+.tl-page .tl-form-heading strong{font-size:17px}
+.tl-page .tl-form-heading small,.tl-page .tl-form-note{font-size:12px;color:#566b60;line-height:1.8}
+.tl-page .tl-form legend{color:#203a2e;font-weight:850;font-size:14px}
+.tl-page .tl-choice,.tl-page .tl-option{border-color:#dbe6de;border-radius:10px;background:#fff;color:#345243;min-height:46px;font-size:13px}
+.tl-page .tl-choice:hover,.tl-page .tl-option:hover{border-color:#9dbfac;background:#f5faf5}
+.tl-page .tl-choice.active,.tl-page .tl-option.active{background:#e9f5ed;border-color:#74aa8f;color:#14543d}
+.tl-page .tl-choice-text b{font-size:14px}
+.tl-page .tl-choice-text small{font-size:12px;color:#557363}
+.tl-page .tl-reset{font-size:13px;min-height:43px}
+.tl-page .tl-results-head h3{font-size:21px}
+.tl-page .tl-result-count{font-size:12px}
+.tl-page .tl-cards{gap:17px}
+.tl-page .tl-card-content{padding:19px 20px}
+.tl-page .tl-company-name{font-size:19px}
+.tl-page .tl-company p{font-size:12px}
+.tl-page .tl-score strong{font-size:30px;color:#185f45}
+.tl-page .tl-score span,.tl-page .tl-rank{font-size:11px}
+.tl-page .tl-summary{font-size:14px;line-height:1.85;color:#394f44}
+.tl-page .tl-price{border:1px solid #e0ebe3;border-radius:10px;background:#f6faf7}
+.tl-page .tl-price strong{color:#184e3a}
+.tl-page .tl-tags span{border-radius:6px;font-size:11px}
+.tl-page .tl-prose p,.tl-page .tl-caution p{font-size:12px;line-height:1.9}
+.tl-page .tl-visit,.tl-page .tl-secondary-link{min-height:45px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:850}
+.tl-page .tl-compare-toggle{min-height:43px;border-radius:9px;font-size:12px}
+.tl-page .tl-compare-section{overflow:hidden;border-radius:15px}
+.tl-page .tl-table-wrap{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.tl-page .tl-table{min-width:670px}
+.tl-page .tl-table th,.tl-page .tl-table td{font-size:12px;line-height:1.75;padding:13px}
+.tl-page .tl-table thead th{background:#e9f3eb;color:#174a35}
+.tl-page .tl-method-grid article{padding:25px}
+.tl-page .tl-method-grid p{font-size:13px;line-height:1.9}
+.tl-page .tl-method-detail{font-size:13px;line-height:1.9}
+.tl-page .tl-footer{background:#18382e}
+.tl-page .tl-footer-disclosure p{font-size:12px;line-height:1.9}
+@media(max-width:780px){.tl-page .tl-work{padding-block:40px 66px}.tl-page .tl-steps{margin-top:12px}.tl-page .tl-results{padding:17px}}
+@media(max-width:570px){.tl-page .tl-hero-copy>p{font-size:14px}.tl-page .tl-hero h1{font-size:35px}.tl-page .tl-form{padding:18px}.tl-page .tl-card-content{padding:16px}.tl-page .tl-section-head p{font-size:13px}.tl-page .tl-table{min-width:600px}}
