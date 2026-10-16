@@ -48,7 +48,10 @@ async function probe(label, url, headers) {
 }
 
 export default async function handler(req, res) {
-    res.setHeader('Cache-Control', 'no-store');
+    // 1回の診断で楽天APIを4回叩くため、公開URLを連打されるとレート制限を食い潰し
+    // 本番の商品検索まで止まる。CDNで60秒キャッシュして呼び出し回数を抑える。
+    res.setHeader('Cache-Control', 's-maxage=60');
+    res.setHeader('X-Robots-Tag', 'noindex');
 
     const base = new URLSearchParams({
         format: 'json',

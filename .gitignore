@@ -26,3 +26,6 @@ dist-ssr
 .vercel
 .env
 .env.local
+
+# ビルド時の静的HTML生成用（配信しない）
+.ssr-build

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
+import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl, cleanSearchKeyword } from '../api';
+import { trackOutbound } from '../shared/track';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
 
 function StarRating({ score }) {
@@ -15,8 +16,9 @@ function StarRating({ score }) {
 }
 
 export default function ProductCard({ item, viewMode, isSelected, onToggleCompare, isCheapest }) {
-    // 半角・全角スペース区切りの先頭語を他モール検索のキーワードにする
-    const keyword = item.itemName.split(/[ \u3000]/)[0];
+    // 販促文言（【送料無料】等）を除いた商品名の先頭数語を他モール検索のキーワードにする。
+    // 以前は先頭1語だけで「【送料無料】Apple」のような検索になり、送客しても商品が見つからなかった。
+    const keyword = cleanSearchKeyword(item.itemName);
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
     const yahooUrl = buildYahooAffiliateUrl(keyword);
 
@@ -27,6 +29,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
     );
     const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場'
         : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
+    const track = (target, placement) => () => trackOutbound({ section: 'products', target, placement });
 
     return (
         <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}${isSelected ? ' selected' : ''}`}>
@@ -38,7 +41,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                         {item.isFreeShipping ? '実質最安' : '実質最安（送料別）'}
                     </div>
                 )}
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link">
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link" onClick={track(winnerPlatform, 'card-image')}>
                     {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.itemName} className="product-image" loading="lazy" />
                     ) : (
@@ -49,7 +52,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
 
             <div className="product-info-col">
                 <h3 className="product-title">
-                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link">
+                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link" onClick={track(winnerPlatform, 'card-title')}>
                         {item.itemName}
                     </a>
                 </h3>
@@ -106,7 +109,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     比較に追加
                 </label>
 
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first">
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first" onClick={track(winnerPlatform, 'card-cta')}>
                     {platformLabel}で購入する ▶<br />
                     <span className="dy-tooltip">
                         {rakutenTracked ? '楽天市場の商品ページへ' : `楽天の在庫が確認できないため${platformLabel}へ`}
@@ -114,11 +117,11 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                 </a>
 
                 <div className="sub-actions">
-                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small">
-                        Amazonで探す
+                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small" onClick={track('amazon', 'card-cross')}>
+                        Amazonで価格を見る
                     </a>
-                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small">
-                        Yahoo!で探す
+                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small" onClick={track('yahoo', 'card-cross')}>
+                        Yahoo!で価格を見る
                     </a>
                 </div>
             </div>

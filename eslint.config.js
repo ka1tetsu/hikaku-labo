@@ -5,7 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist', '.ssr-build'] },
   // api/ と scripts/ は Vercel のサーバーサイド実行なので Node のグローバルを許可する
   {
     files: ['api/**/*.js', 'scripts/**/*.mjs'],

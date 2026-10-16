@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
-import { calculateTravelBudget, DESTINATIONS } from './budget.js';
+import { calculateTravelBudget, DESTINATIONS, rakutenTravelAreaUrl } from './budget.js';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
+import { wrapWithRakutenAffiliate } from '../api.js';
+import { trackOutbound } from '../shared/track.js';
+import { TRAVEL_FAQ } from './faq.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
 
@@ -12,11 +15,31 @@ function BookingAd({ variant }) {
   if (!AD_READY) return <div className="tv-ad-placeholder">
     <span className="tv-ad-label">宿泊プランを調べる</span>
     <p>最新の宿泊料金やポイント条件は予約サイトでご確認ください。</p>
-    <a href="https://travel.yahoo.co.jp/" target="_blank" rel="noopener noreferrer">Yahoo!トラベルの公式サイト ↗</a>
+    <a href="https://travel.yahoo.co.jp/" target="_blank" rel="noopener noreferrer" onClick={() => trackOutbound({ section: 'travel', target: 'yahoo-travel', placement: variant, sponsored: false })}>Yahoo!トラベルの公式サイト ↗</a>
   </div>;
-  return <div className="tv-affiliate-ad" aria-label="Yahoo!トラベル アフィリエイト広告">
+  // A8.netの広告コードは改変せず、外側の要素でクリックだけを数える
+  const onClick = event => {
+    if (event.target instanceof Element && event.target.closest('a')) trackOutbound({ section: 'travel', target: 'a8-yahoo-travel', placement: variant });
+  };
+  return <div className="tv-affiliate-ad" aria-label="Yahoo!トラベル アフィリエイト広告" onClick={onClick}>
     <span className="tv-ad-label">PR・広告 / Yahoo!トラベル</span>
     <div dangerouslySetInnerHTML={{ __html: YAHOO_TRAVEL_A8_CREATIVES[variant] }} />
+  </div>;
+}
+
+// 選んだエリアの都道府県ごとに、楽天トラベルの宿一覧へ楽天アフィリエイト経由で案内する。
+// バナー1枚だけの導線より、行き先が具体的なテキストリンクのほうが予約につながりやすい。
+function RakutenTravelLinks({ place, placement }) {
+  return <div className="tv-rakuten-links">
+    <span className="tv-ad-label">PR・広告 / 楽天トラベル</span>
+    <strong>楽天トラベルで{place.name}の宿を探す</strong>
+    <div className="tv-rakuten-grid">
+      {place.prefectures.map(pref => {
+        const raw = rakutenTravelAreaUrl(pref.slug);
+        return <a key={pref.slug} href={wrapWithRakutenAffiliate(raw) || raw} target="_blank" rel="noopener noreferrer sponsored"
+          onClick={() => trackOutbound({ section: 'travel', target: 'rakuten-travel', placement })}>{pref.name}の宿 ↗</a>;
+      })}
+    </div>
   </div>;
 }
 const ADVICE = [
@@ -87,19 +110,17 @@ export default function TravelPage() {
             <div className="tv-total">{yen(budget.total)}<small> / 全員分</small></div><p className="tv-per-person">1人あたり 約 <b>{yen(budget.perPerson)}</b></p>
             <div className="tv-cost-bar">{rows.map(row=><div key={row.name} className={'tv-bar-'+row.color} style={{flex:row.total, display:row.total?'block':'none'}}/>)}{budget.total===0&&<div style={{background:'#e2e6e0',flex:1}}/>}</div>
             <div className="tv-cost-breakdown">{rows.map(row=><div key={row.name}><span><i className={'tv-cost-dot tv-bar-'+row.color}/>{row.name}</span><strong>{yen(row.total)}</strong></div>)}</div>
-            <div className="tv-result-booking"><strong>次は宿泊プランを比較</strong><p>宿泊費の目安 {yen(budget.lodging)} に合わせて、日付・人数・食事条件などを揃えてチェック。</p><BookingAd variant="banner234"/></div>
+            <div className="tv-result-booking"><strong>次は宿泊プランを比較</strong><p>宿泊費の目安 {yen(budget.lodging)} に合わせて、日付・人数・食事条件などを揃えてチェック。</p><RakutenTravelLinks place={place} placement="result"/><BookingAd variant="banner234"/></div>
           </aside>
         </div>
       </section>
 
       <section className="tv-guide" id="guide"><div className="tv-wrap"><span className="tv-eyebrow">BEFORE YOU BOOK</span><h2>予約前に確かめたい、<br/>3つのチェックポイント。</h2><div className="tv-guide-cards">{ADVICE.map(item=><article key={item.number}><span>{item.number}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div></div></section>
-      <section className="tv-wrap tv-booking-cta"><div><span className="tv-eyebrow">FIND YOUR STAY</span><h2>実際の宿泊プランを、<br/>自分の条件で探そう。</h2><p>Yahoo!トラベルではエリア・宿泊日・人数などで探せます。表示価格やポイントの適用条件、キャンセル規定は予約前に公式サイトで確認してください。</p></div><BookingAd variant="banner300"/></section>
+      <section className="tv-wrap tv-booking-cta"><div><span className="tv-eyebrow">FIND YOUR STAY</span><h2>実際の宿泊プランを、<br/>自分の条件で探そう。</h2><p>楽天トラベルやYahoo!トラベルでは、エリア・宿泊日・人数などで探せます。同じ条件で複数の予約サイトを見比べると、ポイント還元やクーポンの違いも確認できます。表示価格やポイントの適用条件、キャンセル規定は予約前に公式サイトで確認してください。</p><RakutenTravelLinks place={place} placement="cta"/></div><BookingAd variant="banner300"/></section>
       <section className="tv-wrap tv-faq"><span className="tv-eyebrow">Q & A</span><h2>宿泊予約について</h2>
-        <details><summary>表示された料金は最新の宿泊料金ですか？</summary><p>いいえ。入力した単価をもとに計算した予算の目安です。実際のプラン価格、空室、ポイント適用条件は予約サイトでご確認ください。</p></details>
-        <details><summary>ポイント即時利用・クーポンは計算されますか？</summary><p>自動反映されません。利用資格、支払方法、対象プラン等で条件が異なるため、予約確認画面の金額をご確認ください。</p></details>
-        <details><summary>比較ラボで直接予約できますか？</summary><p>できません。比較ラボは旅行予算の計画を支援するサイトです。予約・支払・キャンセル手続きは旅行予約サイトでお願いします。</p></details>
+        {TRAVEL_FAQ.map(item => <details key={item.q}><summary>{item.q}</summary><p>{item.a}</p></details>)}
       </section>
     </main>
-    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボ / travel</strong><p>旅の計画をもっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.netに登録済みのサイトとして広告を掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
+    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボ / travel</strong><p>旅の計画をもっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。Yahoo!トラベルはA8.net、楽天トラベルは楽天アフィリエイトを通じて広告を掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
   </div>;
 }

@@ -42,13 +42,29 @@ function fetchRakuten(url) {
     });
 }
 
-export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    if (req.method === 'OPTIONS') return res.status(200).end();
+// 入力の正規化。楽天APIの上限（page<=100, keyword は最大128文字程度）を超える値や
+// 数字以外の genreId を素通しすると無駄なAPI呼び出し（=レート制限の消費）になる。
+export function normalizeSearchQuery(query = {}) {
+    const keyword = String(query.keyword ?? '').trim().slice(0, 128);
+    const genreId = /^\d{1,9}$/.test(String(query.genreId ?? '')) ? String(query.genreId) : '';
+    const pageNum = Math.floor(Number(query.page));
+    const page = Number.isFinite(pageNum) ? Math.max(1, Math.min(100, pageNum)) : 1;
+    return { keyword, genreId, page };
+}
 
-    const { keyword = '', genreId = '', page = 1 } = req.query;
-    const opts = { keyword, genreId, page };
+export default async function handler(req, res) {
+    // 自サイトのフロントエンドからの同一オリジン呼び出しだけを想定する。
+    // 以前は Access-Control-Allow-Origin: * で、他サイトがこのプロキシ経由で
+    // 楽天APIの呼び出し枠（レート制限）を消費できる状態だった。
+    if (req.method !== 'GET') {
+        res.setHeader('Allow', 'GET');
+        return res.status(405).json({ error: 'method_not_allowed' });
+    }
+
+    const opts = normalizeSearchQuery(req.query);
+    if (!opts.keyword && !opts.genreId) {
+        return res.status(400).json({ error: 'keyword または genreId を指定してください。' });
+    }
 
     // applicationId の形式から、叩くべきエンドポイントを決める。
     // 形式に合わないエンドポイントを叩いても "specify valid applicationId" になるだけなので、
@@ -85,7 +101,9 @@ export default async function handler(req, res) {
             const text = await rakutenRes.text();
 
             if (rakutenRes.ok) {
-                res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+                // CDNで10分キャッシュし、その後も1日までは古い結果を即返しつつ裏で更新する。
+                // 同じ検索語の楽天API呼び出しが減り、表示も速くなる。
+                res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=86400');
                 // 成果計測が効いているかを運用側から確認できるようにする
                 res.setHeader('X-Rakuten-Affiliate', affiliateState);
                 return res.status(200).send(text);

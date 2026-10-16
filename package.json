@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir .ssr-build && node scripts/prerender.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:articles": "node scripts/generate-articles.mjs",
     "test:tools": "node --test tests/tools.test.mjs",
     "test:travel": "node --test tests/travel.test.mjs",
     "test:all": "node --test tests/*.test.mjs"

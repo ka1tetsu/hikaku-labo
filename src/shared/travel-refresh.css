@@ -51,3 +51,10 @@
  .tv-page .tv-total{font-size:36px!important}
  .tv-page .tv-guide{padding-block:58px}
 }
+
+/* 楽天トラベル（楽天アフィリエイト）エリア別リンク */
+.tv-rakuten-links{display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:14px;border:1px solid #e5d3d3;border-radius:12px;background:#fff}
+.tv-rakuten-links strong{font-size:14px;color:#1c3029}
+.tv-rakuten-grid{display:flex;flex-wrap:wrap;gap:8px}
+.tv-rakuten-grid a{display:inline-flex;align-items:center;padding:8px 12px;border-radius:9px;background:#bf0000;color:#fff!important;font-weight:800;font-size:13px;text-decoration:none!important}
+.tv-rakuten-grid a:hover{background:#9e0000}
