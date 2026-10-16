@@ -149,3 +149,9 @@ body { margin: 0; }
   .tl-footer-top { grid-template-columns: 1fr; }.tl-footer-top > div:first-child { grid-column: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .tl-page * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Separate approved A8 HTML creative; preserve generated link source unchanged. */
+.tl-a8-placement { border: 1px solid #d9e5d9; border-radius: 9px; padding: 13px; text-align: center; overflow-wrap: anywhere; }
+.tl-a8-label { display: block; text-align: left; font-size: 10px; font-weight: 800; color: #64756b; margin-bottom: 8px; }
+.tl-a8-placement a { color: #126d52; text-decoration: underline; font-size: 13px; }
+.tl-a8-placement img { max-width: 100%; height: auto; }
