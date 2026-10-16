@@ -1,0 +1,52 @@
+/* Hikaku Labo unified design layer. Readability and layout principles are informed by
+ * Tabler (MIT) and Carbon Design System; original SVGs by Tabler Icons (MIT).
+ * See docs/UI-DESIGN-SYSTEM.md and public/icons/tabler/LICENSE.
+ */
+:root{
+  --hl-ink:#162b28;--hl-text:#304740;--hl-muted:#536860;--hl-brand:#14664f;
+  --hl-brand-hover:#0f4b3a;--hl-accent:#cbe9da;--hl-bg:#f6f8f7;
+  --hl-paper:#fff;--hl-line:#dce5e1;--hl-line-strong:#bdccc5;
+  --hl-radius:14px;--hl-radius-lg:20px;
+  --hl-shadow:0 9px 25px rgba(20,40,32,.052);
+  --hl-focus:#14664f;
+}
+html{scroll-padding-top:120px}
+.hl-chrome,.hl-chrome *{box-sizing:border-box}
+.hl-chrome{font-family:'Noto Sans JP',system-ui,-apple-system,sans-serif;position:relative;z-index:50}
+.hl-chrome a{text-decoration:none}
+.hl-container{max-width:1200px;width:calc(100% - 44px);margin:0 auto}
+.hl-skip{position:absolute;left:16px;top:-65px;z-index:999;background:#fff;color:#123c30!important;padding:12px 18px;border:2px solid #0c7453;border-radius:6px;font-weight:800}
+.hl-skip:focus{top:6px}
+.hl-header{background:#fff;border-bottom:1px solid #dfe8e2}
+.hl-header-row{min-height:80px;display:flex;align-items:center;gap:28px}
+.hl-brand{display:flex;align-items:center;gap:10px;color:var(--hl-ink)!important;flex-shrink:0}
+.hl-brand-mark{width:38px;height:38px;display:grid;grid-template-columns:repeat(2,1fr);gap:3px;padding:8px;background:#155d48;border-radius:11px;box-shadow:0 5px 12px #12553b23;transform:rotate(-8deg)}
+.hl-brand-mark span{background:#eef3c7;border-radius:2px}
+.hl-brand-mark span:nth-child(2),.hl-brand-mark span:nth-child(3){background:#91cdb1}
+.hl-brand-text{font-size:18px;font-weight:900;letter-spacing:-.05em;line-height:1.05}
+.hl-brand-text small{display:block;font:800 8px/1.7 Inter,sans-serif;letter-spacing:.22em;color:#78968a;margin-top:3px}
+.hl-main-nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.hl-nav-item{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:10px;color:var(--hl-muted)!important;font-size:13px;font-weight:750;white-space:nowrap;transition:background .17s,color .17s}
+.hl-nav-item img,.hl-header-link img{opacity:.75}
+.hl-nav-item:hover{background:#f2f7f4;color:var(--hl-brand)!important}
+.hl-nav-item.is-current{background:#e5f1ea;color:#11593f!important}
+.hl-header-link{display:flex;align-items:center;gap:5px;color:#fff!important;background:#165f4b;border-radius:9px;padding:12px 16px;font-size:12px;font-weight:850;white-space:nowrap}
+.hl-header-link img{filter:brightness(0) invert(1)}
+.hl-header-link:hover{background:#0e4838}
+.hl-nav-item:focus-visible,.hl-header-link:focus-visible,.hl-brand:focus-visible,.hl-directory a:focus-visible{outline:3px solid #167957;outline-offset:3px}
+@media(max-width:920px){
+  .hl-header-row{flex-wrap:wrap;gap:8px 16px;padding:12px 0}
+  .hl-main-nav{order:3;width:100%;margin:0;overflow-x:auto;scrollbar-width:thin;justify-content:space-between;padding-bottom:2px}
+  .hl-nav-item{flex:1;padding:11px 8px}
+  .hl-header-link{margin-left:auto}
+}
+@media(max-width:520px){
+  .hl-container{width:calc(100% - 32px)}
+  .hl-header-row{gap:9px 8px}
+  .hl-brand-text{font-size:16px}
+  .hl-brand-mark{width:33px;height:33px}
+  .hl-header-link{padding:10px;font-size:11px}
+  .hl-nav-item{font-size:11px;gap:5px}
+  .hl-nav-item img{width:16px;height:16px}
+}
+@media(prefers-reduced-motion:reduce){.hl-chrome *{scroll-behavior:auto!important;transition:none!important}}
