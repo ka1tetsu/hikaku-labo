@@ -24,6 +24,7 @@ export default function Header({ inputValue, setInputValue, onSearch }) {
                 </form>
 
                 <div className="header-links">
+                    <a href="/travel/" className="header-badge travel-badge">✈ 宿泊予算ガイド</a>
                     <a href="/tools/" className="header-badge tools-badge">✳ ITツール診断</a>
                     <a href={buildRakutenSearchAffiliateUrl(inputValue || '人気')} target="_blank" rel="noopener noreferrer sponsored" className="header-badge rakuten-badge">楽天</a>
                     <a href="https://www.amazon.co.jp/?tag=kuronekosanta-22" target="_blank" rel="noopener noreferrer" className="header-badge amazon-badge">Amazon</a>
