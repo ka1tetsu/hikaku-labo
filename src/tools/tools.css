@@ -1,3 +1,5 @@
+html { scroll-behavior: smooth; }
+body { margin: 0; }
 /* 比較ラボ Tools — isolated from legacy product-comparison styles */
 .tl-page {
   --tl-ink: #18352e; --tl-muted: #64736f; --tl-green: #11634d;
