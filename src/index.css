@@ -1567,3 +1567,12 @@ a:hover {
 .tools-home-link { white-space: nowrap; background: #d7edb7; border-radius: 9px; padding: 12px 18px; color: #173d2d !important; font-weight: 900; font-size: 12px; }
 .header .tools-badge { background: #116c4f; border: 1px solid #bbebd3; }
 @media (max-width: 700px) { .tools-home-banner { flex-direction: column; align-items: stretch; padding: 20px; gap: 17px; } .tools-home-banner h2 { font-size: 17px; } .tools-home-link { text-align: center; } }
+
+/* Travel planning feature discovery */
+.travel-home-banner { grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:26px;padding:27px 29px;border-radius:12px;background:linear-gradient(115deg,#e8efdf,#cfe7dd);border:1px solid #b9d7c9;color:#164e3c }
+.travel-home-eyebrow{font-size:10px;font-weight:900;letter-spacing:.1em;color:#1c825e}
+.travel-home-banner h2{font-size:21px;margin:5px 0 7px;line-height:1.5;letter-spacing:-.03em}
+.travel-home-banner p{font-size:12px;color:#497c62}
+.travel-home-link{white-space:nowrap;background:#16684d;border-radius:9px;padding:13px 18px;color:#fff!important;font-weight:900;font-size:12px}
+.header .travel-badge{background:#167659;border:1px solid #d6f8d8;color:#fff!important}
+@media(max-width:700px){.travel-home-banner{flex-direction:column;align-items:stretch;padding:20px;gap:15px}.travel-home-banner h2{font-size:17px}.travel-home-link{text-align:center}}
