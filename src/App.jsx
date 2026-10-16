@@ -144,6 +144,16 @@ export default function App() {
       />
 
       <main className="main-content container">
+        {/* ITツール導入診断への入口。従来の商品検索には影響しない */}
+        <section className="tools-home-banner">
+          <div>
+            <span className="tools-home-eyebrow">NEW / 無料・登録不要</span>
+            <h2>あなたに合うITサービスが見つかる、無料の導入診断</h2>
+            <p>Webサイト制作・ネットショップ・WordPressを、予算と使いやすさで比較。公式情報と注意点まで確認できます。</p>
+          </div>
+          <a href="/tools/" className="tools-home-link">ITツールを診断する →</a>
+        </section>
+
         {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
           <div className="affiliate-bar-title">
