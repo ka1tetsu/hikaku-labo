@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
+import SectionDirectory from './shared/SectionDirectory.jsx';
+import './shared/home-refresh.css';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import CategoryNav from './components/CategoryNav';
@@ -143,29 +145,13 @@ export default function App() {
         onSelect={handleCategory}
       />
 
-      <main className="main-content container">
-        {/* ITツール導入診断への入口。従来の商品検索には影響しない */}
-        <section className="tools-home-banner">
-          <div>
-            <span className="tools-home-eyebrow">NEW / 無料・登録不要</span>
-            <h2>あなたに合うITサービスが見つかる、無料の導入診断</h2>
-            <p>Webサイト制作・ネットショップ・WordPressを、予算と使いやすさで比較。公式情報と注意点まで確認できます。</p>
-          </div>
-          <a href="/tools/" className="tools-home-link">ITツールを診断する →</a>
-        </section>
+      <main id="main-content" className="main-content container">
+        <SectionDirectory />
 
-        <section className="travel-home-banner">
-          <div>
-            <span className="travel-home-eyebrow">NEW / TRAVEL PLANNING</span>
-            <h2>旅の予算を計算して、宿泊プラン選びをもっと簡単に。</h2>
-            <p>旅行人数・泊数・交通費を入力するだけ。費用の目安と宿泊前のチェックポイントがわかります。</p>
-          </div>
-          <a href="/travel/" className="travel-home-link">無料で旅行予算を計算 →</a>
-        </section>
         {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
           <div className="affiliate-bar-title">
-            🔥 今売れている商品の最安値を各モールで一発検索！
+            主要モールの検索結果を比較・確認
           </div>
           <div className="affiliate-bar-links">
             {['スマートフォン', 'ノートPC', '液晶テレビ', 'ドラム式洗濯機'].map(kw => (
@@ -179,11 +165,12 @@ export default function App() {
           </div>
         </div>
 
-        <div className="results-header">
-          <h2 className="results-title">{searchTitle}</h2>
+        <div className="results-header" id="results">
+          <div className="hl-results-heading"><span className="hl-kicker"><span className="hl-kicker-dot"/> PRODUCT RESEARCH</span><h2 className="results-title">{searchTitle}</h2><p className="hl-results-caption">商品情報は楽天市場の取得時点のものです。最新の価格や送料、ポイント条件は販売ページでご確認ください。</p></div>
           {products.length > 0 && (
             <div className="results-controls">
               <select
+                aria-label="検索結果の並び順"
                 value={sortMode}
                 onChange={e => setSortMode(e.target.value)}
                 className="sort-select"
@@ -200,11 +187,15 @@ export default function App() {
                   className={viewMode === 'grid' ? 'active' : ''}
                   onClick={() => setViewMode('grid')}
                   title="グリッド表示"
+                  aria-label="グリッド表示"
+                  aria-pressed={viewMode === 'grid'}
                 >⊞</button>
                 <button
                   className={viewMode === 'list' ? 'active' : ''}
                   onClick={() => setViewMode('list')}
                   title="リスト表示"
+                  aria-label="リスト表示"
+                  aria-pressed={viewMode === 'list'}
                 >☰</button>
               </div>
             </div>
