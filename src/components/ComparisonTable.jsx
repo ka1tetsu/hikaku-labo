@@ -81,14 +81,14 @@ export default function ComparisonTable({ items, onRemove, onClear }) {
         <section className="comparison-panel">
             <div className="comparison-header">
                 <h2 className="comparison-title">選択した商品を比較（{items.length}件）</h2>
-                <button className="comparison-clear" onClick={onClear}>すべて解除</button>
+                <button type="button" className="comparison-clear" onClick={onClear}>すべて解除</button>
             </div>
 
             {items.length === 1 && (
                 <p className="comparison-hint">もう1件チェックすると横並びで比較できます。</p>
             )}
 
-            <div className="comparison-scroll">
+            <div className="comparison-scroll" role="region" aria-label="商品比較表（左右にスクロールできます）" tabIndex="0">
                 <table className="comparison-table">
                     <thead>
                         <tr>
@@ -99,6 +99,7 @@ export default function ComparisonTable({ items, onRemove, onClear }) {
                                         className="comparison-remove"
                                         onClick={() => onRemove(it.itemCode)}
                                         title="比較から外す"
+                                        aria-label={it.itemName + "を比較から外す"}
                                     >×</button>
                                     {it.imageUrl && (
                                         <img src={it.imageUrl} alt={it.itemName} className="comparison-thumb" loading="lazy" />

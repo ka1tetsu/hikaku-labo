@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
+import SiteHeader from '../shared/SiteHeader.jsx';
 import { calculateTravelBudget, DESTINATIONS } from './budget.js';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import './travel.css';
+import '../shared/travel-refresh.css';
 
 const yen = (value) => '¥' + value.toLocaleString('ja-JP');
 const AD_READY = travelAffiliateEnabled(import.meta.env);
@@ -47,11 +49,8 @@ export default function TravelPage() {
   ];
   const place = DESTINATIONS.find(x => x.id === destination);
   return <div className="tv-page">
-    <header className="tv-header"><div className="tv-wrap tv-header-inner">
-      <a href="/" className="tv-logo"><span>✳</span> 比較ラボ <small>/ travel</small></a>
-      <nav aria-label="メニュー"><a href="#planner">予算シミュレーション</a><a href="#guide">宿選びのコツ</a><a href="/tools/">ITツール比較</a><a href="/" className="tv-header-button">商品価格比較へ ↗</a></nav>
-    </div></header>
-    <main>
+    <SiteHeader active="travel" />
+    <main id="main-content">
       <section className="tv-hero"><div className="tv-wrap tv-hero-layout">
         <div className="tv-hero-text"><span className="tv-eyebrow">SMART TRAVEL PLANNING</span>
           <h1>旅の予算を整えて、<br/><em>自分らしい</em>宿選び。</h1>

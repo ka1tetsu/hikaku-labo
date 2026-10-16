@@ -1,35 +1,24 @@
-import { buildRakutenSearchAffiliateUrl } from '../api';
+import SiteHeader from '../shared/SiteHeader.jsx';
 
 export default function Header({ inputValue, setInputValue, onSearch }) {
-    return (
-        <header className="header">
-            <div className="container header-inner">
-                <a href="/" className="logo">
-                    <span className="logo-kaku">比較</span>
-                    <span className="logo-labo">ラボ</span>
-                    <span className="logo-tag">価格比較・最安値</span>
-                </a>
-
-                <form className="header-search" onSubmit={onSearch}>
-                    <input
-                        type="text"
-                        value={inputValue}
-                        onChange={e => setInputValue(e.target.value)}
-                        placeholder="商品名・キーワードで検索..."
-                        className="header-search-input"
-                    />
-                    <button type="submit" className="header-search-btn">
-                        🔍 検索
-                    </button>
-                </form>
-
-                <div className="header-links">
-                    <a href="/travel/" className="header-badge travel-badge">✈ 宿泊予算ガイド</a>
-                    <a href="/tools/" className="header-badge tools-badge">✳ ITツール診断</a>
-                    <a href={buildRakutenSearchAffiliateUrl(inputValue || '人気')} target="_blank" rel="noopener noreferrer sponsored" className="header-badge rakuten-badge">楽天</a>
-                    <a href="https://www.amazon.co.jp/?tag=kuronekosanta-22" target="_blank" rel="noopener noreferrer" className="header-badge amazon-badge">Amazon</a>
-                </div>
-            </div>
-        </header>
-    );
+  return <SiteHeader active="products">
+    <div className="hl-searchbar">
+      <div className="hl-container hl-searchbar-row">
+        <span className="hl-searchbar-prompt"><img src="/icons/tabler/search.svg" alt="" aria-hidden="true" width="19" height="19"/> 商品を探す</span>
+        <form className="hl-searchform" role="search" onSubmit={onSearch}>
+          <label className="hl-visually-hidden" htmlFor="hl-product-search">商品名・キーワード</label>
+          <input
+            id="hl-product-search"
+            type="search"
+            value={inputValue}
+            onChange={event => setInputValue(event.target.value)}
+            placeholder="例：ワイヤレスイヤホン、ノートPC、カメラ"
+            autoComplete="off"
+          />
+          <button type="submit">商品を検索 <img src="/icons/tabler/arrow-right.svg" alt="" aria-hidden="true" width="17" height="17"/></button>
+        </form>
+        <span className="hl-searchbar-help">楽天市場の商品データを確認</span>
+      </div>
+    </div>
+  </SiteHeader>;
 }

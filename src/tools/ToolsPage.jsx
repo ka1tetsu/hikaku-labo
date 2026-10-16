@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import SiteHeader from '../shared/SiteHeader.jsx';
 import { CATEGORIES, LAST_REVIEWED } from './catalog.js';
 import { rankServices } from './score.js';
 import { outboundLink, recordOutbound } from './affiliate.js';
 import { A8_AD_PLACEMENTS } from './a8Placements.js';
 import './tools.css';
+import '../shared/tools-refresh.css';
 
 const BUDGETS = [
   { id: 'free', label: '無料で始めたい' },
@@ -112,18 +114,9 @@ export default function ToolsPage() {
   }
   return (
     <div className="tl-page">
-      <header className="tl-header">
-        <div className="tl-wrap tl-nav">
-          <a href="/" className="tl-logo" aria-label="比較ラボのトップへ"><span className="tl-logo-icon">✳</span>比較ラボ<span className="tl-logo-light"> / tools</span></a>
-          <div className="tl-nav-end">
-            <a href="/travel/" className="tl-back">宿泊予算ガイド ↗</a>
-            <a href="/" className="tl-back">商品価格比較へ ↗</a>
-            <a href="#selector" className="tl-nav-action">無料で診断する <span aria-hidden="true">→</span></a>
-          </div>
-        </div>
-      </header>
+      <SiteHeader active="tools" />
 
-      <main>
+      <main id="main-content">
         <section className="tl-hero">
           <div className="tl-wrap tl-hero-grid">
             <div className="tl-hero-copy">
