@@ -1,0 +1,53 @@
+name: Production and affiliate readiness audit
+
+on:
+  push:
+    branches: [main, audit/production-affiliate-readiness]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install, unit-test, lint and build
+        run: |
+          npm ci
+          npm run test:tools
+          npm run lint
+          npm run build
+      - name: Check production site via real HTTP
+        shell: bash
+        env:
+          PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
+        run: |
+          set -euo pipefail
+          for path in "/" "/tools/"; do
+            printf '\n=== Checking %s%s ===\n' "$PUBLIC_SITE_URL" "$path"
+            status=$(curl -L -sS --max-time 30 --retry 2 -o /tmp/hikaku-check.html -w '%{http_code}' "$PUBLIC_SITE_URL$path")
+            echo "HTTP status: $status"
+            echo "Downloaded bytes: $(wc -c < /tmp/hikaku-check.html)"
+            if [ "$status" != "200" ]; then
+              head -c 450 /tmp/hikaku-check.html || true
+              echo
+              echo "::error::Production endpoint $path returned HTTP $status. Check Vercel domains, deployed output, and deployment protection."
+              exit 1
+            fi
+            if [ "$path" = "/tools/" ]; then
+              grep -q '無料ITツール診断' /tmp/hikaku-check.html || {
+                echo "::error::The /tools/ URL does not serve the expected tools page."
+                exit 1
+              }
+            fi
+          done
+      - name: Check advertising setup (not actual revenue)
+        if: always()
+        run: node scripts/audit-affiliate.mjs
