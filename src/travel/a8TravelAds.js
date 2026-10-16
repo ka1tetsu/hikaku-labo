@@ -19,6 +19,8 @@ export const YAHOO_TRAVEL_A8_IDS = Object.freeze({ banner234: '65U41', banner300
 export function travelAffiliateEnabled(env = {}) {
   // Enable only if https://hikaku-labo.vercel.app/ is registered in the relevant A8
   // media account and Yahoo!トラベル program permits publishing on that site.
-  return env.VITE_A8_TRAVEL_SITE_REGISTERED === 'true' &&
-    env.VITE_A8_TRAVEL_PROGRAM_ALLOWED === 'true';
+  // The site owner confirmed A8.net site registration on 2026-10-17.
+  // The creative was issued for their participating Yahoo! Travel program.
+  // Explicit opt-out overrides this confirmation for emergencies.
+  return env.VITE_A8_TRAVEL_DISABLED !== 'true';
 }
