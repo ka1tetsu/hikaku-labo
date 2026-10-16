@@ -1,3 +1,4 @@
+import { recordOutboundClick } from '../shared/outboundClient.js';
 import { useMemo, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import { calculateTravelBudget, DESTINATIONS } from './budget.js';
@@ -9,12 +10,17 @@ const yen = (value) => '¥' + value.toLocaleString('ja-JP');
 const AD_READY = travelAffiliateEnabled(import.meta.env);
 
 function BookingAd({ variant }) {
+  const onAdClick = (event) => {
+    if (event.target.closest('a[href^="https://px.a8.net/"]')) {
+      recordOutboundClick({ section: 'travel', merchant: 'yahoo-travel', placement: variant, sponsored: true });
+    }
+  };
   if (!AD_READY) return <div className="tv-ad-placeholder">
     <span className="tv-ad-label">宿泊プランを調べる</span>
     <p>最新の宿泊料金やポイント条件は予約サイトでご確認ください。</p>
     <a href="https://travel.yahoo.co.jp/" target="_blank" rel="noopener noreferrer">Yahoo!トラベルの公式サイト ↗</a>
   </div>;
-  return <div className="tv-affiliate-ad" aria-label="Yahoo!トラベル アフィリエイト広告">
+  return <div className="tv-affiliate-ad" aria-label="Yahoo!トラベル アフィリエイト広告" onClick={onAdClick}>
     <span className="tv-ad-label">PR・広告 / Yahoo!トラベル</span>
     <div dangerouslySetInnerHTML={{ __html: YAHOO_TRAVEL_A8_CREATIVES[variant] }} />
   </div>;
@@ -94,6 +100,7 @@ export default function TravelPage() {
 
       <section className="tv-guide" id="guide"><div className="tv-wrap"><span className="tv-eyebrow">BEFORE YOU BOOK</span><h2>予約前に確かめたい、<br/>3つのチェックポイント。</h2><div className="tv-guide-cards">{ADVICE.map(item=><article key={item.number}><span>{item.number}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div></div></section>
       <section className="tv-wrap tv-booking-cta"><div><span className="tv-eyebrow">FIND YOUR STAY</span><h2>実際の宿泊プランを、<br/>自分の条件で探そう。</h2><p>Yahoo!トラベルではエリア・宿泊日・人数などで探せます。表示価格やポイントの適用条件、キャンセル規定は予約前に公式サイトで確認してください。</p></div><BookingAd variant="banner300"/></section>
+      <div className="tv-wrap tv-editorial-link"><div><strong>予約前に失敗しないための比較ガイド</strong><p>宿泊費・交通費・食費に加えて、支払総額やキャンセル条件も確認。</p></div><a href="/guides/travel-budget/">宿泊予約のチェックリストを見る ↗</a></div>
       <section className="tv-wrap tv-faq"><span className="tv-eyebrow">Q & A</span><h2>宿泊予約について</h2>
         <details><summary>表示された料金は最新の宿泊料金ですか？</summary><p>いいえ。入力した単価をもとに計算した予算の目安です。実際のプラン価格、空室、ポイント適用条件は予約サイトでご確認ください。</p></details>
         <details><summary>ポイント即時利用・クーポンは計算されますか？</summary><p>自動反映されません。利用資格、支払方法、対象プラン等で条件が異なるため、予約確認画面の金額をご確認ください。</p></details>

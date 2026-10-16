@@ -1,3 +1,4 @@
+import { recordOutboundClick } from '../shared/outboundClient.js';
 import { buildRakutenAffiliateUrl } from '../api';
 
 const yen = (n) => `¥${Math.round(n).toLocaleString()}`;
@@ -134,6 +135,7 @@ export default function ComparisonTable({ items, onRemove, onClear }) {
                                         target="_blank"
                                         rel="noopener noreferrer sponsored"
                                         className="comparison-cta"
+                                        onClick={() => recordOutboundClick({ section: 'products', merchant: 'rakuten', placement: 'comparison-table', sponsored: true })}
                                     >楽天市場で見る ▶</a>
                                 </td>
                             ))}

@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'  # weekly, Monday 12:00 JST
 
 permissions:
   contents: read
@@ -26,13 +28,13 @@ jobs:
           npm run lint
           npm run build
       - name: Check production site via real HTTP
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
         shell: bash
         env:
           PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
         run: |
           set -euo pipefail
-          for path in "/" "/tools/" "/travel/"; do
+          for path in "/" "/tools/" "/travel/" "/guides/travel-budget/" "/guides/website-tools/" "/robots.txt" "/sitemap.xml"; do
             printf '\n=== Checking %s%s ===\n' "$PUBLIC_SITE_URL" "$path"
             status=$(curl -L -sS --max-time 30 --retry 2 -o /tmp/hikaku-check.html -w '%{http_code}' "$PUBLIC_SITE_URL$path")
             echo "HTTP status: $status"
@@ -49,6 +51,12 @@ jobs:
                 exit 1
               }
             fi
+            if [ "$path" = "/sitemap.xml" ]; then
+              grep -q 'https://hikaku-labo.vercel.app/guides/travel-budget/' /tmp/hikaku-check.html || {
+                echo "::error::Sitemap missing travel guide."
+                exit 1
+              }
+            fi
             if [ "$path" = "/tools/" ]; then
               grep -q '無料ITツール診断' /tmp/hikaku-check.html || {
                 echo "::error::The /tools/ URL does not serve the expected tools page."
@@ -56,6 +64,8 @@ jobs:
               }
             fi
           done
+      - name: Audit production npm dependencies
+        run: npm audit --omit=dev --audit-level=high
       - name: Check advertising setup (not actual revenue)
         if: always()
         run: node scripts/audit-affiliate.mjs

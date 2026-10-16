@@ -217,6 +217,7 @@ export default function ToolsPage() {
           </table></div>
         </section>}
 
+        <aside className="hl-inline-guide" aria-label="ITサービス選びのガイド"><div><strong>導入前に、料金と運用の落とし穴を確認</strong><p>月額以外の手数料や、データ移行の条件もチェックしましょう。</p></div><a href="/guides/website-tools/">サイト制作・ネットショップの選び方 ↗</a></aside>
         <section className="tl-method tl-wrap">
           <div className="tl-method-heading"><span className="tl-overline">HOW WE COMPARE</span><h2>広告よりも、納得できる選び方を。</h2></div>
           <div className="tl-method-grid">
