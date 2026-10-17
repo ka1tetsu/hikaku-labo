@@ -23,6 +23,8 @@ export const TRAVEL_PROVIDERS=Object.freeze([
   {id:'kkday',name:'KKday',type:'activity',url:'https://www.kkday.com/ja',capabilities:['体験','観光チケット'],affiliate:false},
   {id:'rentalcars',name:'Rentalcars.com',type:'car',url:'https://www.rentalcars.com/',capabilities:['レンタカー'],affiliate:false},
   {id:'discovercars',name:'DiscoverCars',type:'car',url:'https://www.discovercars.com/',capabilities:['レンタカー'],affiliate:false},
+  {id:'airalo',name:'Airalo',type:'connectivity',url:'https://www.airalo.com/',capabilities:['旅行用eSIM','海外データ通信'],affiliate:false},
+  {id:'holafly',name:'Holafly',type:'connectivity',url:'https://esim.holafly.com/',capabilities:['旅行用eSIM','海外データ通信'],affiliate:false},
 ]);
 // Only put URLs here AFTER operator-specific approval. Do not auto-append a tracking ID.
 export const APPROVED_TRAVEL_PARTNER_LINKS=Object.freeze({
@@ -43,4 +45,5 @@ export const TRAVEL_PROVIDER_TYPES=Object.freeze([
   {id:'hotel',label:'宿泊',emoji:'🏨'},
   {id:'activity',label:'現地体験',emoji:'🎟️'},
   {id:'car',label:'レンタカー',emoji:'🚗'},
+  {id:'connectivity',label:'eSIM・通信',emoji:'📶'},
 ]);
