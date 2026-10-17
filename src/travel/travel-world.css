@@ -1,0 +1,134 @@
+/* Hikaku Labo Travel — worldwide search, AI concierge and flight / hotel comparison */
+.tvw-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tv-page #concierge,.tv-page #booking,.tv-page #compare{scroll-margin-top:18px}
+
+/* Hero column must shrink below the search box's intrinsic width on phones. */
+.tvx-hero-grid>div{min-width:0}
+
+/* Search combobox */
+.tvw-search>label small{font-weight:600;color:#6c8576;margin-left:6px;font-size:11px}
+.tvw-options{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px solid #e3eae5;max-height:360px;overflow:auto}
+.tvw-options-heading{font-size:11px;font-weight:800;color:#6c8576;padding:2px 10px 6px;letter-spacing:.04em}
+.tvw-option{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:9px;cursor:pointer;color:#254739}
+.tvw-option.active{background:#e9f5ed}
+.tvw-option-emoji{width:30px;height:30px;display:grid;place-items:center;font-size:19px;background:#f1f6f2;border-radius:8px;flex:none}
+.tvw-option-body{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.45}
+.tvw-option-body strong{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tvw-option-body small{font-size:11px;color:#647c6b}
+.tvw-option-hint{font-size:11px;color:#2b7a5a;background:#eef7f1;border-radius:20px;padding:3px 9px;white-space:nowrap;max-width:45%;overflow:hidden;text-overflow:ellipsis}
+.tvw-option-external .tvw-option-body strong{font-weight:700;color:#3d5f4e}
+.tvw-search-foot{font-size:11px;color:#6c8576;margin:9px 6px 0;line-height:1.7}
+.tvw-external{margin-top:14px;background:#fff;color:#213d2d;border-radius:14px;padding:16px 18px;max-width:685px;box-shadow:0 14px 40px #091f1930}
+.tvw-external-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.tvw-external-head strong{font-size:14px}
+.tvw-external-head button{border:0;background:#eef4ef;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px;color:#335b47}
+.tvw-external>p{font-size:12px;color:#587163;line-height:1.8;margin:6px 0 10px}
+
+/* Outbound link lists (flights / stays) */
+.tvw-links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.tvw-links a{position:relative;display:flex;flex-direction:column;gap:3px;height:100%;padding:13px 34px 13px 15px;border:1px solid #d6e5da;border-radius:12px;background:#fff;color:#1d4332!important;transition:border-color .15s,box-shadow .15s}
+.tvw-links a:hover{border-color:#5fa883;box-shadow:0 6px 16px #1a4a3014;opacity:1}
+.tvw-link-main{display:flex;align-items:center;gap:8px}
+.tvw-link-main strong{font-size:14px}
+.tvw-links small{font-size:11px;color:#5f7a69;line-height:1.6}
+.tvw-link-arrow{position:absolute;right:13px;top:12px;color:#3c8a66;font-weight:800}
+.tvw-pr{font-style:normal;font-size:9px;font-weight:900;letter-spacing:.06em;color:#8a5a00;background:#fff3d6;border:1px solid #f0d699;border-radius:4px;padding:1px 5px}
+.tvw-affiliate-note{font-size:11px;color:#6b7f72;line-height:1.8;margin:12px 0 0}
+
+/* Booking hub */
+.tvw-hub{margin-top:21px;border:1px solid #d5e6db;border-radius:18px;background:#fff;padding:26px;box-shadow:0 9px 28px #102c1a10}
+.tvw-hub-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.tvw-hub-head h3{font-size:21px;letter-spacing:-.03em;color:#1a4230;margin:7px 0 4px}
+.tvw-hub-head p{font-size:12px;color:#5d7767;margin:0}
+.tvw-tabs{display:flex;background:#eef5f0;border-radius:11px;padding:4px;gap:4px}
+.tvw-tabs button{border:0;background:transparent;border-radius:8px;padding:9px 15px;font-size:13px;font-weight:800;color:#3c624d;cursor:pointer;min-height:40px}
+.tvw-tabs button.active{background:#fff;color:#154f39;box-shadow:0 2px 8px #1a4a3018}
+.tvw-hub-form{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;background:#f5f9f6;border:1px solid #e1ece4;border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.tvw-hub-form label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:800;color:#355a46}
+.tvw-hub-form select,.tvw-hub-form input[type=date]{min-height:42px;border:1px solid #cfdfd4;border-radius:8px;background:#fff;color:#224c38;padding:7px 10px;font:600 13px 'Noto Sans JP',sans-serif}
+.tvw-hub-form input[readonly]{background:#f0f4f1;color:#4f6c5c}
+.tvw-hub-form .tvw-check{flex-direction:row;align-items:center;gap:7px;min-height:42px}
+.tvw-hub-form small{flex-basis:100%;font-size:11px;color:#6b8173}
+.tvw-hub-empty p{font-size:13px;color:#4c6858;margin:0 0 10px}
+
+/* Discover filters */
+.tvw-area-tabs{display:inline-flex;gap:4px;background:#eef5f0;padding:4px;border-radius:12px;margin-bottom:17px}
+.tvw-area-tabs button{border:0;background:transparent;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:800;color:#3c624d;cursor:pointer;min-height:40px}
+.tvw-area-tabs button.active{background:#fff;color:#154f39;box-shadow:0 2px 8px #1a4a3018}
+.tvw-filter-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px!important;align-items:end}
+.tvw-filter-grid label{display:flex;flex-direction:column;gap:6px}
+.tvw-filter-grid select{min-width:0!important;width:100%}
+.tvw-filter-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px}
+.tvw-filter-foot .tvx-filter-caption{margin-left:0;flex:1;min-width:220px}
+.tvw-scope{display:inline-flex;align-items:center;gap:8px;background:#e3f2e8;color:#185a3f;font-size:12px;font-weight:800;border-radius:30px;padding:5px 6px 5px 13px}
+.tvw-scope button{border:0;background:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;color:#2c6a4d;font-size:13px;line-height:1}
+.tvw-text-button{border:0;background:transparent;color:#1f6c4d;text-decoration:underline;font-size:12px;font-weight:800;cursor:pointer;padding:6px}
+.tvw-result-count{font-size:12px;font-weight:800;color:#4b6b59;margin:0 0 12px}
+.tvw-card-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:12px 0 0}
+.tvw-card-facts div{background:#f5f9f6;border-radius:8px;padding:6px 8px;min-width:0}
+.tvw-card-facts dt{font-size:10px;color:#6d8576;font-weight:800}
+.tvw-card-facts dd{margin:0;font-size:11px;color:#244b37;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.tvx-destination-card.beach .tvx-destination-cover{background:linear-gradient(125deg,#1f6f8b,#7cc6c4)}
+.tvw-more{text-align:center;margin-top:24px}
+.tvw-more button{border:1px solid #bcd8c6;background:#fff;color:#1d6247;border-radius:30px;padding:12px 26px;font-size:13px;font-weight:850;cursor:pointer;min-height:46px}
+.tvw-more button:hover{background:#eef7f1}
+
+/* Concierge */
+.tvw-concierge{padding-top:70px}
+.tvw-chat{background:#fff;border:1px solid #d7e6dc;border-radius:20px;box-shadow:0 12px 34px #12382412;overflow:hidden}
+.tvw-log{max-height:620px;min-height:260px;overflow-y:auto;padding:24px 22px 8px;background:linear-gradient(#f7fbf8,#fff 140px);scrollbar-width:thin}
+.tvw-msg{display:flex;gap:11px;margin-bottom:18px;align-items:flex-start}
+.tvw-msg-user{justify-content:flex-end}
+.tvw-msg-user .tvw-bubble{background:#14634a;color:#fff;border-radius:16px 16px 4px 16px;max-width:min(78%,560px);font-size:14px;line-height:1.8;white-space:pre-wrap}
+.tvw-avatar{flex:none;width:36px;height:36px;border-radius:12px;background:#14634a;color:#f3e9a2;display:grid;place-items:center;font-size:20px}
+.tvw-bubble{padding:13px 16px;border-radius:4px 16px 16px 16px;background:#f2f7f3;color:#203f30;min-width:0;max-width:100%}
+.tvw-msg-bot .tvw-bubble{flex:1;max-width:820px}
+.tvw-bubble p{margin:0 0 7px;font-size:14px;line-height:1.85}
+.tvw-summary{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.tvw-summary span{font-size:11px;font-weight:800;color:#1f6146;background:#fff;border:1px solid #cfe4d6;border-radius:20px;padding:2px 9px}
+.tvw-bullets{margin:4px 0 8px;padding-left:20px;font-size:13px;line-height:1.9}
+.tvw-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:10px 0 6px}
+.tvw-card{background:#fff;border:1px solid #d8e7dd;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.tvw-card-head{display:flex;gap:9px;align-items:center}
+.tvw-card-head strong{display:block;font-size:16px;color:#173f2d}
+.tvw-card-head small{display:block;font-size:11px;color:#628070;line-height:1.5}
+.tvw-card-rank{font:900 12px Inter,sans-serif;color:#fff;background:#2b8c6b;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;flex:none}
+.tvw-card-emoji{font-size:26px}
+.tvw-card ul{margin:0;padding-left:17px;font-size:12px;line-height:1.75;color:#34584a}
+.tvw-card-meta,.tvw-card-fit{font-size:11px!important;color:#5f7a69;line-height:1.7!important;margin:0!important}
+.tvw-card-fit{color:#7a5b10!important;font-weight:700}
+.tvw-card-actions{display:flex;gap:7px;margin-top:auto}
+.tvw-card-actions button,.tvw-plan>button,.tvw-inline-action{border:0;background:#14634a;color:#fff;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:850;cursor:pointer;min-height:40px;flex:1}
+.tvw-card-actions button.ghost{background:#eaf4ed;color:#1c5b41}
+.tvw-plan{background:#fff;border:1px solid #d8e7dd;border-radius:13px;padding:12px 14px;margin:8px 0}
+.tvw-plan ol{list-style:none;margin:0 0 10px;padding:0}
+.tvw-plan li{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:7px 0;border-bottom:1px dashed #dbe8df;font-size:13px;line-height:1.7}
+.tvw-plan li:last-child{border:0}
+.tvw-plan li b{font:800 11px Inter,sans-serif;color:#2b7a5a;padding-top:2px}
+.tvw-plan>button,.tvw-inline-action{width:100%;margin-top:4px}
+.tvw-msg-links h4{font-size:12px;color:#2e5a45;margin:12px 0 7px}
+.tvw-msg-links .tvw-links{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.tvw-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.tvw-chips button{border:1px solid #c6dfcf;background:#fff;color:#1f5f45;border-radius:30px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;min-height:36px;text-align:left}
+.tvw-chips button:hover{background:#eaf5ee}
+.tvw-composer{border-top:1px solid #e1ece4;padding:14px 16px;background:#fff}
+.tvw-composer textarea{width:100%;resize:vertical;min-height:58px;border:1px solid #cddfd3;border-radius:12px;padding:11px 13px;font:500 14px/1.7 'Noto Sans JP',sans-serif;color:#1d3d2f;background:#fbfdfb}
+.tvw-composer textarea:focus{outline:3px solid #a8d5bc;outline-offset:1px}
+.tvw-composer-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:9px}
+.tvw-composer-actions button{border:0;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:850;cursor:pointer;min-height:44px;background:#14634a;color:#fff}
+.tvw-composer-actions button.ghost{background:#eef5f0;color:#2d5b45}
+.tvw-composer-actions button:disabled{opacity:.45;cursor:not-allowed}
+.tvw-disclaimer{font-size:11px;color:#6b7f72;line-height:1.8;margin:0;padding:0 18px 16px}
+
+@media(max-width:1080px){.tvw-filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.tvw-hub{padding:20px}.tvw-concierge{padding-top:50px}}
+@media(max-width:530px){
+ .tvw-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tvw-area-tabs{display:flex;width:100%}.tvw-area-tabs button{flex:1;padding:9px 6px}
+ .tvw-log{padding:18px 12px 4px;max-height:560px}.tvw-avatar{width:30px;height:30px;font-size:17px}
+ .tvw-msg-user .tvw-bubble{max-width:88%}.tvw-cards{grid-template-columns:1fr}
+ .tvw-hub{padding:16px}.tvw-hub-head h3{font-size:18px}.tvw-tabs{width:100%}.tvw-tabs button{flex:1}
+ .tvw-hub-form{padding:12px}.tvw-hub-form label{flex:1 1 130px}
+ .tvw-links{grid-template-columns:1fr}.tvw-option-hint{display:none}
+}
+@media(prefers-reduced-motion:reduce){.tvw-links a{transition:none}}

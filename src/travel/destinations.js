@@ -1,6 +1,9 @@
-// Curated editorial travel ideas informed by JNTO's destination index.
+// Curated editorial travel ideas. Domestic entries are informed by JNTO's destination
+// index; overseas entries live in worldDestinations.js.
 // These are NOT transport schedules, booking inventory, precise travel-time routes,
 // ticket prices or verified opening hours. Check official sites before travel.
+import { WORLD_DESTINATIONS } from './worldDestinations.js';
+
 export const INTERESTS = Object.freeze([
   { id: 'history', label: '歴史・文化', emoji: '⛩️' },
   { id: 'food', label: 'グルメ', emoji: '🍜' },
@@ -8,14 +11,44 @@ export const INTERESTS = Object.freeze([
   { id: 'city', label: '街歩き', emoji: '🏙️' },
   { id: 'relax', label: '温泉・癒し', emoji: '♨️' },
   { id: 'family', label: '家族で楽しむ', emoji: '🎡' },
+  { id: 'beach', label: 'ビーチ・海', emoji: '🏖️' },
+  { id: 'art', label: 'アート・建築', emoji: '🎨' },
+  { id: 'shopping', label: 'ショッピング', emoji: '🛍️' },
 ]);
 
 const JNTO = 'https://www.japan.travel/en/destinations/';
-const city = (id, name, region, emoji, tagline, aliases, interests, routes, note) => ({
-  id, name, region, emoji, tagline, aliases: [name, ...aliases],
-  interests, routes, note, source: JNTO,
-});
-export const DESTINATION_CATALOG = Object.freeze([
+// Rough access from Tokyo, flight codes for search links, editorial best months and a
+// relative 1–5 price feel. Approximations for planning only, never quotes or timetables.
+const DOMESTIC_META = {
+  tokyo:{ en:'Tokyo', flight:{city:'TYO',airport:'HND'}, hours:0, access:'首都圏の玄関口（羽田・成田）', months:[3,4,5,10,11,12], cost:4, extra:['shopping','art'] },
+  kyoto:{ en:'Kyoto', flight:{city:'OSA',airport:'ITM'}, hours:2.3, access:'東京から新幹線で約2時間15分', months:[3,4,5,10,11], cost:4, extra:['art'] },
+  osaka:{ en:'Osaka', flight:{city:'OSA',airport:'KIX'}, hours:2.5, access:'東京から新幹線で約2時間30分', months:[3,4,5,10,11], cost:3, extra:['shopping'] },
+  sapporo:{ en:'Sapporo', flight:{city:'SPK',airport:'CTS'}, hours:1.5, access:'東京から飛行機で約1時間30分', months:[2,6,7,8,9], cost:3, extra:[] },
+  hakodate:{ en:'Hakodate', flight:{city:'HKD',airport:'HKD'}, hours:1.3, access:'東京から飛行機で約1時間20分', months:[6,7,8,9,12], cost:3, extra:[] },
+  sendai:{ en:'Sendai', flight:{city:'SDJ',airport:'SDJ'}, hours:1.5, access:'東京から新幹線で約1時間30分', months:[5,6,8,10], cost:2, extra:[] },
+  nikko:{ en:'Nikko', flight:null, hours:2, access:'浅草から特急で約2時間', months:[5,10,11], cost:2, extra:[] },
+  hakone:{ en:'Hakone', flight:null, hours:1.5, access:'新宿から特急で約1時間30分', months:[3,4,5,10,11], cost:4, extra:[] },
+  kanazawa:{ en:'Kanazawa', flight:{city:'KMQ',airport:'KMQ'}, hours:2.5, access:'東京から北陸新幹線で約2時間30分', months:[4,5,10,11,12], cost:3, extra:['art'] },
+  niigata:{ en:'Niigata', flight:{city:'KIJ',airport:'KIJ'}, hours:2, access:'東京から上越新幹線で約2時間', months:[6,7,8,9,10], cost:2, extra:[] },
+  sado:{ en:'Sado', flight:null, hours:3.5, access:'新潟港から高速船で約1時間〜（新潟まで新幹線で約2時間）', months:[5,6,7,8,9,10], cost:2, extra:['beach'] },
+  takayama:{ en:'Takayama', flight:null, hours:4.5, access:'名古屋から特急で約2時間30分', months:[4,5,10,11], cost:2, extra:[] },
+  nagoya:{ en:'Nagoya', flight:{city:'NGO',airport:'NGO'}, hours:1.7, access:'東京から新幹線で約1時間40分', months:[3,4,5,10,11], cost:3, extra:['shopping'] },
+  nara:{ en:'Nara', flight:{city:'OSA',airport:'ITM'}, hours:3, access:'京都から電車で約45分', months:[3,4,5,10,11], cost:2, extra:[] },
+  hiroshima:{ en:'Hiroshima', flight:{city:'HIJ',airport:'HIJ'}, hours:4, access:'東京から新幹線で約4時間（飛行機は約1時間30分）', months:[3,4,5,10,11], cost:3, extra:[] },
+  fukuoka:{ en:'Fukuoka', flight:{city:'FUK',airport:'FUK'}, hours:2, access:'東京から飛行機で約2時間', months:[3,4,5,10,11], cost:3, extra:['shopping'] },
+  nagasaki:{ en:'Nagasaki', flight:{city:'NGS',airport:'NGS'}, hours:2, access:'東京から飛行機で約2時間', months:[3,4,5,10,11,12], cost:3, extra:[] },
+  naha:{ en:'Naha', flight:{city:'OKA',airport:'OKA'}, hours:2.8, access:'東京から飛行機で約2時間30分〜3時間', months:[3,4,5,6,10,11], cost:3, extra:['beach'] },
+};
+const city = (id, name, region, emoji, tagline, aliases, interests, routes, note) => {
+  const meta = DOMESTIC_META[id];
+  return {
+    id, name, nameEn: meta.en, country: 'JP', area: 'domestic', region, emoji, tagline,
+    aliases: [name, ...aliases], interests: [...interests, ...meta.extra], routes, note,
+    source: JNTO, sourceLabel: '日本政府観光局（JNTO）の旅行先ガイド',
+    flight: meta.flight, hours: meta.hours, access: meta.access, bestMonths: meta.months, costLevel: meta.cost,
+  };
+};
+export const DOMESTIC_DESTINATIONS = Object.freeze([
   city('tokyo','東京','関東','🗼','伝統と新しい街を一度に味わう',['東京都','tokyo','とうきょう','浅草','新宿','渋谷'],
     ['city','food','history','family'],
     { classic:['浅草・浅草寺','上野公園・博物館エリア','東京駅・丸の内','渋谷・表参道','新宿御苑','東京スカイツリー周辺'],
@@ -126,4 +159,7 @@ export const DESTINATION_CATALOG = Object.freeze([
     '海況・台風時期の交通情報と施設の営業を確認'),
 ]);
 
+export const DESTINATION_CATALOG = Object.freeze([...DOMESTIC_DESTINATIONS, ...WORLD_DESTINATIONS]);
 export const DESTINATION_REGIONS = Object.freeze(['すべて',...new Set(DESTINATION_CATALOG.map(d => d.region))]);
+export const DOMESTIC_REGIONS = Object.freeze([...new Set(DOMESTIC_DESTINATIONS.map(d => d.region))]);
+export const OVERSEAS_REGIONS = Object.freeze([...new Set(WORLD_DESTINATIONS.map(d => d.region))]);
