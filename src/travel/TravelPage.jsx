@@ -4,6 +4,7 @@ import SiteHeader from '../shared/SiteHeader.jsx';
 import { calculateTravelBudget } from './budget.js';
 import { DESTINATION_CATALOG } from './destinations.js';
 import TravelDiscovery from './TravelDiscovery.jsx';
+import GlobalTravelSearch from './GlobalTravelSearch.jsx';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
@@ -45,6 +46,7 @@ export default function TravelPage() {
     const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('destination');
     return DESTINATION_CATALOG.some(item => item.id === requested) ? requested : 'kyoto';
   });
+  const [selectedPlaceName, setSelectedPlaceName] = useState(() => typeof window === 'undefined' ? '京都' : new URLSearchParams(window.location.search).get('place') || '京都');
   const [nights, setNights] = useState(2);
   const [travelers, setTravelers] = useState(2);
   const [rooms, setRooms] = useState(1);
@@ -60,18 +62,20 @@ export default function TravelPage() {
     { name: 'その他', total: budget.other, color: 'gray' },
   ];
   const place = DESTINATION_CATALOG.find(x => x.id === destination) || DESTINATION_CATALOG[0];
+  const chooseDomestic = id => { const match = DESTINATION_CATALOG.find(item => item.id === id); setDestination(id); if (match) setSelectedPlaceName(match.name); };
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
-      <TravelDiscovery selectedId={destination} onSelect={setDestination} nights={nights} setNights={setNights} budget={budget}/>
+      <GlobalTravelSearch onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName} nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} />
+      <TravelDiscovery selectedId={destination} onSelect={chooseDomestic} nights={nights} setNights={setNights} budget={budget}/>
 
       <section className="tv-wrap tv-planner-section" id="planner">
-        <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
+        <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{selectedPlaceName||place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
         <div className="tv-planner-grid">
           <div className="tv-form"><div className="tv-form-heading"><strong>旅行の条件</strong><small>いつでも変更できます</small></div>
             <label className="tv-destination-label" htmlFor="tv-destination">旅行先エリア</label>
-            <select id="tv-destination" className="tv-destination" value={destination} onChange={e => setDestination(e.target.value)}>{DESTINATION_CATALOG.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select>
-            <p className="tv-hint">{place.note}</p>
+            <input id="tv-destination" className="tv-destination" type="text" value={selectedPlaceName} onChange={e => setSelectedPlaceName(e.target.value)} placeholder="例：ロンドン、沖縄、佐渡" />
+            <p className="tv-hint">{selectedPlaceName===place.name?place.note:"どの旅行先でも予算は入力できます。宿泊料金や航空運賃は取得していません。"}</p>
             <div className="tv-fields">
               <NumberSelect label="宿泊日数" values={Array.from({length:6},(_,i)=>i)} value={nights} onChange={setNights} formatter={n=>n===0?'日帰り':n+'泊'}/>
               <NumberSelect label="旅行人数" values={Array.from({length:10},(_,i)=>i+1)} value={travelers} onChange={setTravelers} formatter={n=>n+'名'}/>

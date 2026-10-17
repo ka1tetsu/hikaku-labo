@@ -154,3 +154,14 @@
  .tvx-compare-scroll table{min-width:650px}
 }
 @media(prefers-reduced-motion:reduce){.tvx-destination-card,.tvx-style-card{transition:none!important}}
+
+.tvx-domestic-banner{padding-top:55px;padding-bottom:14px}
+.tvx-domestic-banner h2{font-size:clamp(26px,3vw,36px);letter-spacing:-.045em;line-height:1.5;margin:9px 0;color:#1a4230}
+.tvx-domestic-banner>p{font-size:13px;color:#5a7463;margin-bottom:18px}
+.tvx-domestic-quick{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:#fff;border-radius:13px;padding:15px 20px;border:1px solid #d8e6dd}
+.tvx-domestic-quick>label{font-size:13px;font-weight:850;color:#325a42}
+.tvx-domestic-quick>div{display:flex;flex:1;min-width:200px;gap:7px}
+.tvx-domestic-quick input{min-height:44px;flex:1;min-width:0;padding:10px 13px;border:1px solid #c9dcca;border-radius:8px;background:#fff;color:#234937;font:600 13px 'Noto Sans JP',sans-serif}
+.tvx-domestic-quick button{border:0;border-radius:8px;background:#166248;color:#fff;font-weight:800;font-size:12px;padding:10px 15px;white-space:nowrap;cursor:pointer}
+.tvx-domestic-quick>p{width:100%;color:#92362e;font-size:12px}
+@media(max-width:570px){.tvx-domestic-quick{align-items:stretch;flex-direction:column;gap:9px}.tvx-domestic-quick>div{min-width:0;flex-direction:column}}

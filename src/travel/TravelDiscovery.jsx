@@ -70,41 +70,20 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
     }
   }
   return <>
-    <section className="tvx-hero" aria-labelledby="tvx-title">
-      <div className="tv-wrap tvx-hero-grid">
-        <div>
-          <div className="tvx-eyebrow"><span className="tvx-sparkle">✳</span> HIKAKU LABO TRAVEL</div>
-          <h1 id="tvx-title">行きたい場所から、<br/><em>ぴったりの旅</em>を見つけよう。</h1>
-          <p className="tvx-hero-lead">目的地を入力するだけで、あなたの好み・日数に合わせたモデルコースを提案。全国の行き先を比べて、旅の予算までひとつの画面で。</p>
-          <form className="tvx-search" role="search" onSubmit={submitSearch}>
-            <label htmlFor="tvx-destination-search">どこに行きたいですか？</label>
-            <div className="tvx-search-control">
-              <span aria-hidden="true">⌕</span>
-              <input id="tvx-destination-search" type="search" value={query}
-                onChange={e=>{setQuery(e.target.value);setSearchError('');}}
-                placeholder="例：京都、札幌、金沢、佐渡…" autoComplete="off" list="tvx-destinations"/>
-              <datalist id="tvx-destinations">{DESTINATION_CATALOG.map(d=><option key={d.id} value={d.name}/>)}</datalist>
-              <button type="submit">プランを探す <span aria-hidden="true">→</span></button>
-            </div>
-            {query.trim()&&matches.length>0&&<div className="tvx-suggestions" aria-label="目的地の検索候補">
-              {matches.slice(0,5).map(d=><button type="button" key={d.id} onClick={()=>goToDestination(d)}>{d.emoji} {d.name}<small>{d.region}</small></button>)}
-            </div>}
-            {searchError&&<p className="tvx-search-error" role="alert">{searchError}</p>}
-          </form>
-          <div className="tvx-shortcuts"><span>人気の目的地</span>{['kyoto','tokyo','sapporo','naha'].map(id=>{const d=getCity(id);return <button key={id} type="button" onClick={()=>goToDestination(d)}>{d.name} ↗</button>;})}</div>
-          <p className="tvx-hero-note">登録不要 · 国内18都市 · 旅行プランは編集部監修のモデルコース（宿・交通の予約ではありません）</p>
+    <section className="tv-wrap tvx-domestic-banner" aria-labelledby="tvx-title">
+      <span className="tvx-kicker">JAPAN DESTINATIONS</span>
+      <h2 id="tvx-title">国内18都市も、テーマでじっくり比較。</h2>
+      <p>日本国内なら定番の観光スポットを使ったモデルコースをさらに詳しく提案します。</p>
+      <form className="tvx-domestic-quick" role="search" onSubmit={submitSearch}>
+        <label htmlFor="tvx-destination-search">日本国内の旅行先を検索</label>
+        <div><input id="tvx-destination-search" type="search" value={query} onChange={e=>{setQuery(e.target.value);setSearchError('');}}
+          placeholder="例：京都、札幌、佐渡…" list="tvx-destinations"/>
+          <datalist id="tvx-destinations">{DESTINATION_CATALOG.map(d=><option key={d.id} value={d.name}/>)}</datalist>
+          <button type="submit">モデルコースを見る ↗</button>
         </div>
-        <div className="tvx-hero-art" aria-hidden="true">
-          <div className="tvx-art-orbit tvx-art-orbit-one"/><div className="tvx-art-orbit tvx-art-orbit-two"/>
-          <span className="tvx-art-title">FIND YOUR<br/>NEXT ESCAPE<span>✦</span></span>
-          <span className="tvx-art-spot tvx-art-spot-a">⛩️<small>KYOTO</small></span>
-          <span className="tvx-art-spot tvx-art-spot-b">🌺<small>OKINAWA</small></span>
-          <span className="tvx-art-spot tvx-art-spot-c">❄️<small>HOKKAIDO</small></span>
-          <span className="tvx-art-compass">↗</span>
-        </div>
-      </div>
+        {searchError&&<p role="alert">{searchError}</p>}
+      </form>
     </section>
-
     <div className="tv-wrap tvx-trust-strip" aria-label="このサイトでできること">
       <div><b>01</b><span>旅行先を探す</span></div><div><b>02</b><span>モデルコースを選ぶ</span></div>
       <div><b>03</b><span>行き先を比較</span></div><div><b>04</b><span>予算と宿を確認</span></div>
