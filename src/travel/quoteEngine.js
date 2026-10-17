@@ -3,7 +3,7 @@
  // licensed provider quotes disclose the complete total and were checked recently.
 export function normalizeQuote(q){
   if(!q||typeof q!=='object'||typeof q.provider!=='string')return null;
-  if(!['flight','hotel','activity','car'].includes(q.type))return null;
+  if(!['flight','hotel','activity','car','connectivity'].includes(q.type))return null;
   if(!Number.isFinite(q.total)||q.total<0||!Number.isSafeInteger(q.total))return null;
   if(!['JPY','USD','EUR'].includes(q.currency))return null;
   if(!q.taxIncluded||!q.feesIncluded||!q.totalForAllTravelers)return null;
