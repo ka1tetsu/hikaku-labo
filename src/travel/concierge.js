@@ -176,6 +176,7 @@ export function recommendTrips(slots = {}, { catalog = DESTINATION_CATALOG, excl
     if (slots.price === 'luxury') score += (d.costLevel - 3) * 4;
     if (slots.nights !== undefined && slots.nights <= 2 && d.hours > 8) { score -= 14; reasons.push('短い日程には移動が長め'); }
     else if (slots.nights !== undefined && slots.nights <= 3 && d.hours <= 5 && d.area === 'overseas') { score += 5; reasons.push('短い日程でも行きやすい距離'); }
+    if (slots.nights !== undefined && slots.nights <= 1 && d.area === 'domestic' && d.hours <= 3) { score += 8; reasons.push('週末・1泊でも行きやすい'); }
     if (slots.maxHours && d.area === 'overseas') reasons.push(d.access);
     return { destination: d, score, reasons, fit };
   }).sort((a, b) => b.score - a.score || a.destination.hours - b.destination.hours || a.destination.name.localeCompare(b.destination.name, 'ja'));

@@ -2,6 +2,7 @@ import { recordOutboundClick } from './shared/outboundClient.js';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import SectionDirectory from './shared/SectionDirectory.jsx';
+import SiteConcierge from './shared/SiteConcierge.jsx';
 import './shared/home-refresh.css';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
@@ -104,6 +105,22 @@ export default function App() {
     } else {
       doSearch('おすすめ 人気', '', 1);
     }
+  }, [doSearch]);
+
+  // The concierge's "比較ページで一覧を見る" runs the search on this page.
+  useEffect(() => {
+    const onAction = (event) => {
+      if (event.detail?.type !== 'products' || !event.detail.keyword) return;
+      event.preventDefault();
+      const kw = event.detail.keyword;
+      setInputValue(kw);
+      setQuery(kw);
+      setActiveCategory(null);
+      doSearch(kw, '', 1);
+      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('hikaku:concierge-action', onAction);
+    return () => window.removeEventListener('hikaku:concierge-action', onAction);
   }, [doSearch]);
 
   const handleSearch = (e) => {
@@ -287,6 +304,7 @@ export default function App() {
       </main>
 
       <Footer />
+      <SiteConcierge section="products" />
     </div>
   );
 }

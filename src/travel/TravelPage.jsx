@@ -1,11 +1,13 @@
 import { recordOutboundClick } from '../shared/outboundClient.js';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import { calculateTravelBudget } from './budget.js';
 import { DESTINATION_CATALOG } from './destinations.js';
 import { STYLES } from './recommender.js';
 import TravelDiscovery from './TravelDiscovery.jsx';
 import Concierge from './Concierge.jsx';
+import SiteConcierge from '../shared/SiteConcierge.jsx';
+import { runConciergeAction } from '../shared/conciergeActions.js';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
@@ -74,6 +76,7 @@ export default function TravelPage() {
   const place = DESTINATION_CATALOG.find(x => x.id === destination) || DESTINATION_CATALOG[0];
   // The concierge can open its suggested plan (or the budget planner) on the page.
   function showFromConcierge(action) {
+    if (action?.type !== 'show' && action?.type !== 'planner') { runConciergeAction(action); return; }
     if (!action?.id || !DESTINATION_CATALOG.some(item => item.id === action.id)) return;
     setDestination(action.id);
     if (action.type === 'planner') { scrollToId('planner'); return; }
@@ -82,6 +85,16 @@ export default function TravelPage() {
     setStyleChoice(action.styleId || null);
     scrollToId('recommendations');
   }
+  // The floating concierge asks the page to open a plan in place.
+  useEffect(() => {
+    const onAction = event => {
+      if (event.detail?.type !== 'show' && event.detail?.type !== 'planner') return;
+      event.preventDefault();
+      showFromConcierge(event.detail);
+    };
+    window.addEventListener('hikaku:concierge-action', onAction);
+    return () => window.removeEventListener('hikaku:concierge-action', onAction);
+  });
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
@@ -130,6 +143,7 @@ export default function TravelPage() {
         <details><summary>掲載されていない国や都市は探せますか？</summary><p>検索窓に入力すると、{DESTINATION_CATALOG.length}都市のモデルコースに加えて約200の国と地域を検索できます。掲載外の場所でも、宿・航空券・地図を各サイトで直接検索するリンクを表示します。</p></details>
       </section>
     </main>
+    <SiteConcierge section="travel" />
     <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボトラベル</strong><p>世界の旅の計画を、もっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#concierge">AIコンシェルジュ</a><a href="#booking">航空券・ホテル比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク（「PR」表示）経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.net・楽天アフィリエイト等の提携に基づき掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
   </div>;
 }
