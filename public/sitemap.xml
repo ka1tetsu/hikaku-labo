@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://hikaku-labo.vercel.app/</loc></url>
   <url><loc>https://hikaku-labo.vercel.app/compare/</loc></url>
+  <url><loc>https://hikaku-labo.vercel.app/life/</loc></url>
+  <url><loc>https://hikaku-labo.vercel.app/sim/</loc></url>
+  <url><loc>https://hikaku-labo.vercel.app/hikari/</loc></url>
+  <url><loc>https://hikaku-labo.vercel.app/card/</loc></url>
+  <url><loc>https://hikaku-labo.vercel.app/hoken/</loc></url>
   <url><loc>https://hikaku-labo.vercel.app/tools/</loc></url>
   <url><loc>https://hikaku-labo.vercel.app/travel/</loc></url>
   <url><loc>https://hikaku-labo.vercel.app/guides/travel-budget/</loc></url>

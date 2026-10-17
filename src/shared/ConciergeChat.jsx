@@ -119,6 +119,8 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   const [listening, setListening] = useState(false);
+  // Decided after mount so server-rendered markup matches the first client render.
+  const [canSpeak, setCanSpeak] = useState(false);
   const logRef = useRef(null);
   const inputRef = useRef(null);
   const sendRef = useRef(null);
@@ -131,6 +133,7 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
     if (log && last?.length) log.scrollTo({ top: last[last.length - 1].offsetTop - 12, behavior: 'smooth' });
   }, [messages]);
   useEffect(() => { if (autoFocus) inputRef.current?.focus(); }, [autoFocus]);
+  useEffect(() => { setCanSpeak(Boolean(SpeechRecognition)); }, []);
   useEffect(() => {
     if (!storageKey) return;
     try { sessionStorage.setItem(storageKey, JSON.stringify({ messages: messages.slice(-30), convo })); } catch { /* storage unavailable */ }
@@ -188,7 +191,7 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
         onChange={e => setInput(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(input); } }} />
       <div className="hcx-composer-actions">
-        {SpeechRecognition && <button type="button" className={'ghost hcx-mic' + (listening ? ' is-listening' : '')} onClick={toggleVoice} aria-pressed={listening} title="音声で入力（ブラウザの音声認識を使用）">{listening ? '● 聞き取り中' : '🎤 音声'}</button>}
+        {canSpeak && <button type="button" className={'ghost hcx-mic' + (listening ? ' is-listening' : '')} onClick={toggleVoice} aria-pressed={listening} title="音声で入力（ブラウザの音声認識を使用）">{listening ? '● 聞き取り中' : '🎤 音声'}</button>}
         <button type="button" className="ghost" onClick={reset}>リセット</button>
         <button type="submit" disabled={!input.trim() || thinking}>相談する ↑</button>
       </div>

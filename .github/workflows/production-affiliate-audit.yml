@@ -34,7 +34,7 @@ jobs:
           PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
         run: |
           set -euo pipefail
-          for path in "/" "/compare/" "/tools/" "/travel/" "/guides/travel-budget/" "/guides/website-tools/" "/robots.txt" "/sitemap.xml"; do
+          for path in "/" "/compare/" "/life/" "/sim/" "/hikari/" "/card/" "/hoken/" "/tools/" "/travel/" "/guides/travel-budget/" "/guides/website-tools/" "/robots.txt" "/sitemap.xml"; do
             printf '\n=== Checking %s%s ===\n' "$PUBLIC_SITE_URL" "$path"
             status=$(curl -L -sS --max-time 30 --retry 2 -o /tmp/hikaku-check.html -w '%{http_code}' "$PUBLIC_SITE_URL$path")
             echo "HTTP status: $status"

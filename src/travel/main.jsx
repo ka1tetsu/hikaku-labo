@@ -1,7 +1,4 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { mount } from '../shared/mount.jsx';
 import TravelPage from './TravelPage.jsx';
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode><TravelPage /></StrictMode>
-);
+mount(<TravelPage />);
