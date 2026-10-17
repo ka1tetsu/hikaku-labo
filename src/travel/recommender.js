@@ -6,7 +6,7 @@ export const STYLES = Object.freeze([
   { id:'slow', label:'のんびり癒やし', emoji:'🌿', subtitle:'詰め込みすぎず景色を楽しむ', interests:['nature','relax'] },
 ]);
 export function normalizeDestinationQuery(value='') {
-  return String(value).normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[\s・／/、,　]/g,'').trim();
+  return String(value).normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[\s・／/、,]/g,'').trim();
 }
 export function searchDestinations(input, catalog=DESTINATION_CATALOG) {
   const q=normalizeDestinationQuery(input);
