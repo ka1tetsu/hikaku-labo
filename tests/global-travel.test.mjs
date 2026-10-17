@@ -81,7 +81,7 @@ test('price comparison requires approved source, all-in comparable totals and 2 
 test('official travel providers are not falsely presented as approved affiliates',()=>{
   assert.ok(TRAVEL_PROVIDERS.length>=20);
   assert.equal(new Set(TRAVEL_PROVIDERS.map(p=>p.id)).size,TRAVEL_PROVIDERS.length);
-  assert.equal(TRAVEL_PROVIDER_TYPES.length,4);
+  assert.equal(TRAVEL_PROVIDER_TYPES.length,5);
   for(const provider of TRAVEL_PROVIDERS){
     assert.equal(providerTarget(provider).sponsored,false,provider.id);
     assert.ok(providerTarget(provider).url.startsWith('https://'));
