@@ -5,19 +5,15 @@ import { recordOutboundClick } from '../shared/outboundClient.js';
 import './global-travel.css';
 
 const yen=n=>'¥'+n.toLocaleString('ja-JP');
-const initialDestination=()=>typeof window==='undefined'?'':new URLSearchParams(window.location.search).get('place')||'';
 const LOCAL_IATA={tokyo:'TYO',osaka:'OSA',sapporo:'SPK',fukuoka:'FUK',naha:'OKA',niigata:'KIJ',nagoya:'NGO',sendai:'SDJ',hakodate:'HKD',hiroshima:'HIJ',nagasaki:'NGS'};
 
-export default function GlobalTravelSearch({ onDomesticDestination }) {
+export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers }) {
   const [query,setQuery]=useState('');
   const [parsed,setParsed]=useState(null);
   const [origin,setOrigin]=useState('東京');
-  const [destination,setDestination]=useState(initialDestination);
   const [departureDate,setDepartureDate]=useState('');
   const [returnDate,setReturnDate]=useState('');
-  const [travelers,setTravelers]=useState(2);
   const [maxBudget,setMaxBudget]=useState('');
-  const [nights,setNights]=useState(3);
   const [nonstop,setNonstop]=useState(false);
   const [checkedBag,setCheckedBag]=useState(false);
   const [refundable,setRefundable]=useState(false);
