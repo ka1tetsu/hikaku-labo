@@ -4,6 +4,7 @@ import SiteHeader from '../shared/SiteHeader.jsx';
 import { calculateTravelBudget } from './budget.js';
 import { DESTINATION_CATALOG } from './destinations.js';
 import TravelDiscovery from './TravelDiscovery.jsx';
+import GlobalTravelSearch from './GlobalTravelSearch.jsx';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
@@ -63,6 +64,7 @@ export default function TravelPage() {
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
+      <GlobalTravelSearch onDomesticDestination={setDestination} />
       <TravelDiscovery selectedId={destination} onSelect={setDestination} nights={nights} setNights={setNights} budget={budget}/>
 
       <section className="tv-wrap tv-planner-section" id="planner">
