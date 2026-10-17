@@ -56,7 +56,7 @@ export default async function handler(req,res){
     return res.status(200).json({
       status:'cached_indicative',fares:cleanIndicativeFares(data,search),
       currency:'JPY',observedAt:new Date().toISOString(),
-      notice:'過去の検索で見つかった参考価格です。リアルタイム空席・販売価格・燃油/税/手荷物を含む最終支払額ではなく、最安値保証もありません。',
+      notice:'過去の検索で見つかった片道航空券の参考価格です。リアルタイム空席・販売価格・燃油/税/手荷物を含む最終支払額ではなく、最安値保証もありません。',
     });
   }catch{
     res.setHeader('Cache-Control','no-store');
