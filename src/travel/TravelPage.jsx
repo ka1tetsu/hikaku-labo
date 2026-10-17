@@ -8,6 +8,7 @@ import TravelDiscovery from './TravelDiscovery.jsx';
 import Concierge from './Concierge.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { runConciergeAction } from '../shared/conciergeActions.js';
+import GlobalTravelSearch from './GlobalTravelSearch.jsx';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
@@ -60,6 +61,7 @@ export default function TravelPage() {
   });
   const [pace, setPace] = useState(() => (['relaxed', 'standard', 'active'].includes(param('pace')) ? param('pace') : 'standard'));
   const [styleChoice, setStyleChoice] = useState(() => (STYLES.some(x => x.id === param('style')) ? param('style') : null));
+  const [selectedPlaceName, setSelectedPlaceName] = useState(() => param('place') || DESTINATION_CATALOG.find(item => item.id === param('destination'))?.name || '京都');
   const [travelers, setTravelers] = useState(2);
   const [rooms, setRooms] = useState(1);
   const [perRoomNight, setPerRoomNight] = useState(15000);
@@ -74,11 +76,12 @@ export default function TravelPage() {
     { name: 'その他', total: budget.other, color: 'gray' },
   ];
   const place = DESTINATION_CATALOG.find(x => x.id === destination) || DESTINATION_CATALOG[0];
+  const chooseDomestic = id => { const match = DESTINATION_CATALOG.find(item => item.id === id); if (!match) return; setDestination(id); setSelectedPlaceName(match.name); };
   // The concierge can open its suggested plan (or the budget planner) on the page.
   function showFromConcierge(action) {
     if (action?.type !== 'show' && action?.type !== 'planner') { runConciergeAction(action); return; }
     if (!action?.id || !DESTINATION_CATALOG.some(item => item.id === action.id)) return;
-    setDestination(action.id);
+    chooseDomestic(action.id);
     if (action.type === 'planner') { scrollToId('planner'); return; }
     if (Number.isInteger(action.nights)) setNights(Math.min(7, action.nights));
     if (action.pace) setPace(action.pace);
@@ -98,16 +101,18 @@ export default function TravelPage() {
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
-      <TravelDiscovery selectedId={destination} onSelect={setDestination} nights={nights} setNights={setNights} travelers={travelers} budget={budget}
+      <TravelDiscovery selectedId={destination} onSelect={chooseDomestic} nights={nights} setNights={setNights} travelers={travelers} budget={budget}
         pace={pace} setPace={setPace} styleChoice={styleChoice} setStyleChoice={setStyleChoice}
         concierge={<Concierge onShow={showFromConcierge}/>}/>
+      <GlobalTravelSearch showHero={false} onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName}
+        nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers}/>
 
       <section className="tv-wrap tv-planner-section" id="planner">
         <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
         <div className="tv-planner-grid">
           <div className="tv-form"><div className="tv-form-heading"><strong>旅行の条件</strong><small>いつでも変更できます</small></div>
             <label className="tv-destination-label" htmlFor="tv-destination">旅行先エリア</label>
-            <select id="tv-destination" className="tv-destination" value={destination} onChange={e => setDestination(e.target.value)}>
+            <select id="tv-destination" className="tv-destination" value={destination} onChange={e => chooseDomestic(e.target.value)}>
               {[['domestic','国内'],['overseas','海外']].map(([area,label])=><optgroup key={area} label={label}>{DESTINATION_CATALOG.filter(item=>item.area===area).map(item=><option key={item.id} value={item.id}>{item.name}（{item.region}）</option>)}</optgroup>)}
             </select>
             <p className="tv-hint">{place.access}。{place.note}</p>

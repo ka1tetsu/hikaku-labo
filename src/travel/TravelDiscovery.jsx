@@ -114,7 +114,6 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
         </div>
       </div>
     </section>
-
     <div className="tv-wrap tvx-trust-strip" aria-label="このサイトでできること">
       <div><b>01</b><span>世界の旅先を探す</span></div><div><b>02</b><span>AIに旅を相談</span></div>
       <div><b>03</b><span>航空券・宿を比較</span></div><div><b>04</b><span>旅の予算を計算</span></div>
