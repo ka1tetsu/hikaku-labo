@@ -42,6 +42,7 @@ function ProductPicks({ query }) {
       <a href={buildAmazonAffiliateUrl(keyword)} target="_blank" rel="sponsored noopener" onClick={() => track('amazon')}>Amazon</a>
       <a href={buildYahooAffiliateUrl(keyword)} target="_blank" rel="sponsored noopener" onClick={() => track('yahoo-shopping')}>Yahoo!</a>
       <button type="button" onClick={() => runConciergeAction({ type: 'products', keyword })}>比較ページで一覧を見る →</button>
+      <a className="hcx-compare-all" href={'/compare/?q=' + encodeURIComponent(keyword)}>全ショップで価格比較 →</a>
     </div>
     <p className="hcx-note">「PR」はアフィリエイトリンクです。商品情報は楽天市場の取得時点のもので、最新の価格・送料・在庫は販売ページで確認してください。</p>
   </div>;

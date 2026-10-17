@@ -199,6 +199,7 @@ export default function App() {
         <div className="affiliate-bar">
           <div className="affiliate-bar-title">
             主要モールの検索結果を比較・確認
+            <a className="affiliate-compare-link" href="/compare/">型番で全ショップの価格を比較 →</a>
           </div>
           <div className="affiliate-bar-links">
             {['スマートフォン', 'ノートPC', '液晶テレビ', 'ドラム式洗濯機'].map(kw => (

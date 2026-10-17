@@ -2,6 +2,7 @@ import { recordOutboundClick } from '../shared/outboundClient.js';
 import { useMemo } from 'react';
 import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
+import { deriveProductQuery } from '../shared/priceCompare.js';
 
 function StarRating({ score }) {
     const stars = Math.round((score || 0) * 2) / 2;
@@ -114,6 +115,10 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     <span className="dy-tooltip">
                         {rakutenTracked ? '楽天市場の商品ページへ' : `楽天の在庫が確認できないため${platformLabel}へ`}
                     </span>
+                </a>
+
+                <a className="btn-compare-all" href={`/compare/?q=${encodeURIComponent(deriveProductQuery(item.itemName))}&ref=${encodeURIComponent(item.itemName.slice(0, 160))}`}>
+                    全ショップで価格比較 →
                 </a>
 
                 <div className="sub-actions">
