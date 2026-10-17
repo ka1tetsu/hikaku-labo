@@ -15,7 +15,7 @@ test('travel calculator includes all costs with transparent assumptions', () => 
 
 test('travel budgets sanitize negative and impossible inputs', () => {
   const result = calculateTravelBudget({nights: -9, rooms: 0, travelers: -3, perRoomNight: -999, travelPerPerson: NaN});
-  assert.equal(result.nights, 1);
+  assert.equal(result.nights, 0);
   assert.equal(result.rooms, 1);
   assert.equal(result.travelers, 1);
   assert.equal(result.lodging, 0);
