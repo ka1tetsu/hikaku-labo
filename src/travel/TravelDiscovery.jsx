@@ -4,7 +4,6 @@ import { searchDestinations, suggestDestinations, rankPlanStyles, makeItinerary,
 
 const getCity = id => DESTINATION_CATALOG.find(city=>city.id===id)||DESTINATION_CATALOG[0];
 const tags = ids => INTERESTS.filter(i=>ids.includes(i)).map(i=>i.label);
-const defaultQuery = () => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('destination') || '';
 
 export default function TravelDiscovery({ selectedId, onSelect, nights, setNights, budget }) {
   const [query,setQuery] = useState('');
@@ -45,9 +44,9 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
   }
   function submitSearch(e){
     e.preventDefault();
-    const hit=matches[0];
+    const hit=query.trim()?matches[0]:null;
     if(hit) goToDestination(hit);
-    else setSearchError('まだ対応していない目的地です。下の18都市から選択してください。観光地の情報を捏造せず、掲載都市を順次増やします。');
+    else setSearchError('目的地が未入力か、まだ対応していない場所です。下の18都市から選択してください。観光地の情報を捏造せず、掲載都市を順次増やします。');
   }
   function toggleInterest(id){
     setInterests(current=>current.includes(id)?current.filter(x=>x!==id):[...current,id]);
