@@ -46,7 +46,7 @@ jobs:
               exit 1
             fi
             if [ "$path" = "/travel/" ]; then
-              grep -q '旅行予算シミュレーター' /tmp/hikaku-check.html || {
+              grep -q '比較ラボトラベル' /tmp/hikaku-check.html || {
                 echo "::error::Travel page not served at /travel/."
                 exit 1
               }

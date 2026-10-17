@@ -17,7 +17,7 @@ export function calculateTravelBudget({
 } = {}) {
   const integer = (v, min, max) => Number.isFinite(Number(v))
     ? Math.max(min, Math.min(max, Math.floor(Number(v)))) : min;
-  const n = integer(nights, 1, 30);
+  const n = integer(nights, 0, 30);
   const r = integer(rooms, 1, 10);
   const p = integer(travelers, 1, 30);
   const rate = integer(perRoomNight, 0, 1_000_000);

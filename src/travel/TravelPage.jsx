@@ -1,10 +1,13 @@
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { useMemo, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
-import { calculateTravelBudget, DESTINATIONS } from './budget.js';
+import { calculateTravelBudget } from './budget.js';
+import { DESTINATION_CATALOG } from './destinations.js';
+import TravelDiscovery from './TravelDiscovery.jsx';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
+import './travel-discovery.css';
 
 const yen = (value) => '¥' + value.toLocaleString('ja-JP');
 const AD_READY = travelAffiliateEnabled(import.meta.env);
@@ -38,7 +41,10 @@ function NumberSelect({ label, values, value, onChange, formatter = String }) {
 }
 
 export default function TravelPage() {
-  const [destination, setDestination] = useState('kanto');
+  const [destination, setDestination] = useState(() => {
+    const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('destination');
+    return DESTINATION_CATALOG.some(item => item.id === requested) ? requested : 'kyoto';
+  });
   const [nights, setNights] = useState(2);
   const [travelers, setTravelers] = useState(2);
   const [rooms, setRooms] = useState(1);
@@ -53,33 +59,21 @@ export default function TravelPage() {
     { name: '食費', total: budget.meals, color: 'purple' },
     { name: 'その他', total: budget.other, color: 'gray' },
   ];
-  const place = DESTINATIONS.find(x => x.id === destination);
+  const place = DESTINATION_CATALOG.find(x => x.id === destination) || DESTINATION_CATALOG[0];
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
-      <section className="tv-hero"><div className="tv-wrap tv-hero-layout">
-        <div className="tv-hero-text"><span className="tv-eyebrow">SMART TRAVEL PLANNING</span>
-          <h1>旅の予算を整えて、<br/><em>自分らしい</em>宿選び。</h1>
-          <p>宿泊費だけではなく、交通費や食費も。旅行に必要なお金をまとめて整理してから、納得できる宿泊プランを探そう。</p>
-          <div className="tv-hero-actions"><a className="tv-primary-button" href="#planner">旅費を計算してみる ↗</a><a href="#guide" className="tv-secondary-button">比較のポイントを見る</a></div>
-          <span className="tv-hero-minor">✓ 無料・会員登録不要   ✓ 入力した予算をその場で計算</span>
-        </div>
-        <div className="tv-art" aria-hidden="true"><div className="tv-sun"/><div className="tv-mountain tv-mountain-back"/><div className="tv-mountain tv-mountain-front"/>
-          <div className="tv-art-ticket"><small>YOUR NEXT GETAWAY</small><strong>次の旅を、<br/>もう少し身近に。</strong><div><b>TRIP / 01</b><span>↗</span></div></div>
-          <span className="tv-art-star">✳</span>
-        </div>
-      </div></section>
-      <div className="tv-wrap tv-process"><div><strong>01</strong><span>行きたいエリアを選ぶ</span></div><div><strong>02</strong><span>泊数・人数・費用を入力</span></div><div><strong>03</strong><span>予算を見て宿を探す</span></div></div>
+      <TravelDiscovery selectedId={destination} onSelect={setDestination} nights={nights} setNights={setNights} budget={budget}/>
 
       <section className="tv-wrap tv-planner-section" id="planner">
-        <div className="tv-section-heading"><div><span className="tv-eyebrow">TRIP BUDGET PLANNER</span><h2>旅行の予算を、<br/>まとめて見える化。</h2><p>入力した金額に基づく旅行費用のシミュレーションです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
+        <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
         <div className="tv-planner-grid">
           <div className="tv-form"><div className="tv-form-heading"><strong>旅行の条件</strong><small>いつでも変更できます</small></div>
             <label className="tv-destination-label" htmlFor="tv-destination">旅行先エリア</label>
-            <select id="tv-destination" className="tv-destination" value={destination} onChange={e => setDestination(e.target.value)}>{DESTINATIONS.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select>
-            <p className="tv-hint">{place.hint}</p>
+            <select id="tv-destination" className="tv-destination" value={destination} onChange={e => setDestination(e.target.value)}>{DESTINATION_CATALOG.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select>
+            <p className="tv-hint">{place.note}</p>
             <div className="tv-fields">
-              <NumberSelect label="宿泊日数" values={Array.from({length:14},(_,i)=>i+1)} value={nights} onChange={setNights} formatter={n=>n+'泊'}/>
+              <NumberSelect label="宿泊日数" values={Array.from({length:6},(_,i)=>i)} value={nights} onChange={setNights} formatter={n=>n===0?'日帰り':n+'泊'}/>
               <NumberSelect label="旅行人数" values={Array.from({length:10},(_,i)=>i+1)} value={travelers} onChange={setTravelers} formatter={n=>n+'名'}/>
               <NumberSelect label="部屋数" values={[1,2,3,4,5]} value={rooms} onChange={setRooms} formatter={n=>n+'室'}/>
               <NumberSelect label="1室1泊の宿泊予算" values={[5000,8000,10000,15000,20000,30000,50000,80000,100000]} value={perRoomNight} onChange={setPerRoomNight} formatter={yen}/>
@@ -87,7 +81,7 @@ export default function TravelPage() {
               <NumberSelect label="食費 / 人・日" values={[0,1500,2500,3500,5000,8000,10000,15000]} value={foodPerPersonDay} onChange={setFoodPerPersonDay} formatter={yen}/>
               <NumberSelect label="観光・その他 / 人" values={[0,1000,3000,5000,10000,20000,30000,50000]} value={otherPerPerson} onChange={setOtherPerPerson} formatter={yen}/>
             </div>
-            <p className="tv-calculator-note">※ 宿泊費は1室1泊の予算×部屋数×泊数。食費は（泊数＋1日）×人数で計算。実際のホテル料金・空室・税金・ポイント還元を取得したものではありません。</p>
+            <p className="tv-calculator-note">※ 宿泊費は1室1泊の予算×部屋数×泊数（日帰りは0円）。食費は（泊数＋1日）×人数で計算。実際のホテル料金・空室・税金・ポイント還元を取得したものではありません。</p>
           </div>
           <aside className="tv-result" aria-live="polite"><span className="tv-eyebrow">YOUR ESTIMATED COST</span><h3>旅行費用の目安</h3>
             <div className="tv-total">{yen(budget.total)}<small> / 全員分</small></div><p className="tv-per-person">1人あたり 約 <b>{yen(budget.perPerson)}</b></p>
@@ -107,6 +101,6 @@ export default function TravelPage() {
         <details><summary>比較ラボで直接予約できますか？</summary><p>できません。比較ラボは旅行予算の計画を支援するサイトです。予約・支払・キャンセル手続きは旅行予約サイトでお願いします。</p></details>
       </section>
     </main>
-    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボ / travel</strong><p>旅の計画をもっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.netに登録済みのサイトとして広告を掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
+    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ 比較ラボトラベル</strong><p>旅の計画をもっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.netに登録済みのサイトとして広告を掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 比較ラボ <a href="#planner">ページ上部へ ↑</a></div></footer>
   </div>;
 }
