@@ -30,23 +30,23 @@ test('event schema rejects unknown merchants, identifiers and personal data', ()
   ]) assert.equal(validOutboundEvent(event),false);
 });
 
-test('tracker endpoint enforces origin and logs no identification fields', () => {
+test('tracker endpoint enforces origin and logs no identification fields', async () => {
   const originalLog=console.info;const events=[];
   console.info=event=>events.push(JSON.parse(event));
-  function request(req) {
+  async function request(req) {
     let status=200;let payload=null;
     const res={setHeader(){},status(s){status=s;return this},json(p){payload=p;return this},end(){return this}};
-    handler(req,res);
+    await handler(req,res);
     return {status,payload};
   }
   try {
     const good={method:'POST',headers:{host:'hikaku-labo.vercel.app',origin:'https://hikaku-labo.vercel.app','content-length':'110'},body:{event:'outbound',section:'travel',merchant:'yahoo-travel',placement:'banner234',sponsored:true}};
-    assert.equal(request(good).status,204);
+    assert.equal((await request(good)).status,204);
     assert.equal(events.length,1);
     assert.deepEqual(Object.keys(events[0]).sort(), ['merchant','placement','section','sponsored','timestamp','type'].sort());
-    assert.equal(request({...good,headers:{...good.headers,origin:'https://other.example'}}).status,403);
-    assert.equal(request({...good,body:{...good.body,keyword:'foo'}}).status,400);
-    assert.equal(request({...good,method:'GET'}).status,405);
+    assert.equal((await request({...good,headers:{...good.headers,origin:'https://other.example'}})).status,403);
+    assert.equal((await request({...good,body:{...good.body,keyword:'foo'}})).status,400);
+    assert.equal((await request({...good,method:'GET'})).status,405);
   } finally { console.info=originalLog; }
 });
 
@@ -71,18 +71,19 @@ test('A8 original creative HTML stays unmodified with its exact pixels', () => {
   assert.match(a8, /src="https:\/\/www13\.a8\.net\/0\.gif/);
 });
 
-test('anonymous page views are accepted so click-through rate can be computed', () => {
+test('anonymous page views are accepted so click-through rate can be computed', async () => {
   const originalLog = console.info; const events = [];
   console.info = event => events.push(JSON.parse(event));
   let status = 0;
   const res = { setHeader() {}, status(s) { status = s; return this; }, json() { return this; }, end() { return this; } };
   try {
-    handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: 'sim' } }, res);
+    await handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: 'sim', src: 'google' } }, res);
     assert.equal(status, 204);
-    assert.deepEqual(Object.keys(events[0]).sort(), ['page', 'timestamp', 'type']);
-    handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: '/secret?q=1' } }, res);
+    assert.deepEqual(Object.keys(events[0]).sort(), ['page', 'src', 'timestamp', 'type']);
+    assert.equal(events[0].src, 'google');
+    await handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: '/secret?q=1' } }, res);
     assert.equal(status, 400);
-    handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: 'sim', userId: 'x' } }, res);
+    await handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: 'sim', userId: 'x' } }, res);
     assert.equal(status, 400);
   } finally { console.info = originalLog; }
 });

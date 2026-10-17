@@ -16,13 +16,11 @@
 
 ## ログで把握できること／できないこと
 
-`/api/track` は Vercel Function Logs に `hikaku_outbound` を記録します。
-フィールド: `section` / `merchant` / `placement` / `sponsored` / `timestamp`。
-端末ID、Cookie、個人名、検索キーワード、商品名、広告URLは送信しません。
-サイトに永続保存DBはなく、Vercelログ保持期間に制限があります。
-広告をクリックしない閲覧数を計測していないため、**CTR（クリック率）は算出できません**。明示的なクリック回数のみ比較可能です。
-レポートに記載する `outbound` は、広告主への送客候補の操作であり、広告主が認識したクリック数や実際の売上・確定報酬とは異なります。
-サーバーログは偽イベントの可能性もあるので、ユーザー数や成約件数として解釈しないでください。
+`/api/track` は Vercel Function Logs に `hikaku_view`（ページ・流入元の種類）と `hikaku_outbound`（`section` / `merchant` / `placement` / `sponsored`）を記録します。
+Upstash Redis を接続すると、同じイベントが日別の合計値として保存され、`/admin/` で訪問者数・ページビュー・クリック率・成約率を確認できます（詳細は `docs/ANALYTICS.md`）。
+端末ID、Cookie、個人名、検索キーワード、商品名、広告URL、参照元URLは送信・保存しません。
+`outbound` は広告主への送客候補の操作で、広告主が認識したクリック数や実際の売上・確定報酬とは異なります。
+成果件数・報酬は ASP の管理画面の数字を `/admin/` に入力（またはポストバック）したもので、確定報酬は必ず ASP 側で確認してください。
 
 ## 収益KPI（必ずASPの実データから）
 

@@ -26,7 +26,10 @@ export const PAGE_IDS = Object.freeze({
   '/': 'home', '/compare/': 'compare', '/tools/': 'tools', '/life/': 'life', '/sim/': 'sim', '/hikari/': 'hikari',
   '/card/': 'card', '/hoken/': 'hoken', '/travel/': 'travel', '/guides/travel-budget/': 'guide-travel-budget', '/guides/website-tools/': 'guide-website-tools',
 });
+// Coarse traffic source derived in the browser from the referrer's host; the URL itself is never sent.
+export const TRAFFIC_SOURCES = Object.freeze(['direct', 'internal', 'google', 'yahoo', 'bing', 'search-other', 'x', 'instagram', 'facebook', 'line', 'youtube', 'tiktok', 'social-other', 'referral']);
 export function validViewEvent(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return false;
-  return body.event === 'view' && [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(body.page) && Object.keys(body).every(key => ['event', 'page'].includes(key));
+  if (body.src !== undefined && !TRAFFIC_SOURCES.includes(body.src)) return false;
+  return body.event === 'view' && [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(body.page) && Object.keys(body).every(key => ['event', 'page', 'src'].includes(key));
 }
