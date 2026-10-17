@@ -8,6 +8,17 @@ const ConciergeChat = lazy(() => import('./ConciergeChat.jsx'));
 export default function SiteConcierge({ section = 'site' }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [pending, setPending] = useState(null);
+  useEffect(() => {
+    // Opened from the header button or "AIコンシェルジュに相談" links on the page.
+    const onOpen = event => {
+      setOpen(true);
+      setLoaded(true);
+      if (event.detail?.text) setPending({ text: event.detail.text, at: Date.now() });
+    };
+    window.addEventListener('hikaku:concierge-open', onOpen);
+    return () => window.removeEventListener('hikaku:concierge-open', onOpen);
+  }, []);
   useEffect(() => {
     if (!open) return undefined;
     const onKey = e => { if (e.key === 'Escape') setOpen(false); };
@@ -29,7 +40,7 @@ export default function SiteConcierge({ section = 'site' }) {
         <button type="button" className="hcl-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button>
       </div>
       <Suspense fallback={<p className="hcl-loading">読み込み中…</p>}>
-        <ConciergeChat section={section} compact autoFocus={open} />
+        <ConciergeChat section={section} compact autoFocus={open} storageKey="hikaku-concierge" pending={pending} />
       </Suspense>
     </div>}
     <button type="button" className={'hcl-launcher' + (open ? ' is-open' : '')} aria-expanded={open} aria-haspopup="dialog"

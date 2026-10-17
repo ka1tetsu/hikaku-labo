@@ -100,12 +100,28 @@ function AssistantMessage({ message, onSend, onAction }) {
 }
 
 // One concierge for the whole site: travel, shopping and web tools.
-export default function ConciergeChat({ section = 'site', onAction = runConciergeAction, compact = false, autoFocus = false }) {
-  const [messages, setMessages] = useState(() => [welcomeMessage(section)]);
-  const [convo, setConvo] = useState({});
+function restore(storageKey) {
+  if (!storageKey) return null;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+    return Array.isArray(saved?.messages) && saved.messages.length ? saved : null;
+  } catch { return null; }
+}
+const SpeechRecognition = typeof window === 'undefined' ? null : window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const replyDelay = () => (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 450);
+
+// One concierge for the whole site: travel, shopping and web tools.
+// storageKey keeps the conversation while the visitor moves between pages (this tab only).
+export default function ConciergeChat({ section = 'site', onAction = runConciergeAction, compact = false, autoFocus = false, storageKey = '', pending = null }) {
+  const [messages, setMessages] = useState(() => restore(storageKey)?.messages || [welcomeMessage(section)]);
+  const [convo, setConvo] = useState(() => restore(storageKey)?.convo || {});
   const [input, setInput] = useState('');
+  const [thinking, setThinking] = useState(false);
+  const [listening, setListening] = useState(false);
   const logRef = useRef(null);
   const inputRef = useRef(null);
+  const sendRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     // Bring the start of the newest exchange into view, not the bottom of a long answer.
@@ -114,19 +130,47 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
     if (log && last?.length) log.scrollTo({ top: last[last.length - 1].offsetTop - 12, behavior: 'smooth' });
   }, [messages]);
   useEffect(() => { if (autoFocus) inputRef.current?.focus(); }, [autoFocus]);
+  useEffect(() => {
+    if (!storageKey) return;
+    try { sessionStorage.setItem(storageKey, JSON.stringify({ messages: messages.slice(-30), convo })); } catch { /* storage unavailable */ }
+  }, [storageKey, messages, convo]);
+  useEffect(() => { if (pending?.text) sendRef.current?.(pending.text); }, [pending]);
+  useEffect(() => () => recognitionRef.current?.abort(), []);
 
   function send(text) {
     const value = String(text || '').trim();
-    if (!value) return;
+    if (!value || thinking) return;
     const { message, state } = siteReply(value, convo, { section, config: LINK_CONFIG });
     setConvo(state);
-    setMessages(list => [...list, { role: 'user', text: [value] }, message].slice(-40));
+    setMessages(list => [...list, { role: 'user', text: [value] }].slice(-40));
     setInput('');
+    setThinking(true);
+    setTimeout(() => { setMessages(list => [...list, message].slice(-40)); setThinking(false); }, replyDelay());
   }
+  sendRef.current = send;
   function reset() {
     setMessages([welcomeMessage(section)]);
     setConvo({});
     inputRef.current?.focus();
+  }
+  // Voice input uses the browser's own speech recognition (no API key).
+  function toggleVoice() {
+    if (!SpeechRecognition) return;
+    if (listening) { recognitionRef.current?.stop(); return; }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = true;
+    let finalText = '';
+    recognition.onresult = event => {
+      const text = Array.from(event.results).map(result => result[0].transcript).join('');
+      setInput(text);
+      if (event.results[event.results.length - 1].isFinal) finalText = text;
+    };
+    recognition.onend = () => { setListening(false); if (finalText) sendRef.current?.(finalText); };
+    recognition.onerror = () => setListening(false);
+    recognitionRef.current = recognition;
+    setListening(true);
+    recognition.start();
   }
 
   return <div className={'hcx-chat' + (compact ? ' hcx-compact' : '')}>
@@ -134,6 +178,7 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
       {messages.map((message, index) => message.role === 'user'
         ? <div className="hcx-msg hcx-msg-user" key={index}><div className="hcx-bubble">{message.text[0]}</div></div>
         : <AssistantMessage key={index} message={message} onSend={send} onAction={onAction} />)}
+      {thinking && <div className="hcx-msg hcx-msg-bot"><span className="hcx-avatar" aria-hidden="true">✳</span><div className="hcx-bubble hcx-typing" aria-label="回答を考えています"><span /><span /><span /></div></div>}
     </div>
     <form className="hcx-composer" onSubmit={e => { e.preventDefault(); send(input); }}>
       <label htmlFor={'hcx-input-' + section + (compact ? '-c' : '')} className="hcx-visually-hidden">コンシェルジュへのメッセージ</label>
@@ -142,8 +187,9 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
         onChange={e => setInput(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(input); } }} />
       <div className="hcx-composer-actions">
+        {SpeechRecognition && <button type="button" className={'ghost hcx-mic' + (listening ? ' is-listening' : '')} onClick={toggleVoice} aria-pressed={listening} title="音声で入力（ブラウザの音声認識を使用）">{listening ? '● 聞き取り中' : '🎤 音声'}</button>}
         <button type="button" className="ghost" onClick={reset}>リセット</button>
-        <button type="submit" disabled={!input.trim()}>相談する ↑</button>
+        <button type="submit" disabled={!input.trim() || thinking}>相談する ↑</button>
       </div>
     </form>
     <p className="hcx-disclaimer">{compact

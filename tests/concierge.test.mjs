@@ -85,3 +85,17 @@ test('the concierge is available on every public page', () => {
   for (const guide of ['guides/travel-budget/index.html', 'guides/website-tools/index.html']) assert.match(read(guide), /conciergeMount\.jsx/);
   assert.match(read('src/shared/SiteConcierge.jsx'), /lazy\(\(\) => import\('\.\/ConciergeChat\.jsx'\)\)/);
 });
+
+test('product keywords keep brands and specs but drop filler words', () => {
+  assert.equal(parseProductRequest('ダイソンのドライヤー').keyword, 'ダイソン ドライヤー');
+  assert.equal(parseProductRequest('米 10kg').keyword, '米 10kg');
+  assert.equal(parseProductRequest('いやほん').keyword, 'イヤホン');
+  assert.equal(parseProductRequest('ルンバみたいなやつ').keyword, 'ロボット掃除機');
+  assert.equal(parseProductRequest('スマホの充電がすぐ切れる').keyword, 'モバイルバッテリー');
+});
+
+test('products page search and header use the concierge helpers', () => {
+  const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
+  assert.match(read('src/App.jsx'), /parseProductRequest\(text\)/);
+  assert.match(read('src/shared/SiteHeader.jsx'), /openConcierge\(\)/);
+});

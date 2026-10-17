@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import SectionDirectory from './shared/SectionDirectory.jsx';
 import SiteConcierge from './shared/SiteConcierge.jsx';
+import { describeProductRequest, parseProductRequest } from './shared/productAdvisor.js';
+import { openConcierge } from './shared/conciergeActions.js';
 import './shared/home-refresh.css';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
@@ -36,6 +38,8 @@ export default function App() {
   const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortMode, setSortMode] = useState('popular');
   const [compareList, setCompareList] = useState([]);
+  // Natural-language search ("母の日のプレゼント 3000円くらい") → keyword + filters.
+  const [smart, setSmart] = useState(null);
 
   const MAX_COMPARE = 4;
 
@@ -68,12 +72,12 @@ export default function App() {
     return products.reduce((min, p) => (p.effectivePrice < min.effectivePrice ? p : min)).itemCode;
   }, [products]);
 
-  const doSearch = useCallback(async (kw, genre, pg = 1) => {
+  const doSearch = useCallback(async (kw, genre, pg = 1, options = {}) => {
     if (!kw && !genre) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await searchRakutenItems(kw, genre, pg);
+      const data = await searchRakutenItems(kw, genre, pg, options);
       setProducts(data.items);
       setTotalPages(Math.min(data.pageCount, 100));
       setPage(pg);
@@ -116,6 +120,7 @@ export default function App() {
       setInputValue(kw);
       setQuery(kw);
       setActiveCategory(null);
+      setSmart(null);
       doSearch(kw, '', 1);
       document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
@@ -123,15 +128,39 @@ export default function App() {
     return () => window.removeEventListener('hikaku:concierge-action', onAction);
   }, [doSearch]);
 
+  // Plain product names search as typed; wishes, budgets and preferences are interpreted.
+  const runSmartSearch = (text) => {
+    const request = parseProductRequest(text);
+    const interpreted = request.keyword && (request.need || request.maxPrice || request.minPrice || request.freeShipping || request.sort !== 'standard');
+    setActiveCategory(null);
+    if (!interpreted) {
+      setSmart(null);
+      setQuery(text);
+      doSearch(text, '', 1);
+      return;
+    }
+    const options = { minPrice: request.minPrice, maxPrice: request.maxPrice, sort: request.sort, freeShipping: request.freeShipping };
+    setSmart({ original: text, keyword: request.keyword, options, summary: describeProductRequest(request), alternatives: request.need ? request.need.keywords.filter(k => k !== request.keyword) : [] });
+    if (request.sort === '+itemPrice') setSortMode('effective-asc');
+    if (request.sort === '-reviewAverage') setSortMode('review');
+    setQuery(request.keyword);
+    doSearch(request.keyword, '', 1, options);
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
-    setQuery(inputValue);
-    setActiveCategory(null);
-    doSearch(inputValue, '', 1);
+    runSmartSearch(inputValue.trim());
+  };
+
+  const searchAlternative = (keyword) => {
+    setSmart(current => current && { ...current, keyword, alternatives: [current.keyword, ...current.alternatives.filter(k => k !== keyword)] });
+    setQuery(keyword);
+    doSearch(keyword, '', 1, smart?.options || {});
   };
 
   const handleCategory = (cat) => {
+    setSmart(null);
     setActiveCategory(cat);
     setQuery('');
     setInputValue('');
@@ -139,7 +168,7 @@ export default function App() {
   };
 
   const handlePage = (newPage) => {
-    doSearch(query, activeCategory?.genreId || '', newPage);
+    doSearch(query, activeCategory?.genreId || '', newPage, smart?.options || {});
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -219,6 +248,14 @@ export default function App() {
             </div>
           )}
         </div>
+
+        {smart && (
+          <div className="hl-smart-search" role="status">
+            <p><strong>「{smart.original}」</strong>を、<strong>{smart.keyword}</strong>{smart.summary.filter(item => !item.startsWith('検索:') && item !== smart.keyword).length > 0 && <>（{smart.summary.filter(item => !item.startsWith('検索:')).join('・')}）</>}で検索しました。</p>
+            {smart.alternatives.length > 0 && <div className="hl-smart-chips"><span>ほかの候補：</span>{smart.alternatives.map(k => <button type="button" key={k} onClick={() => searchAlternative(k)}>{k}</button>)}</div>}
+            <button type="button" className="hl-smart-ask" onClick={() => openConcierge(smart.original)}>✳ AIコンシェルジュに詳しく相談する</button>
+          </div>
+        )}
 
         {loading && (
           <div className="loading-state">

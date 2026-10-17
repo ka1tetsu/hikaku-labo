@@ -20,8 +20,13 @@ export const PRODUCT_NOUNS = [
   'ベビーカー', 'チャイルドシート', 'おもちゃ', '知育玩具', 'ぬいぐるみ', '絵本',
   'ヨガマット', 'ダンベル', 'プロテイン', 'テント', '寝袋', 'キャンプ用品', '自転車',
   'コーヒー', '紅茶', 'お菓子', 'スイーツ', 'チョコレート', 'ビール', 'ワイン', '日本酒', 'お米', '水', 'ふるさと納税',
+  'お米', '米', '牛肉', 'カニ', 'うなぎ', 'ルンバ', 'ダイソン', 'AirPods', 'ケース', 'フィルム', '時計',
   '化粧水', '日焼け止め', 'シャンプー', '香水', 'ハンドクリーム', 'タオル', '花', 'フラワー', 'カタログギフト',
 ];
+
+// "ルンバみたいなやつ" → the generic category instead of the brand.
+const LIKE = { 'ルンバ': 'ロボット掃除機', 'ダイソン': 'コードレス掃除機', 'AirPods': 'ワイヤレスイヤホン', 'iPad': 'タブレット', 'Switch': 'ゲーム機' };
+const toKatakana = text => text.replace(/[\u3041-\u3096]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
 
 // Attribute words → Rakuten keyword terms.
 const ATTRIBUTES = [
@@ -41,11 +46,21 @@ export const NEEDS = [
   { re: /(結婚祝い|新築祝い|引っ越し祝い)/, label: 'お祝いギフト', keywords: ['結婚祝い ペア', 'カタログギフト', 'ペアグラス', 'タオル ギフト'] },
   { re: /(お返し|内祝い|香典返し)/, label: 'お返し・内祝い', keywords: ['内祝い', 'カタログギフト', 'お菓子 詰め合わせ', 'タオル ギフト'] },
   { re: /(クリスマス).*(プレゼント|ギフト)/, label: 'クリスマスギフト', keywords: ['クリスマス プレゼント', 'クリスマス お菓子', 'イルミネーション', 'ぬいぐるみ'] },
+  { re: /^(父の日)/, label: '父の日のギフト', keywords: ['父の日 ギフト', 'ビール ギフト', '名入れ グラス', 'ネクタイ'] },
+  { re: /^(母の日)/, label: '母の日のギフト', keywords: ['母の日 ギフト', 'ハンドクリーム ギフト', 'フラワー ギフト', 'スイーツ ギフト'] },
   { re: /(プレゼント|ギフト|贈り物|手土産)/, label: 'プレゼント・ギフト', keywords: ['ギフト 人気', 'スイーツ ギフト', 'カタログギフト', 'タオル ギフト'] },
   { re: /(一人暮らし|ひとり暮らし|新生活)/, label: '一人暮らし・新生活', keywords: ['冷蔵庫 一人暮らし', '電子レンジ 一人暮らし', '洗濯機 一人暮らし', '炊飯器 3合'] },
   { re: /(在宅ワーク|在宅勤務|テレワーク|リモートワーク|作業環境|デスク環境)/, label: '在宅ワークを快適に', keywords: ['モニター 27インチ', 'オフィスチェア', 'ウェブカメラ', 'ノイズキャンセリング イヤホン'] },
+  { re: /(引っ越し|引越し|新居)/, label: '引っ越し・新居の準備', keywords: ['カーテン', '収納ボックス', '照明 LED', '洗濯機'] },
+  { re: /(肩こり|肩が凝|首が痛|首こり)/, label: '肩こり・首のケア', keywords: ['マッサージ器 肩', '枕 肩こり', 'ネックピロー', 'ホットアイマスク'] },
+  { re: /(腰痛|腰が痛)/, label: '腰痛対策', keywords: ['クッション 腰', 'オフィスチェア', 'マットレス 腰痛', 'コルセット 腰'] },
+  { re: /(起きられない|起きれない|寝坊|目覚まし)/, label: '朝すっきり起きたい', keywords: ['光目覚まし時計', '目覚まし時計 大音量', 'スマートライト', '遮光カーテン'] },
+  { re: /(乾燥(する|して)|部屋が乾燥|喉が乾燥|加湿)/, label: '部屋の乾燥対策', keywords: ['加湿器', '加湿空気清浄機', '保湿クリーム', '濡れマスク'] },
+  { re: /(花粉|ハウスダスト|空気が悪)/, label: '花粉・空気の対策', keywords: ['空気清浄機', '花粉 マスク', '布団クリーナー', '加湿空気清浄機'] },
+  { re: /(充電がすぐ|充電が切れ|バッテリーが持たな|電池が持たな)/, label: 'スマホの充電対策', keywords: ['モバイルバッテリー', '急速充電器', 'ワイヤレス充電器', '充電ケーブル'] },
+  { re: /(目が疲れ|眼精疲労|目の疲れ)/, label: '目の疲れ対策', keywords: ['ホットアイマスク', 'ブルーライトカット メガネ', 'モニターライト', '目元マッサージャー'] },
   { re: /(眠れない|寝れない|睡眠|快眠|寝つき)/, label: '睡眠の質を上げたい', keywords: ['枕', 'マットレス', 'アイマスク', '遮光カーテン'] },
-  { re: /(時短|料理が面倒|家事を楽|自炊)/, label: '家事・料理の時短', keywords: ['電気圧力鍋', '食洗機', 'ロボット掃除機', 'フードプロセッサー'] },
+  { re: /(時短|料理が面倒|料理を楽|料理が楽|家事を楽|家事が楽|自炊)/, label: '家事・料理の時短', keywords: ['電気圧力鍋', '食洗機', 'ロボット掃除機', 'フードプロセッサー'] },
   { re: /(掃除|部屋をきれい|ホコリ)/, label: '掃除を楽にしたい', keywords: ['ロボット掃除機', 'コードレス掃除機', '空気清浄機', 'ハンディクリーナー'] },
   { re: /(暑い|暑さ|夏を快適|熱中症)/, label: '暑さ対策', keywords: ['サーキュレーター', 'ハンディファン', '冷感 敷きパッド', '日傘'] },
   { re: /(寒い|寒さ|冬を快適|冷え性)/, label: '寒さ対策', keywords: ['電気毛布', 'セラミックヒーター', '加湿器', '着る毛布'] },
@@ -58,6 +73,14 @@ export const NEEDS = [
 ];
 
 const STOP = /^(おすすめ|オススメ|人気|安い|安く|いい|良い|よい|欲しい|ほしい|買いたい|買う|探して|探す|教えて|ください|したい|たい|もの|物|やつ|商品|何か|なにか|どれ|何|なに|最安|最安値|格安|コスパ|高評価|評価|レビュー|口コミ|予算|以下|以内|まで|くらい|程度|前後|円|万円|送料無料|ポイント|比較|ランキング|売れ筋|最新|ある|あれば|です|ます|今|ちょっと|ほど|探し|向け|用|に|を|が|は|で|と|の|も)$/;
+
+function contentWords(text) {
+  return text
+    .replace(/(\d+(?:\.\d+)?)\s*(万|千)?\s*(円\s*(以下|以内|まで|未満|くらい|前後|程度|以上)?|(以下|以内|まで|未満|くらい|前後|程度|以上))/g, ' ')
+    .split(/[\s、。,.!?！？]|の|が|を|で|に|と|は|も|って|から|みたいな|みたい|やつ/)
+    .map(w => w.trim()).filter(w => w.length >= 2 && !STOP.test(w) && !/^(たい|ほしい|欲しい|したい|ください)/.test(w) && !/(たい|てる|ている|です|ます)$/.test(w))
+    .map(w => w.replace(/(が|を)?(欲しい|ほしい|買いたい|探してる|探している|ある\?)$/, ''));
+}
 
 export function parseProductRequest(input) {
   const raw = String(input || '').trim();
@@ -90,20 +113,27 @@ export function parseProductRequest(input) {
 
   // Product noun (longest first) + attributes.
   const nouns = [...PRODUCT_NOUNS].sort((a, b) => b.length - a.length);
-  const noun = nouns.find(n => text.toLowerCase().includes(n.toLowerCase()));
+  const lower = text.toLowerCase();
+  // Hiragana input ("いやほん") matches katakana product names too.
+  let noun = nouns.find(n => lower.includes(n.toLowerCase())) || nouns.find(n => /[ァ-ヶ]/.test(n) && toKatakana(lower).includes(n));
+  if (noun && LIKE[noun] && /(みたいな|のような|っぽい|似た)/.test(text)) noun = LIKE[noun];
   if (noun) request.signals += 4;
   const attributes = ATTRIBUTES.filter(([re]) => re.test(text)).map(([, word]) => word).filter(word => !noun || !noun.includes(word));
-  if (noun) request.keyword = [...attributes.slice(0, 2), noun].join(' ');
+  if (noun) {
+    // Keep one extra content word such as a brand or ingredient ("ダイソン ドライヤー", "ふるさと納税 牛肉").
+    const words = contentWords(text);
+    const spec = words.find(w => /^\d+(\.\d+)?(kg|g|ml|l|cm|mm|インチ|型|個|本|枚|合|人用|畳)$/i.test(w));
+    const extra = words.find(w => !toKatakana(w).includes(noun) && !noun.includes(w) && !attributes.includes(w) && !ATTRIBUTES.some(([re]) => re.test(w)) && !/^\d/.test(w));
+    request.keyword = [...attributes.slice(0, 2), ...(extra && !/(みたい|ような|やつ)/.test(text) ? [extra] : []), noun, ...(spec ? [spec] : [])].join(' ');
+  }
   else if (!request.need) {
     // Fall back to the remaining content words ("北海道 カニ", "抹茶 スイーツ").
-    const words = text
-      .replace(/(\d+(?:\.\d+)?)\s*(万|千)?\s*円?\s*(以下|以内|まで|未満|くらい|前後|程度|以上)?/g, ' ')
-      .split(/[\s、。,.!?！？]|の|が|を|で|に|と|は|も|って|から/)
-      .map(w => w.trim()).filter(w => w.length >= 2 && !STOP.test(w) && !/^(たい|ほしい|欲しい|したい|ください)/.test(w) && !/(たい|てる|ている|です|ます)$/.test(w))
-      .map(w => w.replace(/(が|を)?(欲しい|ほしい|買いたい|探してる|探している|ある\?)$/, ''));
+    const words = contentWords(text);
     request.keyword = [...attributes.slice(0, 1), ...words.slice(0, 3)].filter(Boolean).join(' ').trim();
   }
-  if (request.need && !noun) request.keyword = request.need.keywords[0];
+  // "スマホの充電がすぐ切れる": the device is context, the need names the product.
+  const contextOnly = ['スマホ', 'スマートフォン', 'PC', 'パソコン', 'iPhone'].includes(noun) && request.need && !/ギフト|プレゼント/.test(request.need.label);
+  if (request.need && (!noun || contextOnly)) request.keyword = request.need.keywords[0];
   return request;
 }
 

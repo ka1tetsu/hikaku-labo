@@ -2,6 +2,7 @@ import { useId, useMemo, useState } from 'react';
 import { DESTINATION_CATALOG } from './destinations.js';
 import { COUNTRY_INDEX, countryByCode, flagOf } from './countries.js';
 import { describeMatch, searchTravel } from './search.js';
+import { openConcierge } from '../shared/conciergeActions.js';
 
 const RECENT_KEY = 'hikaku-travel-recent';
 const POPULAR = ['kyoto', 'sapporo', 'naha', 'seoul', 'taipei', 'bangkok', 'honolulu', 'paris'];
@@ -53,6 +54,10 @@ export default function TravelSearchBox({ onDestination, onScope, onExternal }) 
     }
     for (const g of result.groups.slice(0, 2)) out.push({ type: 'scope', key: 'g' + g.word, emoji: '🗺️', label: g.word, hint: `${g.count}都市`, scope: { label: g.word, regions: g.regions || [], countries: g.countries || [], area: g.area || null } });
     for (const t of result.themes.slice(0, 2)) out.push({ type: 'scope', key: 't' + t.id, emoji: t.emoji, label: t.label, hint: `テーマ・${t.count}都市`, scope: { label: t.label, interests: [t.id] } });
+    // Phrases and wishes ("癒されたい", "子連れで近場") are better answered as a conversation.
+    const ask = { type: 'ask', key: 'a', emoji: '✳', label: `「${q}」をAIコンシェルジュに相談`, hint: '曖昧な希望もOK', ask: q };
+    if (/[ぁ-ん]{2,}/.test(q) || q.length >= 8 || result.mode !== 'direct') out.splice(Math.min(out.length, result.destinations.length ? 3 : 0), 0, ask);
+    else out.push(ask);
     out.push({ type: 'external', key: 'x', emoji: '🔎', label: `「${q}」を予約サイト・地図で検索`, hint: '掲載外の場所も世界中どこでも', external: q });
     return out;
   }, [query, recent]);
@@ -61,6 +66,7 @@ export default function TravelSearchBox({ onDestination, onScope, onExternal }) 
     if (!option) return;
     if (option.type === 'destination') { saveRecent(option.d.id); setRecent(readRecent()); onDestination(option.d); }
     else if (option.scope) onScope(option.scope);
+    else if (option.ask) openConcierge(option.ask);
     else if (option.external) onExternal(option.external);
     setQuery('');
     setOpen(false);

@@ -6,7 +6,7 @@ import { rankServices } from '../tools/score.js';
 const CATEGORY_RULES = [
   ['shop', /(ネットショップ|ネットショッピングを始|EC|通販サイト|オンラインショップ|物販|ハンドメイド|作品を売|商品を売|販売サイト|ショップを開|ショップを作|BASE|Shopify|ショッピファイ)/i],
   ['wordpress', /(WordPress|ワードプレス|ワープレ|ブログ|メディア運営|アフィリエイトサイト|レンタルサーバー|サーバー|エックスサーバー|XServer|Kinsta|キンスタ)/i],
-  ['website', /(ホームページ|HP|ウェブサイト|Webサイト|webサイト|サイトを作|サイト制作|サイト作成|ポートフォリオ|LP|ランディングページ|会社案内|店舗サイト|ノーコード|Wix|Studio|スタジオ)/i],
+  ['website', /((お店|会社|店舗|教室|サロン|事務所|病院|クリニック)の?(サイト|HP|ページ)|サイトを?(作|ほし|欲し)|ホームページ|HP|ウェブサイト|Webサイト|webサイト|サイトを作|サイト制作|サイト作成|ポートフォリオ|LP|ランディングページ|会社案内|店舗サイト|ノーコード|Wix|Studio|スタジオ)/i],
 ];
 // Vague goals → most likely category (explained to the user, never silently forced).
 const GOALS = [

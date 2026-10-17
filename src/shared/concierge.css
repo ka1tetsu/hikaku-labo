@@ -63,6 +63,12 @@
 .hcx-tool-head>div{flex:1;min-width:0}
 .hcx-tool-score{font-size:10px;font-weight:800;color:#2b7a5a;background:#eef7f1;border-radius:20px;padding:3px 8px;white-space:nowrap}
 .hcx-tool-link{margin-top:auto;font-size:12px;font-weight:800;color:#14634a!important;border:1px solid #cfe2d6;border-radius:9px;padding:8px 10px;text-align:center}
+/* Typing indicator */
+.hcx-typing{display:flex;gap:5px;align-items:center;flex:none!important;padding:15px 16px}
+.hcx-typing span{width:7px;height:7px;border-radius:50%;background:#7aa98f;animation:hcx-dot 1s infinite ease-in-out}
+.hcx-typing span:nth-child(2){animation-delay:.15s}.hcx-typing span:nth-child(3){animation-delay:.3s}
+@keyframes hcx-dot{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.hcx-mic.is-listening{background:#fde8e4!important;color:#a3321e!important}
 /* Composer */
 .hcx-composer{border-top:1px solid #e1ece4;padding:14px 16px;background:#fff}
 .hcx-composer textarea{width:100%;resize:vertical;min-height:58px;border:1px solid #cddfd3;border-radius:12px;padding:11px 13px;font:500 14px/1.7 'Noto Sans JP',sans-serif;color:#1d3d2f;background:#fbfdfb}
@@ -97,4 +103,4 @@
 .tvw-pr{font-style:normal;font-size:9px;font-weight:900;letter-spacing:.06em;color:#8a5a00;background:#fff3d6;border:1px solid #f0d699;border-radius:4px;padding:1px 5px}
 .tvw-affiliate-note{font-size:11px;color:#6b7f72;line-height:1.8;margin:12px 0 0}
 
-@media(prefers-reduced-motion:reduce){.tvw-links a,.hcx-product{transition:none}}
+@media(prefers-reduced-motion:reduce){.tvw-links a,.hcx-product{transition:none}.hcx-typing span{animation:none}}

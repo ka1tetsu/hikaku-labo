@@ -6,7 +6,7 @@ import { travelLinkConfig } from '../travel/bookingLinks.js';
 import { describeProductRequest, parseProductRequest } from './productAdvisor.js';
 import { adviseTools, parseToolsRequest } from './toolsAdvisor.js';
 
-const TRAVEL_WORDS = /(旅行|旅|観光|ホテル|旅館|宿|航空券|飛行機|フライト|ツアー|海外|国内旅行|世界遺産|観光地|行きたい|行くなら|ビザ|リゾート|温泉|ビーチ|モデルコース|泊|日帰り|連休|ゴールデンウィーク|夏休み|年末年始)/;
+const TRAVEL_WORDS = /(旅行|旅|観光|連れてって|お出かけ|出かけ|遊びに行|見に行|息抜き|バカンス|避暑|休暇|癒され|癒やされ|桜が見|雪が見|雪を見|景色|絶景|ホテル|旅館|宿|航空券|飛行機|フライト|ツアー|海外|国内旅行|世界遺産|観光地|行きたい|行くなら|ビザ|リゾート|温泉|ビーチ|モデルコース|泊|日帰り|連休|ゴールデンウィーク|夏休み|年末年始)/;
 const FOLLOW_UP = /^(もっと|他の|ほかの|別の|それ|これ|あと|次|じゃあ|では|もう少し|やっぱり|高評価|評価|送料無料|安い順|もっと安く|続き)/;
 
 export const SITE_CHIPS = {

@@ -41,6 +41,14 @@ const INTENTS = {
   help: /(使い方|何ができ|ヘルプ|help)/i,
 };
 
+const SIGHT_SEASONS = [[/(桜|花見)/, [3, 4]], [/紅葉/, [10, 11]], [/(雪|スキー|流氷)/, [12, 1, 2]], [/(海水浴|夏祭り|花火)/, [7, 8]]];
+const RARE_WISHES = ['オロラ', 'オーロラ', '氷河', 'サウナ'];
+const PURPOSES = [
+  [/女子旅/, ['food', 'shopping', 'art'], null], [/(卒業旅行|学生旅行)/, ['city', 'food'], 'cheap'], [/(一人旅|ひとり旅)/, ['city', 'history'], null],
+  [/(リフレッシュ|息抜き|疲れた|癒され|癒やされ)/, ['relax', 'nature'], null], [/(親孝行|両親と)/, ['relax', 'history'], null],
+  [/(推し活|ライブ遠征)/, ['city'], null], [/(写真|映え|インスタ)/, ['nature', 'art'], null],
+];
+
 export function parseTravelRequest(input, { now = new Date() } = {}) {
   const raw = String(input || '');
   const text = kanjiNumbers(raw.normalize('NFKC'));
@@ -59,6 +67,8 @@ export function parseTravelRequest(input, { now = new Date() } = {}) {
   else if (/来月/.test(text)) slots.months = [((now.getMonth() + 1) % 12) + 1];
   else if (/今月/.test(text)) slots.months = [now.getMonth() + 1];
   else for (const [re, months] of SEASONS) if (re.test(text)) { slots.months = months; break; }
+  // Seasonal sights imply when to go.
+  if (!slots.months) for (const [re, months] of SIGHT_SEASONS) if (re.test(text)) { slots.months = months; break; }
 
   const nights = text.match(/(\d+)\s*泊/);
   const days = text.match(/(\d+)\s*日間/);
@@ -107,7 +117,16 @@ export function parseTravelRequest(input, { now = new Date() } = {}) {
     ...(scanText.match(/[\u30a1-\u30ff]{3,}/g) || []).map(w => normalizeText(w, { foldKana: false })).filter(w => !places.has(w))])];
   const keywords = words.filter(word => DESTINATION_CATALOG.some(d => findSpot(d, word)));
   if (keywords.length) slots.keywords = keywords.slice(0, 5);
+  // Generic themes (世界遺産, 温泉…) only boost; rare specific wishes also narrow the pool.
+  const specific = keywords.filter(word => !scan.themeWords.includes(word) || RARE_WISHES.includes(word));
+  if (specific.length) slots.must = specific;
   if (/(家族|子連れ|子供|子ども|こども|キッズ)/.test(text)) slots.interests = [...new Set([...(slots.interests || []), 'family'])];
+  // Trip purposes that imply themes or price feel.
+  for (const [re, interests, price] of PURPOSES) {
+    if (!re.test(text)) continue;
+    slots.interests = [...new Set([...(slots.interests || []), ...interests])];
+    if (price && !slots.price) slots.price = price;
+  }
   for (const key of ['countries', 'regions']) if (slots[key] && !slots[key].length) delete slots[key];
 
   // Still nothing about where? Try the search engine (handles typos / landmarks).
@@ -154,7 +173,8 @@ export function recommendTrips(slots = {}, { catalog = DESTINATION_CATALOG, excl
     && (!slots.maxHours || d.area === 'domestic' || d.hours <= slots.maxHours));
   // A concrete wish narrows the pool to places that actually offer it, when any do.
   const wishes = slots.keywords || [];
-  const offering = wishes.length ? pool.filter(d => wishes.some(k => findSpot(d, k))) : [];
+  const must = slots.must || [];
+  const offering = must.length ? pool.filter(d => must.some(k => findSpot(d, k))) : [];
   const scored = (offering.length ? offering : pool).map(d => {
     let score = 0;
     const reasons = [];
@@ -342,11 +362,18 @@ export function conciergeReply(input, state = {}, { now = new Date(), config = t
 
   if (!understood && !has('more')) {
     // Looks like a place name we have no curated guide for: still searchable worldwide.
-    if (text.length <= 24 && !/[?？。、]/.test(text) && /[\u30a0-\u30ff\u4e00-\u9fffA-Za-z]{2,}/.test(text)) {
+    // A bare name without hiragana ("ハルシュタット", "Hallstatt", "白川郷").
+    if (text.length <= 20 && /^[\u30a0-\u30ff\u4e00-\u9fffA-Za-z\s・ー'-]+$/.test(text) && !/(旅|観光|ツアー|おすすめ|安|女子|家族)/.test(text)) {
       return { message: { role: 'assistant', text: [`「${text}」は編集部のモデルコースにまだ掲載していない場所です。情報を作り話で補うことはせず、宿・航空券・地図を各サイトで直接検索できるリンクを用意しました。`],
         links: { flights: [], stays: buildPlaceLinks(text, { config, nights: slots.nights ?? 2, adults: slots.travelers || 2 }) }, chips: HELP_CHIPS.slice(0, 2) }, state: prev };
     }
-    return { message: { role: 'assistant', text: ['ごめんなさい、条件をうまく読み取れませんでした。行き先・時期・日数・予算・やりたいこと（例：ビーチ、温泉、世界遺産、美術館、グルメ）を含めて書いてみてください。'], chips: HELP_CHIPS }, state: prev };
+    // "どこか行きたい": suggest a varied, in-season starter set and ask what matters.
+    const month = ((now.getMonth() + 1) % 12) + 1;
+    const inSeason = catalog.filter(d => d.bestMonths.includes(month));
+    const picks = [inSeason.find(d => d.area === 'domestic'), inSeason.find(d => d.area === 'overseas' && d.hours <= 5), inSeason.find(d => d.area === 'overseas' && d.hours > 8)].filter(Boolean);
+    return { message: { role: 'assistant', text: [`行き先がまだ決まっていなくても大丈夫です。まずは${month}月に過ごしやすい旅先を国内・近場の海外・遠くの海外から1つずつ選びました。やりたいことや予算を教えてもらえれば、もっと絞り込みます。`],
+      cards: picks.map(d => card({ destination: d, reasons: [`${month}月は過ごしやすい時期の目安`, d.tagline], fit: null })),
+      chips: ['国内でのんびり温泉', '近場の海外でグルメ', 'ビーチでリゾート', '世界遺産を見たい', '予算1人10万円で'] }, state: { ...prev, shown: picks.map(d => d.id) } };
   }
 
   const exclude = has('more') ? prev.shown : [];
@@ -355,8 +382,8 @@ export function conciergeReply(input, state = {}, { now = new Date(), config = t
   let recs = recommendTrips(wish, { catalog, exclude });
   const relaxed = [];
   // A concrete wish (オーロラ, ワイナリー…) outranks an earlier area choice.
-  const keywordHit = list => list.some(r => (wish.keywords || []).some(k => findSpot(r.destination, k)));
-  if (wish.keywords?.length && !keywordHit(recs)) {
+  const keywordHit = list => list.some(r => (wish.must || []).some(k => findSpot(r.destination, k)));
+  if (wish.must?.length && !keywordHit(recs)) {
     const wide = { ...wish };
     for (const key of LOCATION_KEYS) delete wide[key];
     const alternative = recommendTrips(wide, { catalog, exclude });

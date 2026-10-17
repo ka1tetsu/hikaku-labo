@@ -16,3 +16,9 @@ export function runConciergeAction(action) {
     window.location.href = action.url;
   }
 }
+
+// Open the floating concierge, optionally sending a first message.
+export function openConcierge(text = '') {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('hikaku:concierge-open', { detail: { text } }));
+}
