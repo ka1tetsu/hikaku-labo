@@ -14,7 +14,8 @@ function send(body) {
 // One anonymous view per page load (page id only), used as the CTR denominator.
 export function recordPageView() {
   if (typeof window === 'undefined') return;
-  const page = PAGE_IDS[window.location.pathname];
+  const path = window.location.pathname;
+  const page = PAGE_IDS[path] || (path.startsWith('/sim/vs/') ? 'sim-vs' : path.startsWith('/hikari/area/') ? 'hikari-area' : null);
   if (page) send(JSON.stringify({ event: 'view', page }));
 }
 

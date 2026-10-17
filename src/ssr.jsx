@@ -5,6 +5,9 @@ import ToolsPage from './tools/ToolsPage.jsx';
 import TravelPage from './travel/TravelPage.jsx';
 import ComparePage from './compare/ComparePage.jsx';
 import ServicesPage from './services/ServicesPage.jsx';
+import { HikariAreaPage, SimPairPage } from './services/StaticPages.jsx';
+import { AREA_PAGES, SIM_PAIRS, areaLabel } from './services/pages.js';
+import { SIM_SERVICES } from './services/catalog.js';
 
 // Built HTML file → page element. Used only by scripts/prerender.mjs.
 export const PAGES = {
@@ -21,4 +24,29 @@ export const PAGES = {
 
 export function render(file) {
   return renderToString(<StrictMode>{PAGES[file]()}</StrictMode>);
+}
+
+// Long-tail pages that exist only as static HTML (no React hydration).
+const simName = id => SIM_SERVICES.find(s => s.id === id).name;
+export const STATIC_PAGES = [
+  ...SIM_PAIRS.map(pair => ({
+    path: pair.path,
+    title: `${simName(pair.a)}と${simName(pair.b)}の比較【2026年10月】料金・通話・サポートの違い｜比較ラボ`,
+    description: `${simName(pair.a)}と${simName(pair.b)}を、データ量ごとの月額料金・通話・店舗サポートで比較。どちらが安いかを使い方別に結論から解説します。`,
+    og: 'sim',
+    crumbs: [['/life/', '通信・お金の比較'], ['/sim/', '格安SIM比較'], [pair.path, pair.title]],
+    element: () => <SimPairPage a={pair.a} b={pair.b} env={import.meta.env} />,
+  })),
+  ...AREA_PAGES.map(page => ({
+    path: page.path,
+    title: `${areaLabel(page.area)}の光回線比較【2026年10月】スマホ別のおすすめとセット割｜比較ラボ`,
+    description: `${areaLabel(page.area)}で申し込める主な光回線を、ドコモ・au・ソフトバンク・楽天モバイルなど使っているスマホ別にセット割と提供エリアで整理。`,
+    og: 'hikari',
+    crumbs: [['/life/', '通信・お金の比較'], ['/hikari/', '光回線比較'], [page.path, page.title]],
+    element: () => <HikariAreaPage area={page.area} env={import.meta.env} />,
+  })),
+];
+
+export function renderStatic(page) {
+  return renderToString(page.element());
 }

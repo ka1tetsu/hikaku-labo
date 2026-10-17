@@ -5,6 +5,7 @@ import { recordOutboundClick } from '../shared/outboundClient.js';
 import { CHECKED_AT, HOKEN_SERVICES } from './catalog.js';
 import { rankCards, rankHikari, rankSim } from './score.js';
 import { serviceLink } from './affiliate.js';
+import { AREA_PAGES, SIM_PAIRS } from './pages.js';
 import './services.css';
 
 const ENV = import.meta.env;
@@ -109,7 +110,10 @@ const RELATED = {
 
 function Related({ category }) {
   const list = [...(RELATED[category] || []), ['/compare/', '日用品・家電は全ショップで最安比較', '楽天・Yahoo!の実売価格を同じ商品で比較']];
+  const deep = category === 'sim' ? ['2社を比べる', SIM_PAIRS.map(p => [p.path, p.title])]
+    : category === 'hikari' ? ['地域別に見る', AREA_PAGES.map(p => [p.path, p.title])] : null;
   return <section className="sv-wrap sv-related" aria-label="あわせて見直す">
+    {deep && <><h2>{deep[0]}</h2><div className="sv-link-list">{deep[1].map(([href, title]) => <a key={href} href={href}>{title}</a>)}</div><br /></>}
     <h2>あわせて見直す</h2>
     <div>{list.map(([href, title, text]) => <a key={href} href={href}><strong>{title} →</strong><span>{text}</span></a>)}</div>
   </section>;

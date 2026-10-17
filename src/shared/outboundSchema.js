@@ -27,5 +27,5 @@ export const PAGE_IDS = Object.freeze({
 });
 export function validViewEvent(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return false;
-  return body.event === 'view' && Object.values(PAGE_IDS).includes(body.page) && Object.keys(body).every(key => ['event', 'page'].includes(key));
+  return body.event === 'view' && [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(body.page) && Object.keys(body).every(key => ['event', 'page'].includes(key));
 }

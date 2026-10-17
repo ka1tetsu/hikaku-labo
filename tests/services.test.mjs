@@ -56,3 +56,16 @@ test('insurance page compares no insurance products and lists services without r
   assert.match(page, /五十音順/);
   assert.ok(!HOKEN_SERVICES.some(s => 'score' in s || 'rate' in s));
 });
+
+test('long-tail pages cover every SIM pair and every region once', async () => {
+  const { SIM_PAIRS, AREA_PAGES, AREAS } = await import('../src/services/pages.js');
+  assert.equal(SIM_PAIRS.length, SIM_SERVICES.length * (SIM_SERVICES.length - 1) / 2);
+  assert.equal(new Set(SIM_PAIRS.map(p => p.path)).size, SIM_PAIRS.length);
+  assert.ok(SIM_PAIRS.every(p => /^\/sim\/vs\/[a-z0-9-]+\/$/.test(p.path)));
+  assert.equal(AREA_PAGES.length, AREAS.length);
+  for (const [area] of AREAS) assert.ok(rankHikari({ area, carrier: 'docomo' }).some(r => r.available), area);
+  const script = readFileSync(new URL('../scripts/prerender.mjs', import.meta.url), 'utf8');
+  assert.match(script, /STATIC_PAGES/);
+  assert.match(script, /SITE_ORIGIN/);
+  assert.match(script, /sitemap\.xml/);
+});
