@@ -8,15 +8,22 @@ import { YAHOO_TRAVEL_A8_CREATIVES } from '../src/travel/a8TravelAds.js';
 
 const get=id=>DESTINATION_CATALOG.find(d=>d.id===id);
 
-test('catalog has 18 distinct, richly described nationwide destinations',()=>{
-  assert.equal(DESTINATION_CATALOG.length,18);
-  assert.equal(new Set(DESTINATION_CATALOG.map(x=>x.id)).size,18);
-  assert.ok(DESTINATION_REGIONS.length>=7);
+test('catalog has 18 domestic and worldwide overseas destinations with complete data',()=>{
+  const domestic=DESTINATION_CATALOG.filter(d=>d.area==='domestic');
+  const overseas=DESTINATION_CATALOG.filter(d=>d.area==='overseas');
+  assert.equal(domestic.length,18);
+  assert.ok(overseas.length>=60);
+  assert.equal(new Set(DESTINATION_CATALOG.map(x=>x.id)).size,DESTINATION_CATALOG.length);
+  assert.ok(DESTINATION_REGIONS.length>=17);
   for(const d of DESTINATION_CATALOG){
-    assert.ok(d.name&&d.region&&d.note&&d.tagline);
-    assert.ok(d.source.startsWith('https://www.japan.travel/'));
+    assert.ok(d.name&&d.nameEn&&d.region&&d.note&&d.tagline&&d.access,d.id);
+    assert.match(d.country,/^[A-Z]{2}$/);
+    assert.ok(d.source.startsWith(d.area==='domestic'?'https://www.japan.travel/':'https://www.anzen.mofa.go.jp/'));
     assert.ok(d.aliases.includes(d.name));
     assert.ok(d.interests.every(id=>INTERESTS.some(i=>i.id===id)));
+    assert.ok(d.bestMonths.length>0&&d.bestMonths.every(m=>m>=1&&m<=12),d.id);
+    assert.ok(d.costLevel>=1&&d.costLevel<=5&&Number.isFinite(d.hours),d.id);
+    if(d.flight) assert.match(d.flight.city+d.flight.airport,/^[A-Z]{6}$/);
     for(const style of STYLES){
       assert.ok(d.routes[style.id].length>=6,d.name+' '+style.id);
       assert.equal(new Set(d.routes[style.id]).size,d.routes[style.id].length);

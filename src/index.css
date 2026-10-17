@@ -1576,3 +1576,8 @@ a:hover {
 .travel-home-link{white-space:nowrap;background:#16684d;border-radius:9px;padding:13px 18px;color:#fff!important;font-weight:900;font-size:12px}
 .header .travel-badge{background:#167659;border:1px solid #d6f8d8;color:#fff!important}
 @media(max-width:700px){.travel-home-banner{flex-direction:column;align-items:stretch;padding:20px;gap:15px}.travel-home-banner h2{font-size:17px}.travel-home-link{text-align:center}}
+
+/* Cross-store comparison entry on each product */
+.btn-compare-all{display:block;text-align:center;margin:8px 0 6px;padding:9px 10px;border:1px solid #b7dcc4;border-radius:9px;background:#eef7f1;color:#14634a!important;font-size:12px;font-weight:800;text-decoration:none}
+.btn-compare-all:hover{background:#e0f1e6}
+.affiliate-compare-link{font-size:12px;font-weight:800;color:#14634a;margin-left:10px}

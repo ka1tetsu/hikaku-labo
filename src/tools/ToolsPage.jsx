@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
+import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { CATEGORIES, LAST_REVIEWED } from './catalog.js';
 import { rankServices } from './score.js';
 import { outboundLink, recordOutbound } from './affiliate.js';
@@ -94,16 +95,35 @@ function PlanCard({ service, index, selected, toggle }) {
   );
 }
 
+// ?category=&budget=&priority= (used by the concierge) preselects the selector.
+function initialChoice(key, options, fallback) {
+  const value = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get(key);
+  return options.some(option => option.id === value) ? value : fallback;
+}
+
 export default function ToolsPage() {
-  const [category, setCategory] = useState('website');
-  const [budget, setBudget] = useState('standard');
-  const [priority, setPriority] = useState('easy');
+  const [category, setCategory] = useState(() => initialChoice('category', CATEGORIES, 'website'));
+  const [budget, setBudget] = useState(() => initialChoice('budget', BUDGETS, 'standard'));
+  const [priority, setPriority] = useState(() => initialChoice('priority', PRIORITIES, 'easy'));
   const [selectedIds, setSelectedIds] = useState([]);
   const [onlySelection, setOnlySelection] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const ranking = rankServices({ category, budget, priority });
   const displayed = onlySelection ? ranking.filter(service => selectedIds.includes(service.id)) : ranking;
   const comparison = ranking.filter(service => selectedIds.includes(service.id));
+  useEffect(() => {
+    const onAction = event => {
+      if (event.detail?.type !== 'tools') return;
+      const params = new URL(event.detail.url, window.location.origin).searchParams;
+      event.preventDefault();
+      if (CATEGORIES.some(c => c.id === params.get('category'))) { setCategory(params.get('category')); setSelectedIds([]); setOnlySelection(false); }
+      if (BUDGETS.some(b => b.id === params.get('budget'))) setBudget(params.get('budget'));
+      if (PRIORITIES.some(p => p.id === params.get('priority'))) setPriority(params.get('priority'));
+      document.getElementById('selector')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('hikaku:concierge-action', onAction);
+    return () => window.removeEventListener('hikaku:concierge-action', onAction);
+  }, []);
   function changeCategory(next) {
     setCategory(next);
     setSelectedIds([]);
@@ -244,6 +264,7 @@ export default function ToolsPage() {
         </div>
         <div className="tl-wrap tl-footer-bottom">© 2026 比較ラボ <a href="#selector">ページ上部へ ↑</a></div>
       </footer>
+      <SiteConcierge section="tools" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // First-party, minimal structured analytics. Vercel function logs only.
 // No cookies, IP, user agent, device ID, page referrer or search keyword recorded.
-import { validOutboundEvent } from '../src/shared/outboundSchema.js';
+import { validOutboundEvent, validViewEvent } from '../src/shared/outboundSchema.js';
 
 export default function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -18,6 +18,10 @@ export default function handler(req, res) {
     body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   } catch { return res.status(400).json({ error: 'invalid_json' }); }
 
+  if (validViewEvent(body)) {
+    console.info(JSON.stringify({ type: 'hikaku_view', page: body.page, timestamp: new Date().toISOString() }));
+    return res.status(204).end();
+  }
   if (!validOutboundEvent(body)) return res.status(400).json({ error: 'invalid_event' });
   console.info(JSON.stringify({
     type: 'hikaku_outbound',

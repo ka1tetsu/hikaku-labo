@@ -7,7 +7,7 @@ import './global-travel.css';
 const yen=n=>'¥'+n.toLocaleString('ja-JP');
 const LOCAL_IATA={tokyo:'TYO',osaka:'OSA',sapporo:'SPK',fukuoka:'FUK',naha:'OKA',niigata:'KIJ',nagoya:'NGO',sendai:'SDJ',hakodate:'HKD',hiroshima:'HIJ',nagasaki:'NGS'};
 
-export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers }) {
+export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, showHero = true }) {
   const [query,setQuery]=useState('');
   const [parsed,setParsed]=useState(null);
   const [origin,setOrigin]=useState('東京');
@@ -96,6 +96,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
     finally{setLoadingFares(false);}
   }
   return <div className="gx-wrap">
+    {showHero&&<>
     <section className="gx-hero" aria-labelledby="gx-headline">
       <div className="tv-wrap gx-hero-grid">
         <div className="gx-lede">
@@ -127,6 +128,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
       <span>✓ 国内・海外の旅行先に対応</span><span>✓ 細かい条件を自由入力</span>
       <span>✓ 各社で最終価格を確認</span><span>✓ 広告と通常リンクを区別</span>
     </div>
+    </>}
     <section id="global-travel-compare" className="tv-wrap gx-workspace" aria-labelledby="gx-workspace-title">
       <div className="gx-heading"><span className="gx-kicker">SEARCH & COMPARE</span><h2 id="gx-workspace-title">条件をそろえて、比較する。</h2>
         <p>検索サイトごとに料金・手荷物・キャンセル条件は異なります。ここではまず検索条件を整理し、実際の予約価格は各社の公式サイトで確認します。</p></div>

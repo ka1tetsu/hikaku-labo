@@ -54,7 +54,7 @@ test('all public guide URLs are crawlable and not disguised affiliate tracking',
   const sitemap=content('public/sitemap.xml');
   const robots=content('public/robots.txt');
   assert.match(robots,/Sitemap: https:\/\/hikaku-labo\.vercel\.app\/sitemap\.xml/);
-  for (const path of ['/', '/tools/', '/travel/', '/guides/travel-budget/', '/guides/website-tools/']) {
+  for (const path of ['/', '/compare/', '/tools/', '/life/', '/sim/', '/hikari/', '/card/', '/hoken/', '/travel/', '/guides/travel-budget/', '/guides/website-tools/']) {
     assert.ok(sitemap.includes('https://hikaku-labo.vercel.app'+path));
   }
   const a=content('guides/travel-budget/index.html');
@@ -69,4 +69,29 @@ test('A8 original creative HTML stays unmodified with its exact pixels', () => {
   assert.match(a8,/4AZ9C4\+21TRSI\+4ZCO\+65U41/);
   assert.match(a8,/4AZ9C4\+21TRSI\+4ZCO\+65ME9/);
   assert.match(a8, /src="https:\/\/www13\.a8\.net\/0\.gif/);
+});
+
+test('anonymous page views are accepted so click-through rate can be computed', () => {
+  const originalLog = console.info; const events = [];
+  console.info = event => events.push(JSON.parse(event));
+  let status = 0;
+  const res = { setHeader() {}, status(s) { status = s; return this; }, json() { return this; }, end() { return this; } };
+  try {
+    handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: 'sim' } }, res);
+    assert.equal(status, 204);
+    assert.deepEqual(Object.keys(events[0]).sort(), ['page', 'timestamp', 'type']);
+    handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: '/secret?q=1' } }, res);
+    assert.equal(status, 400);
+    handler({ method: 'POST', headers: { host: 'h', origin: 'https://h', 'content-length': '30' }, body: { event: 'view', page: 'sim', userId: 'x' } }, res);
+    assert.equal(status, 400);
+  } finally { console.info = originalLog; }
+});
+
+test('every public page has OGP image, Twitter card and structured data', () => {
+  for (const path of ['index.html', 'compare/index.html', 'tools/index.html', 'life/index.html', 'sim/index.html', 'hikari/index.html', 'card/index.html', 'hoken/index.html', 'travel/index.html']) {
+    const html = content(path);
+    assert.match(html, /og:image" content="https:\/\/hikaku-labo\.vercel\.app\/og\/\w+\.png"/, path);
+    assert.match(html, /twitter:card/, path);
+    assert.match(html, /application\/ld\+json/, path);
+  }
 });

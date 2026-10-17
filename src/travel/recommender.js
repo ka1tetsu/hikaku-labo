@@ -1,4 +1,5 @@
 import { DESTINATION_CATALOG } from './destinations.js';
+import { normalizeText, searchTravel } from './search.js';
 
 export const STYLES = Object.freeze([
   { id:'classic', label:'王道を楽しむ', emoji:'📍', subtitle:'はじめてでも巡りやすい定番中心', interests:['history','city','family'] },
@@ -6,31 +7,43 @@ export const STYLES = Object.freeze([
   { id:'slow', label:'のんびり癒やし', emoji:'🌿', subtitle:'詰め込みすぎず景色を楽しむ', interests:['nature','relax'] },
 ]);
 export function normalizeDestinationQuery(value='') {
-  return String(value).normalize('NFKC').toLocaleLowerCase('ja-JP').replace(/[\s・／/、,]/g,'').trim();
+  return normalizeText(value);
 }
 export function searchDestinations(input, catalog=DESTINATION_CATALOG) {
-  const q=normalizeDestinationQuery(input);
-  if (!q) return catalog;
-  return catalog.map(d=>{
-    const names=d.aliases.map(normalizeDestinationQuery);
-    let rank=0;
-    if (names.some(a=>a===q)) rank=3;
-    else if (names.some(a=>a.startsWith(q))) rank=2;
-    else if (names.some(a=>a.includes(q))) rank=1;
-    return {d,rank};
-  }).filter(x=>x.rank>0).sort((a,b)=>b.rank-a.rank || a.d.name.localeCompare(b.d.name,'ja')).map(x=>x.d);
+  if (!normalizeText(input)) return catalog;
+  return searchTravel(input,{catalog}).destinations.map(hit=>hit.destination);
 }
 export function matchDestination(input,catalog=DESTINATION_CATALOG) {
+  if (!normalizeText(input)) return null;
   return searchDestinations(input,catalog)[0]||null;
 }
 export function destinationMatch(destination, interests=[]) {
   const safe=Array.isArray(interests)?interests:[];
   return safe.filter(i=>destination.interests.includes(i)).length;
 }
-export function suggestDestinations({ chosenId='', interests=[], region='すべて', query='' }={},catalog=DESTINATION_CATALOG) {
+export const SORTS = Object.freeze([
+  { id:'match', label:'好みに合う順' },
+  { id:'hours', label:'移動時間が短い順' },
+  { id:'cost', label:'物価・旅費感が安い順' },
+  { id:'name', label:'名前順' },
+]);
+export function suggestDestinations({ chosenId='', interests=[], region='すべて', query='', area='all', country='', month=0, maxHours=0, maxCost=0, sort='match' }={},catalog=DESTINATION_CATALOG) {
   const searched=searchDestinations(query,catalog);
-  return searched.filter(d=>region==='すべて'||d.region===region)
-    .sort((a,b)=>destinationMatch(b,interests)-destinationMatch(a,interests)||Number(b.id===chosenId)-Number(a.id===chosenId)||a.name.localeCompare(b.name,'ja'));
+  const order=new Map(searched.map((d,index)=>[d.id,index]));
+  const byName=(a,b)=>a.name.localeCompare(b.name,'ja');
+  const compare={
+    match:(a,b)=>destinationMatch(b,interests)-destinationMatch(a,interests)||Number(b.id===chosenId)-Number(a.id===chosenId)||(query?order.get(a.id)-order.get(b.id):0)||a.hours-b.hours||byName(a,b),
+    hours:(a,b)=>a.hours-b.hours||byName(a,b),
+    cost:(a,b)=>a.costLevel-b.costLevel||destinationMatch(b,interests)-destinationMatch(a,interests)||byName(a,b),
+    name:byName,
+  }[sort]||byName;
+  return searched.filter(d=>(region==='すべて'||d.region===region)
+    &&(area==='all'||d.area===area)
+    &&(!country||d.country===country)
+    &&(!month||d.bestMonths.includes(Number(month)))
+    &&(!maxHours||d.hours<=maxHours)
+    &&(!maxCost||d.costLevel<=maxCost))
+    .sort(compare);
 }
 export function rankPlanStyles(destination,{interests=[],pace='standard'}={}) {
   return STYLES.map(style=>{

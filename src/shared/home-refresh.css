@@ -117,3 +117,10 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
  .app-wrapper .results-controls{width:100%;justify-content:space-between}
  .app-wrapper .comparison-table{min-width:550px}
 }
+/* Natural-language search interpretation notice */
+.hl-smart-search{grid-column:1;background:#f1f8f3;border:1px solid #cfe4d6;border-radius:14px;padding:14px 16px;margin:0 0 18px;font-size:13px;color:#24463a;line-height:1.8}
+.hl-smart-search p{margin:0 0 6px}
+.hl-smart-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.hl-smart-chips span{font-size:12px;color:#5d7768}
+.hl-smart-chips button{border:1px solid #c6dfcf;background:#fff;color:#1f5f45;border-radius:30px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.hl-smart-ask{border:0;background:transparent;color:#14634a;font-size:12px;font-weight:800;text-decoration:underline;cursor:pointer;padding:4px 0}

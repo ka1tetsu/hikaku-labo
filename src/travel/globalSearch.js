@@ -1,5 +1,8 @@
 import { GLOBAL_DESTINATIONS, matchGlobalDestination } from './globalDestinations.js';
-import { DESTINATION_CATALOG } from './destinations.js';
+import { DESTINATION_CATALOG as CATALOG } from './destinations.js';
+
+// The curated catalog also holds overseas cities; the global index covers those.
+const DESTINATION_CATALOG=CATALOG.filter(d=>d.area==='domestic');
 
 export const ALL_TRAVEL_DESTINATIONS=Object.freeze([
   ...DESTINATION_CATALOG.map(d=>Object.freeze({id:d.id,name:d.name,country:'日本',region:d.region,iata:null,

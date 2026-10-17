@@ -103,9 +103,14 @@ export function normalizeRakutenItem(raw) {
 }
 
 // Search products via our own /api/search proxy (server-side Rakuten call)
-export async function searchRakutenItems(keyword, genreId = '', page = 1) {
+// options: { minPrice, maxPrice, sort, freeShipping } — used by the site concierge.
+export async function searchRakutenItems(keyword, genreId = '', page = 1, options = {}) {
     const params = new URLSearchParams({ keyword, page });
     if (genreId) params.append('genreId', genreId);
+    if (options.minPrice) params.append('minPrice', String(options.minPrice));
+    if (options.maxPrice) params.append('maxPrice', String(options.maxPrice));
+    if (options.sort && options.sort !== 'standard') params.append('sort', options.sort);
+    if (options.freeShipping) params.append('postageFlag', '1');
 
     const res = await fetch(`/api/search?${params}`);
     if (!res.ok) {
