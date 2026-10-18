@@ -2,6 +2,7 @@
 // visible before JavaScript runs. Runs after `vite build`.
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createServer } from 'vite';
+import { execFileSync } from 'node:child_process';
 import { SITE_ORIGIN, siteOrigin } from '../src/shared/site.js';
 
 // SITE_ORIGIN (e.g. https://example.jp) switches canonical / OGP / sitemap URLs to a custom domain.
@@ -52,6 +53,9 @@ ${scripts}
     await writeFile(target, html);
   }
   console.log('static pages', STATIC_PAGES.length);
+  let commit = process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || '';
+  if (!commit) { try { commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: new URL('../', import.meta.url), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { /* build sources may omit Git metadata */ } }
+  await writeFile(new URL('../dist/release.json', import.meta.url), JSON.stringify({ schemaVersion: 1, commit: /^[0-9a-f]{40}$/i.test(commit) ? commit : null, origin: SITE }) + '\n');
 
   // Sitemap: add the generated pages.
   const sitemapPath = new URL('../dist/sitemap.xml', import.meta.url);

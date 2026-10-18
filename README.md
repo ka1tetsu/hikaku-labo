@@ -30,3 +30,5 @@ npm run audit:affiliate
 
 広告URLは `VITE_AFFILIATE_LINKS` のJSONでまとめて設定できます。承認済みの公開成果URLだけを設定してください。
 送客レポートの `nextActions` は、通常リンクへの送客、診断結果からの移動、入力した確定報酬と実費に基づいて確認対象を示します。
+
+本番の収益導線とAPIの状態は `npm run audit:live` で確認できます。[実行状況と本人接続が必要な作業](docs/REVENUE-NEXT-ACTIONS.md) に外部設定の確認先をまとめています。

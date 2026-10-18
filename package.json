@@ -14,7 +14,8 @@
     "test:all": "node --test tests/*.test.mjs",
     "audit:affiliate": "node scripts/audit-affiliate.mjs",
     "report:revenue": "node scripts/revenue-report.mjs",
-    "verify:build": "node scripts/verify-build.mjs"
+    "verify:build": "node scripts/verify-build.mjs",
+    "audit:live": "node scripts/audit-live.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
