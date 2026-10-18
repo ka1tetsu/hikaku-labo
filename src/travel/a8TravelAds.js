@@ -17,10 +17,13 @@ export const YAHOO_TRAVEL_A8_CREATIVES = Object.freeze({
 export const YAHOO_TRAVEL_A8_IDS = Object.freeze({ banner234: '65U41', banner300: '65ME9' });
 
 export function travelAffiliateEnabled(env = {}) {
-  // Enable only if https://hikaku-labo.vercel.app/ is registered in the relevant A8
-  // media account and Yahoo!トラベル program permits publishing on that site.
-  // The site owner confirmed A8.net site registration on 2026-10-17.
-  // The creative was issued for their participating Yahoo! Travel program.
-  // Explicit opt-out overrides this confirmation for emergencies.
-  return env.VITE_A8_TRAVEL_DISABLED !== 'true';
+  // The existing confirmation covers the legacy domain only. The new host must
+  // be registered in the media account before the original material is enabled.
+  if (env.VITE_A8_TRAVEL_DISABLED === 'true') return false;
+  const origin = env.VITE_SITE_ORIGIN || 'https://vivlica.com';
+  const registered = env.VITE_A8_TRAVEL_REGISTERED_ORIGIN || 'https://hikaku-labo.vercel.app';
+  try {
+    const site = new URL(origin), allowed = new URL(registered);
+    return site.protocol === 'https:' && allowed.protocol === 'https:' && !allowed.username && !allowed.password && allowed.pathname === '/' && !allowed.search && !allowed.hash && site.origin === allowed.origin;
+  } catch { return false; }
 }

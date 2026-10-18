@@ -1,9 +1,12 @@
 import { defineConfig } from 'vite'
+import process from 'node:process'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
+import { SITE_ORIGIN, siteOrigin } from './src/shared/site.js'
 
 export default defineConfig({
   plugins: [react()],
+  define: { 'import.meta.env.VITE_SITE_ORIGIN': JSON.stringify(siteOrigin(process.env.SITE_ORIGIN || SITE_ORIGIN)) },
   build: {
     rollupOptions: {
       input: {

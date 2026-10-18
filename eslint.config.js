@@ -6,9 +6,9 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
   { ignores: ['dist'] },
-  // api/ と scripts/ は Vercel のサーバーサイド実行なので Node のグローバルを許可する
+  // api/・server/ と scripts/ は Vercel のサーバーサイド実行なので Node のグローバルを許可する
   {
-    files: ['api/**/*.js', 'scripts/**/*.mjs'],
+    files: ['api/**/*.js', 'server/**/*.js', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: globals.node,
       parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },

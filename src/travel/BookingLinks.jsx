@@ -35,7 +35,7 @@ export default function BookingHub({ destination, nights, travelers }) {
   return <div className="tvw-hub" id="booking">
     <div className="tvw-hub-head">
       <div><span className="tvx-kicker">FLIGHTS &amp; STAYS</span><h3>{destination.emoji} {destination.name}への航空券・ホテルを比較</h3>
-        <p>条件を入れると、各予約サイトの検索結果ページを同じ条件で開けます。比較ラボは料金を取得・保存していません。</p></div>
+        <p>条件を入れると、各予約サイトの検索結果ページを同じ条件で開けます。Vivlicaは料金を取得・保存していません。</p></div>
       <div className="tvw-tabs" role="tablist" aria-label="検索の種類">
         <button type="button" role="tab" aria-selected={tab === 'flights'} className={tab === 'flights' ? 'active' : ''} onClick={() => setTab('flights')}>✈️ 航空券</button>
         <button type="button" role="tab" aria-selected={tab === 'stays'} className={tab === 'stays' ? 'active' : ''} onClick={() => setTab('stays')}>🏨 ホテル・宿</button>

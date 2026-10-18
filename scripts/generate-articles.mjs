@@ -1,6 +1,6 @@
 // scripts/generate-articles.mjs
 // 価格.comクローン用の比較記事を大量生成して Markdown ファイルとして保存するスクリプト
-// 前提: /api/article がデプロイ済み（例: https://hikaku-labo.vercel.app/api/article）
+// 前提: /api/article がデプロイ済み（例: https://vivlica.com/api/article）
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -16,7 +16,7 @@ const OUTPUT_DIR = join(__dirname, "..", "content", "articles");
 
 // 記事生成APIのベースURL（必要に応じて変更）
 const ARTICLE_API_BASE =
-  process.env.ARTICLE_API_BASE || "https://hikaku-labo.vercel.app/api/article";
+  process.env.ARTICLE_API_BASE || "https://vivlica.com/api/article";
 
 // 生成対象カテゴリとサブトピック
 const CATEGORY_TOPICS = {
@@ -68,7 +68,7 @@ async function fetchArticle(categoryId, title) {
   url.searchParams.set("categoryId", categoryId);
   if (title) url.searchParams.set("title", title);
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), { headers: process.env.AI_GENERATION_TOKEN ? { Authorization: `Bearer ${process.env.AI_GENERATION_TOKEN}` } : {} });
   if (!res.ok) {
     throw new Error(`Article API error: ${res.status} ${await res.text()}`);
   }

@@ -74,7 +74,7 @@ test('day trip budget has no accommodation expense and links can be shared',()=>
   assert.equal(daytrip.lodging,0);
   assert.equal(daytrip.meals,7000);
   assert.equal(daytrip.total,25000);
-  const url=shareableTripUrl('https://hikaku-labo.vercel.app/travel/','kyoto','food',2,'relaxed');
+  const url=shareableTripUrl('https://vivlica.com/travel/','kyoto','food',2,'relaxed');
   const parsed=new URL(url);
   assert.equal(parsed.searchParams.get('destination'),'kyoto');
   assert.equal(parsed.searchParams.get('style'),'food');
@@ -85,8 +85,8 @@ test('the exact A8.net ad material is preserved and travel page still reports di
   const travel=readFileSync(new URL('../src/travel/TravelPage.jsx',import.meta.url),'utf8');
   const header=readFileSync(new URL('../src/shared/siteDirectory.js',import.meta.url),'utf8');
   const html=readFileSync(new URL('../travel/index.html',import.meta.url),'utf8');
-  assert.match(html,/比較ラボトラベル/);
-  assert.match(header,/比較ラボトラベル/);
+  assert.match(html,/Vivlica Travel/);
+  assert.match(header,/Vivlica Travel/);
   assert.match(travel,/YAHOO_TRAVEL_A8_CREATIVES/);
   assert.match(travel,/PR・広告/);
   assert.match(travel,/TravelDiscovery/);

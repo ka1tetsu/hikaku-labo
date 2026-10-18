@@ -91,7 +91,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
     <section className="tvx-hero" aria-labelledby="tvx-title">
       <div className="tv-wrap tvx-hero-grid">
         <div>
-          <div className="tvx-eyebrow"><span className="tvx-sparkle">✳</span> HIKAKU LABO TRAVEL — WORLDWIDE</div>
+          <div className="tvx-eyebrow"><span className="tvx-sparkle">✳</span> VIVLICA TRAVEL — WORLDWIDE</div>
           <h1 id="tvx-title">世界中から、<br/><em>ぴったりの旅</em>を見つけよう。</h1>
           <p className="tvx-hero-lead">国内も海外も、都市名・国名・名所・「やりたいこと」で検索。AIコンシェルジュに相談すれば、モデルコースから航空券・ホテルの比較、旅の予算までひとつの画面で。</p>
           <TravelSearchBox onDestination={goToDestination} onScope={applyScope} onExternal={setExternal}/>

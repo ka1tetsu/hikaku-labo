@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Sitemap: https://hikaku-labo.vercel.app/sitemap.xml
+Sitemap: https://vivlica.com/sitemap.xml

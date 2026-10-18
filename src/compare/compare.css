@@ -72,3 +72,5 @@ body{margin:0}
  .cp-offer img,.cp-noimg{width:52px;height:52px}
  .cp-offer-price{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center}
 }
+
+.cp-next-step{padding:22px;margin:18px 0;border:1px solid #bdd8c5;border-radius:12px;background:#f0f8f2}.cp-next-step>strong{font-size:18px;color:#16452f}.cp-next-step>p{font-size:12px;line-height:1.8}.cp-next-step .vl-primary{display:inline-flex;gap:10px;align-items:center;padding:12px 18px;color:#fff;background:#155f48;border-radius:8px;font-weight:700;text-decoration:none;min-height:44px}.cp-next-step small{font-size:10px}

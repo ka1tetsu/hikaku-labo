@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+import SiteFooter from '../shared/SiteFooter.jsx';
+import { useMemo, useRef, useState } from 'react';
+import DecisionBar from '../shared/DecisionBar.jsx';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
@@ -6,6 +8,9 @@ import { CHECKED_AT, HOKEN_SERVICES } from './catalog.js';
 import { rankCards, rankHikari, rankSim } from './score.js';
 import { serviceLink } from './affiliate.js';
 import { AREA_PAGES, SIM_PAIRS } from './pages.js';
+import SavingsPlanner from './SavingsPlanner.jsx';
+import { selectorAnswers } from './selectorState.js';
+import { recordFunnelEvent } from '../shared/outboundClient.js';
 import './services.css';
 
 const ENV = import.meta.env;
@@ -57,11 +62,12 @@ function ServiceLink({ service, placement, label = '公式サイトで確認' })
 
 function Selector({ category }) {
   const config = CATEGORY_PAGES[category];
-  const [answers, setAnswers] = useState(() => Object.fromEntries(config.questions.map(q => [q.id, q.options[category === 'hikari' && q.id === 'area' ? 2 : 0][0]])));
+  const [answers, setAnswers] = useState(() => selectorAnswers(config.questions, category, typeof window === 'undefined' ? '' : window.location.search));
   const ranking = useMemo(() => config.rank(answers), [config, answers]);
   const top = ranking[0];
+  const recommendationRef = useRef(null);
   return <section className="sv-wrap sv-selector" id="selector" aria-labelledby="sv-selector-title">
-    <div className="sv-top-pick" aria-live="polite">
+    <div ref={recommendationRef} className="sv-top-pick" aria-live="polite">
       <span>いまの条件での1位</span>
       <strong>{top.service.name}</strong>
       <b>{config.priceLabel(top)}</b>
@@ -75,7 +81,7 @@ function Selector({ category }) {
         {config.questions.map((q, index) => <fieldset key={q.id}>
           <legend><span>{String(index + 1).padStart(2, '0')}</span>{q.label}</legend>
           <div className="sv-options">{q.options.map(([id, label]) => <button type="button" key={id} aria-pressed={answers[q.id] === id} className={answers[q.id] === id ? 'active' : ''}
-            onClick={() => setAnswers(a => ({ ...a, [q.id]: id }))}>{label}</button>)}</div>
+            onClick={() => { setAnswers(a => ({ ...a, [q.id]: id })); recordFunnelEvent('selector_change'); }}>{label}</button>)}</div>
         </fieldset>)}
         <p className="sv-form-note">広告掲載の有無や紹介報酬額は、順位の計算に使いません。</p>
       </aside>
@@ -97,6 +103,7 @@ function Selector({ category }) {
         </li>)}</ol>
       </div>
     </div>
+    <DecisionBar anchorRef={recommendationRef} name={top.service.name} detail={config.priceLabel(top)} section="life" merchant={top.service.id} link={serviceLink(top.service, ENV)} placement={category + '-decision-bar'} caution={category === 'card' ? '還元の対象条件は公式で確認' : '通話・初期費用・割引条件は公式で確認'} />
   </section>;
 }
 
@@ -134,7 +141,7 @@ function InsurancePage() {
       <h2 id="sv-soudan-title">無料の保険相談サービス</h2>
       <p>複数の保険会社の商品を扱う相談窓口では、ファイナンシャルプランナー等に無料で相談できます。相談窓口は契約が成立すると保険会社から手数料を受け取る仕組みのため、提案理由と他の選択肢を必ず確認しましょう。</p>
       <ul className="sv-soudan">{HOKEN_SERVICES.map(service => <li key={service.id}><strong>{service.name}</strong><span>{service.summary}</span><ServiceLink service={service} placement="hoken-list" label="公式サイトで相談方法を確認" /></li>)}</ul>
-      <p className="sv-note">掲載は五十音順で、順位やおすすめ度ではありません。比較ラボは特定の保険商品の比較・推奨・募集は行いません。取扱保険会社数や相談方法は変わることがあるため、各公式サイトで確認してください。</p>
+      <p className="sv-note">掲載は五十音順で、順位やおすすめ度ではありません。Vivlicaは特定の保険商品の比較・推奨・募集は行いません。取扱保険会社数や相談方法は変わることがあるため、各公式サイトで確認してください。</p>
     </section>
   </>;
 }
@@ -149,6 +156,7 @@ const HUB = [
 export default function ServicesPage({ category }) {
   if (category === 'life') {
     return <PageShell category="life" current="/life/" kicker="LIFE COSTS" h1={['毎月の固定費を、', '条件に合わせて見直す。']} lead="スマホ・光回線・クレジットカード・保険。毎月かかるお金を、公式情報にもとづいて比べられます。">
+      <SavingsPlanner />
       <section className="sv-wrap sv-hub">{HUB.map(([href, icon, title, text]) => <a key={href} href={href}><span aria-hidden="true">{icon}</span><strong>{title}</strong><p>{text}</p><b>比較する →</b></a>)}</section>
     </PageShell>;
   }
@@ -179,10 +187,11 @@ function PageShell({ kicker, h1, lead, current, category, children }) {
       <Related category={category} />
       <section className="sv-wrap sv-disclosure">
         <h2>広告・情報について</h2>
-        <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で申込みが成立すると、比較ラボが紹介料を受け取る場合があります。順位は入力した条件との適合度で決めており、報酬額は使っていません。</p>
+        <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で申込みが成立すると、Vivlicaが紹介料を受け取る場合があります。順位は入力した条件との適合度で決めており、報酬額は使っていません。</p>
         <p>料金・特典・条件は変更されることがあります。申込前に必ず各社の公式サイトで最新の内容を確認してください。誤りに気づいた場合は修正します。</p>
       </section>
     </main>
     <SiteConcierge section="site" />
+    <SiteFooter />
   </div>;
 }

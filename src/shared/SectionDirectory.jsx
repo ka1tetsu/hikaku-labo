@@ -5,11 +5,12 @@ export default function SectionDirectory() {
     <div className="hl-directory-head">
       <div>
         <span className="hl-kicker"><span className="hl-kicker-dot"/> RESEARCH & COMPARISON</span>
-        <h1 id="hl-directory-title">選ぶ前に、<em>比べる軸</em>を。</h1>
-        <p>価格だけでなく、条件・使いやすさ・総費用も。判断に必要な情報を整理できる、{SITE_SECTIONS.length}つの無料比較ツール。</p>
+        <h1 id="hl-directory-title">毎日の支出に、<em>納得できる選択</em>を。</h1>
+        <p>スマホ代を見直す、買い物を比べる、旅行を計画する。予算と使い方から選べる、{SITE_SECTIONS.length}つの無料比較ツール。</p>
       </div>
       <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較カテゴリ</span><small>商品・IT・旅行・通信とお金</small></div>
     </div>
+    <div className="hl-directory-start"><a href="#savings">スマホ代の年間差額を診断 →</a><a href="/compare/">型番で商品価格を比較 →</a></div>
     <div className="hl-directory-grid">
       {SITE_SECTIONS.map(section => <a key={section.id}
         className={'hl-directory-card hl-directory-' + section.id}

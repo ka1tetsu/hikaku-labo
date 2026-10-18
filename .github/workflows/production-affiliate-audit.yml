@@ -27,6 +27,7 @@ jobs:
           npm run test:all
           npm run lint
           npm run build
+          npm run verify:build
       - name: Check production site via real HTTP
         if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
         shell: bash
@@ -46,13 +47,13 @@ jobs:
               exit 1
             fi
             if [ "$path" = "/travel/" ]; then
-              grep -q '比較ラボトラベル' /tmp/hikaku-check.html || {
+              grep -q 'Vivlica Travel' /tmp/hikaku-check.html || {
                 echo "::error::Travel page not served at /travel/."
                 exit 1
               }
             fi
             if [ "$path" = "/sitemap.xml" ]; then
-              grep -q 'https://hikaku-labo.vercel.app/guides/travel-budget/' /tmp/hikaku-check.html || {
+              grep -q 'https://vivlica.com/guides/travel-budget/' /tmp/hikaku-check.html || {
                 echo "::error::Sitemap missing travel guide."
                 exit 1
               }

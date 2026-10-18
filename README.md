@@ -1,8 +1,32 @@
-# React + Vite
+# Vivlica
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+商品・通信・IT・旅行を、予算と使い方から比較する React / Vite サイト。
+本番の正規URLは `https://vivlica.com`。旧「比較ラボ」のパスを維持します。
 
-Currently, two official plugins are available:
+```sh
+npm ci
+npm run dev -- --host 0.0.0.0
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Node.js 22 を使用します。クラウド環境では各シェルで
+`export PATH=/workspace/.cloud-tools/node_modules/.bin:$PATH` を実行してください。
+Viteはフロントエンド用です。`api/` はVercelのサーバーレス関数として動作します。
+APIキーのないローカル環境では商品検索を取得できませんが、料金診断・比較ツール・ショップへの検索リンクは利用できます。
+
+```sh
+npm run test:all
+npm run lint
+npm run build
+npm run verify:build
+npm run audit:affiliate
+```
+
+- 固定費診断: `/life/#savings`（トップページにも設置）
+- 比較: `/compare/`、`/sim/`、`/hikari/`、`/card/`、`/tools/`、`/travel/`
+- 比較方針: `/editorial-policy/`、`/about/`、`/privacy/`
+- 送客集計: `npm run report:revenue -- logs.ndjson`
+
+公開前に [Vivlicaへの統合・収益運用](docs/VIVLICA-LAUNCH.md) を参照してください。
+
+広告URLは `VITE_AFFILIATE_LINKS` のJSONでまとめて設定できます。承認済みの公開成果URLだけを設定してください。
+送客レポートの `nextActions` は、通常リンクへの送客、診断結果からの移動、入力した確定報酬と実費に基づいて確認対象を示します。

@@ -1,3 +1,4 @@
+import { serviceLink } from '../services/affiliate.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 
 // 承認されていない広告URLを挿入しないでください。
@@ -7,7 +8,9 @@ export const APPROVED_AFFILIATE_LINKS = {
   // shopify: 'https://...approved-tracking-url...',
 };
 
-export function outboundLink(service) {
+export function outboundLink(service, env = import.meta.env || {}) {
+  const configured = serviceLink(service, env);
+  if (configured.sponsored) return configured;
   const candidate = APPROVED_AFFILIATE_LINKS[service.id];
   if (typeof candidate === 'string') {
     try {

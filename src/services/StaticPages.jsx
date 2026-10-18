@@ -1,3 +1,4 @@
+import SiteFooter from '../shared/SiteFooter.jsx';
 // Server-rendered long-tail pages (no hydration). Interactive bits — the concierge,
 // the header "AIに相談" button and click tracking — come from conciergeMount.jsx.
 import SiteHeader from '../shared/SiteHeader.jsx';
@@ -34,10 +35,11 @@ function Shell({ crumbs, kicker, title, lead, children }) {
       {children}
       <section className="sv-wrap sv-disclosure">
         <h2>広告・情報について</h2>
-        <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で申込みが成立すると、比較ラボが紹介料を受け取る場合があります。比較の結論は料金と条件だけで決めており、報酬額は使っていません。</p>
+        <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で申込みが成立すると、Vivlicaが紹介料を受け取る場合があります。比較の結論は料金と条件だけで決めており、報酬額は使っていません。</p>
         <p>料金・特典・条件は変更されることがあります。申込前に必ず各社の公式サイトで最新の内容を確認してください。</p>
       </section>
     </main>
+    <SiteFooter />
   </div>;
 }
 
@@ -57,7 +59,7 @@ export function SimPairPage({ a, b, env = {} }) {
   });
   const related = SIM_PAIRS.filter(p => (p.a === a || p.b === a || p.a === b || p.b === b) && !(p.a === a && p.b === b)).slice(0, 10);
   const row = (label, fn) => <tr><th scope="row">{label}</th><td>{fn(A)}</td><td>{fn(B)}</td></tr>;
-  return <Shell crumbs={[['/', '比較ラボ'], ['/life/', '通信・お金'], ['/sim/', '格安SIM比較'], [`/sim/vs/${a}-${b}/`, `${A.name}と${B.name}`]]}
+  return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/sim/', '格安SIM比較'], [`/sim/vs/${a}-${b}/`, `${A.name}と${B.name}`]]}
     kicker="SIM COMPARISON" title={`${A.name}と${B.name}の比較｜料金・通話・サポートの違い`}
     lead={`${A.name}（${A.networkLabel}）と${B.name}（${B.networkLabel}）を、毎月のデータ量ごとの料金、通話、店舗サポートで比べました。`}>
     <section className="sv-wrap sv-guide">
@@ -100,7 +102,7 @@ export function HikariAreaPage({ area, env = {} }) {
     const mansion = rankHikari({ housing: 'mansion', carrier, area })[0];
     return { carrier, carrierLabel, house, mansion };
   });
-  return <Shell crumbs={[['/', '比較ラボ'], ['/life/', '通信・お金'], ['/hikari/', '光回線比較'], [`/hikari/area/${area}/`, `${label}の光回線`]]}
+  return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/hikari/', '光回線比較'], [`/hikari/area/${area}/`, `${label}の光回線`]]}
     kicker="HOME INTERNET BY AREA" title={`${label}で選べる光回線｜スマホ別のおすすめとセット割`}
     lead={`${label}で申し込める主な光回線を、使っているスマホとのセット割と提供エリアから整理しました。`}>
     <section className="sv-wrap sv-guide">

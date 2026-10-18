@@ -3,6 +3,7 @@
 //   - 楽天市場 (Rakuten Ichiba Item Search, existing credentials)
 //   - Yahoo!ショッピング (itemSearch v3, enabled when YAHOO_SHOPPING_CLIENT_ID is set)
 // Store pages are never scraped. Prices are as returned at request time.
+import { upstreamResponse } from '../server/upstream.js';
 import { fetchRakutenSearch } from './search.js';
 import { normalizeRakutenOffer, normalizeYahooOffer, rankOffers, summarizeOffers } from '../src/shared/priceCompare.js';
 
@@ -36,9 +37,9 @@ async function yahooOffers(q, jan) {
   const params = new URLSearchParams({ appid: YAHOO_CLIENT_ID, results: '30', sort: '+price', in_stock: 'true', condition: 'new', image_size: '146' });
   if (jan) params.set('jan_code', jan); else params.set('query', q);
   try {
-    const response = await fetch(`${YAHOO_ENDPOINT}?${params}`, { headers: { 'User-Agent': 'hikaku-labo/1.0' } });
+    const response = await upstreamResponse(`${YAHOO_ENDPOINT}?${params}`, { headers: { 'User-Agent': 'hikaku-labo/1.0' } });
     if (!response.ok) return { status: 'error', offers: [] };
-    const data = await response.json();
+    const data = JSON.parse(response.text);
     return { status: 'ok', offers: (data.hits || []).map(hit => normalizeYahooOffer(hit, wrapYahoo)) };
   } catch {
     return { status: 'error', offers: [] };
@@ -56,7 +57,7 @@ export default async function handler(req, res) {
     yahooOffers(q, jan),
   ]);
   const offers = rankOffers([...rakuten.offers, ...yahoo.offers], ref || q, jan).slice(0, 40);
-  res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1800');
+  res.setHeader('Cache-Control', [rakuten.status, yahoo.status].includes('ok') ? 's-maxage=300, stale-while-revalidate=300' : 'no-store');
   return res.status(200).json({
     query: q, reference: ref, jan,
     sources: { rakuten: rakuten.status, yahoo: yahoo.status },

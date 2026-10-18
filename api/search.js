@@ -1,7 +1,8 @@
 // Vercel Serverless API Route - proxies requests to Rakuten Ichiba Item Search
 // Adds required Referer/Origin headers that Rakuten openapi requires
 
-import { detectPlatform, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
+import { upstreamResponse } from '../server/upstream.js';
+import { detectPlatform, OPENAPI_ENDPOINT } from '../server/rakutenCredentials.js';
 
 // --- 認証情報 ---------------------------------------------------------------
 // いずれも環境変数を優先。未設定時は下記の既定値にフォールバックします。
@@ -47,8 +48,9 @@ function buildParams({ keyword, genreId, page, withAccessKey, filters = {} }) {
     return params;
 }
 
-function fetchRakuten(url) {
-    return fetch(url, {
+function fetchRakuten(url, timeoutMs) {
+    return upstreamResponse(url, {
+        timeoutMs,
         headers: {
             'Referer': SITE_URL + '/',
             'Origin': SITE_URL,
@@ -77,18 +79,23 @@ export async function fetchRakutenSearch(opts) {
     let lastStatus = 500;
     let lastBody = 'no attempt executed';
 
+    const deadline = Date.now() + 7000;
     for (const [affiliateState, params] of attempts) {
         try {
-            const rakutenRes = await fetchRakuten(`${OPENAPI_ENDPOINT}?${params}`);
-            const text = await rakutenRes.text();
+            const rakutenRes = await fetchRakuten(`${OPENAPI_ENDPOINT}?${params}`, Math.max(1, Math.min(4000, deadline - Date.now())));
+            const text = rakutenRes.text;
 
             if (rakutenRes.ok) return { ok: true, status: 200, text, affiliateState };
 
             lastStatus = rakutenRes.status;
             lastBody = text;
+            // Only an affiliate-specific rejection can improve by removing the
+            // affiliate parameter. Do not double traffic on outages or limits.
+            if (![400,403].includes(lastStatus) || !/affiliate|HTTP_REFERRER_NOT_ALLOWED/i.test(text)) break;
         } catch (err) {
             lastStatus = 500;
-            lastBody = err.message;
+            lastBody = err.name === 'TimeoutError' ? 'provider_timeout' : 'provider_unavailable';
+            break;
         }
     }
 
@@ -99,8 +106,10 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'GET') return res.status(405).json({ error: 'method_not_allowed' });
 
-    const { keyword = '', genreId = '', page = 1 } = req.query;
+    const { keyword = '', genreId = '', page = 1 } = req.query || {};
+    if (typeof keyword !== 'string' || keyword.length > 128 || !/^\d{0,12}$/.test(String(genreId)) || !Number.isInteger(Number(page)) || Number(page) < 1 || Number(page) > 100 || (!keyword.trim() && !genreId)) return res.status(400).json({ error: 'invalid_search' });
     const opts = { keyword, genreId, page, filters: searchFilters(req.query) };
 
     // applicationId の形式から、叩くべきエンドポイントを決める。
@@ -109,6 +118,7 @@ export default async function handler(req, res) {
     const detected = detectPlatform(RAKUTEN_APP_ID, RAKUTEN_ACCESS_KEY);
 
     if (!detected.ok) {
+        res.setHeader('Cache-Control', 'no-store');
         res.setHeader('X-Rakuten-Config', 'invalid');
         return res.status(500).json({
             error: detected.reason,
@@ -124,5 +134,6 @@ export default async function handler(req, res) {
         res.setHeader('X-Rakuten-Affiliate', result.affiliateState);
         return res.status(200).send(result.text);
     }
-    return res.status(result.status).json({ error: result.text });
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(result.status >= 400 && result.status <= 599 ? result.status : 502).json({ error: 'search_unavailable' });
 }
