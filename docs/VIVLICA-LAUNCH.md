@@ -3,7 +3,7 @@
 # Vivlica.comへの統合・収益運用
 
 この変更は `https://vivlica.com` のルートに既存の比較サイトを統合する構成です。
-DNS・既存のVivlicaサイト・Vercelプロジェクト・ASP管理画面への操作は実行していません。
+既存のVercel/GitHub連携（ka1tetsus-projects / hikaku-labo）を確認し、PR #15をマージして `https://hikaku-labo.vercel.app` に本番デプロイしました。DNS・Vivlica.comのプロジェクトへの紐付け・ASP管理画面への操作は未実施です。
 このクラウド環境からのVivlica.comへのHTTP接続は、プロキシに403で拒否されました。
 既存サイトの有無やDNSの状態が確認できていないため、既存サイトがある場合は内容を保全してから公開してください。
 既存Vivlicaのサブパスへの統合を行う場合は、公開前にルーティング・アセットURL・canonicalの構成を別途調整してください。
@@ -90,7 +90,7 @@ npm run report:revenue -- /tmp/vivlica-logs.ndjson \
 
 自動テスト、lint、ビルドと生成60ページのリンク・メタデータ検査、ブラウザでの家族分試算・支出増の表示・条件引継ぎ・モバイル表示を確認。
 ブラウザの外部API失敗テストはローカルで503応答を再現しています。
-本番DNS、実際の広告成果、ASP承認、外部APIの本番認証、Vercelへのデプロイは未確認・未実施です。
+Vercelの本番デプロイはGitHub連携で実施済みです。本番DNSの変更、実際の広告成果、ASP承認、外部API認証の完全な実接続確認は未実施です。デプロイ成功と独自ドメインの切替を区別してください。
 
 ## 有料AIのコストを守る
 
@@ -130,3 +130,11 @@ npm run report:revenue -- /tmp/vivlica-logs.ndjson \
 - 所有者が入力した同期間の確定報酬を運営費が上回れば、費用内訳の確認を促します。
 
 推定報酬・架空のEPC・利用者単位の離脱率は算出しません。送客があることだけでは成果の発生や提携可能性を確認できないため、ASPの実データと合わせて判断してください。
+
+
+## 公開経路（認証作業の省略）
+
+このリポジトリは既にVercelと連携しています。リリース用PRのチェックとVercelプレビューが成功したら、mainへのマージで本番デプロイされます。コード公開のためにVercelトークンを新しく発行する必要はありません。
+プロジェクト管理画面: https://vercel.com/ka1tetsus-projects/hikaku-labo
+本番HTTP検査: `.github/workflows/production-affiliate-audit.yml`。主要13パス、サイトマップの有効な公開先URL、計測APIの不正イベント拒否を検査します。不正イベントは集計ログに記録されません。
+Vivlica.comのDNSとVercelドメイン設定は別の管理操作です。ドメイン接続を確認するまで既存ドメインからの転送を有効にしないでください。
