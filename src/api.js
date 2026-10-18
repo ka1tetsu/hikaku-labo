@@ -62,7 +62,7 @@ export function buildAmazonAffiliateUrl(keyword) {
 // Build Yahoo Shopping affiliate URL
 export function buildYahooAffiliateUrl(keyword) {
     const baseUrl = `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(keyword)}`;
-    return `//ck.jp.ap.valuecommerce.com/servlet/referral?sid=${YAHOO_SID}&pid=${YAHOO_PID}&vc_url=${encodeURIComponent(baseUrl)}`;
+    return `https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=${YAHOO_SID}&pid=${YAHOO_PID}&vc_url=${encodeURIComponent(baseUrl)}`;
 }
 
 

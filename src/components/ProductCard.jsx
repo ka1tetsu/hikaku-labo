@@ -17,14 +17,14 @@ function StarRating({ score }) {
 }
 
 export default function ProductCard({ item, viewMode, isSelected, onToggleCompare, isCheapest }) {
-    // 半角・全角スペース区切りの先頭語を他モール検索のキーワードにする
-    const keyword = item.itemName.split(/[ \u3000]/)[0];
+    // 広告文を除き、型番とブランドを他モールへ引き継ぐ。
+    const keyword = deriveProductQuery(item.itemName) || item.itemName;
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
     const yahooUrl = buildYahooAffiliateUrl(keyword);
 
     // --- 楽天ファーストのルーティング結果をキャッシュ ---
     const { bestUrl, winnerPlatform, rakutenTracked } = useMemo(
-        () => getOptimizedAffiliateRoute(item, keyword, item.itemPrice),
+        () => getOptimizedAffiliateRoute(item, keyword),
         [item, keyword]
     );
     const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場'
@@ -111,14 +111,14 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                 </label>
 
                 <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first" onClick={() => recordMerchant('product-primary')}>
-                    {platformLabel}で購入する ▶<br />
+                    {platformLabel}で価格・在庫を確認 ▶<br />
                     <span className="dy-tooltip">
-                        {rakutenTracked ? '楽天市場の商品ページへ' : `楽天の在庫が確認できないため${platformLabel}へ`}
+                        {rakutenTracked ? '楽天市場の商品ページへ' : `別ショップの検索結果で条件を確認`}
                     </span>
                 </a>
 
                 <a className="btn-compare-all" href={`/compare/?q=${encodeURIComponent(deriveProductQuery(item.itemName))}&ref=${encodeURIComponent(item.itemName.slice(0, 160))}`}>
-                    全ショップで価格比較 →
+                    主要ショップで価格比較 →
                 </a>
 
                 <div className="sub-actions">

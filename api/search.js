@@ -1,6 +1,7 @@
 // Vercel Serverless API Route - proxies requests to Rakuten Ichiba Item Search
 // Adds required Referer/Origin headers that Rakuten openapi requires
 
+import { providerGate } from '../server/providerGate.js';
 import { upstreamResponse } from '../server/upstream.js';
 import { detectPlatform, OPENAPI_ENDPOINT } from '../server/rakutenCredentials.js';
 
@@ -16,6 +17,7 @@ const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '432a9f67.24391
 
 // ⚠️ accessKey はシークレットのためソースに埋め込みません。
 const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || '';
+const permissionGate = providerGate();
 
 // Optional narrowing used by the concierge. Only whitelisted, bounded values reach Rakuten.
 const SORTS = ['standard', '+itemPrice', '-itemPrice', '-reviewCount', '-reviewAverage'];
@@ -64,6 +66,8 @@ function fetchRakuten(url, timeoutMs) {
 export async function fetchRakutenSearch(opts) {
     const detected = detectPlatform(RAKUTEN_APP_ID, RAKUTEN_ACCESS_KEY);
     if (!detected.ok) return { ok: false, status: 500, text: detected.reason, affiliateState: 'off' };
+    const retryAfter = permissionGate.remaining();
+    if (retryAfter) return { ok: false, status: 503, text: 'provider_configuration_rejected', affiliateState: 'off', retryAfter };
     // affiliateId を付けると楽天アフィリエイト側のサイト登録が照合され、
     // 未登録だと HTTP_REFERRER_NOT_ALLOWED で全体が失敗する。
     // 商品が1件も出ないよりは、成果計測なしでも表示できる方を優先し、
@@ -85,7 +89,7 @@ export async function fetchRakutenSearch(opts) {
             const rakutenRes = await fetchRakuten(`${OPENAPI_ENDPOINT}?${params}`, Math.max(1, Math.min(4000, deadline - Date.now())));
             const text = rakutenRes.text;
 
-            if (rakutenRes.ok) return { ok: true, status: 200, text, affiliateState };
+            if (rakutenRes.ok) { permissionGate.reset(); return { ok: true, status: 200, text, affiliateState }; }
 
             lastStatus = rakutenRes.status;
             lastBody = text;
@@ -99,7 +103,8 @@ export async function fetchRakutenSearch(opts) {
         }
     }
 
-    return { ok: false, status: lastStatus, text: lastBody, affiliateState: 'off' };
+    if (lastStatus === 403 && /HTTP_REFERRER_NOT_ALLOWED/i.test(lastBody)) permissionGate.reject();
+    return { ok: false, status: lastStatus, text: lastBody, affiliateState: 'off', ...(permissionGate.remaining() ? { retryAfter: permissionGate.remaining() } : {}) };
 }
 
 export default async function handler(req, res) {
@@ -135,5 +140,6 @@ export default async function handler(req, res) {
         return res.status(200).send(result.text);
     }
     res.setHeader('Cache-Control', 'no-store');
+    if (result.retryAfter) res.setHeader('Retry-After', String(result.retryAfter));
     return res.status(result.status >= 400 && result.status <= 599 ? result.status : 502).json({ error: 'search_unavailable' });
 }
