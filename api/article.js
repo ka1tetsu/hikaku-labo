@@ -1,7 +1,7 @@
+import { paidAiAccess } from '../server/paidAiAccess.js';
 // /api/article.js
 // カテゴリIDを受け取り、比較記事を1本返すサーバーレスAPI
-// 実運用では OpenAI / 他LLM を呼び出すが、ここでは環境変数が無い場合は
-// ルールベースなテンプレテキストを返す。
+// 管理者のBearer認証でのみ有料生成する。キー未設定時は無効。
 
 const CATEGORY_MAP = {
   smartphone: {
@@ -29,7 +29,7 @@ async function generateWithLLM(categoryId, overrideTitle) {
 
   const title =
     overrideTitle ||
-    `【徹底比較】${cat.name}おすすめベストバイ3選｜価格.comクローン版`;
+    `【徹底比較】${cat.name}おすすめベストバイ3選｜Vivlica編集用ドラフト`;
 
   const system = "あなたは日本語で家電の比較レビュー記事を書くプロ編集者です。事実ベースで簡潔に書いてください。";
   const user = `
@@ -52,6 +52,7 @@ async function generateWithLLM(categoryId, overrideTitle) {
       { role: "system", content: system },
       { role: "user", content: user }
     ],
+    max_completion_tokens: 1200,
     temperature: 0.5
   };
 
@@ -61,7 +62,8 @@ async function generateWithLLM(categoryId, overrideTitle) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!res.ok) {
@@ -80,56 +82,15 @@ async function generateWithLLM(categoryId, overrideTitle) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  if (req.method === "OPTIONS") return res.status(200).end();
-
-  const { categoryId = "smartphone", title } = req.query;
-
+  if (!paidAiAccess(req, res, 'GET')) return;
+  const { categoryId = 'smartphone', title } = req.query || {};
+  if (typeof categoryId !== 'string' || !Object.hasOwn(CATEGORY_MAP, categoryId) || (title !== undefined && (typeof title !== 'string' || title.length > 200))) {
+    return res.status(400).json({ error: 'invalid_generation_parameters' });
+  }
   try {
-    const llmResult = await generateWithLLM(categoryId, title);
-    if (llmResult) {
-      return res.status(200).json({
-        source: "llm",
-        ...llmResult
-      });
-    }
-
-    const cat = CATEGORY_MAP[categoryId] || {
-      name: "家電全般",
-      exampleProducts: ["人気モデルA", "人気モデルB", "人気モデルC"]
-    };
-
-    const fallbackTitle =
-      title ||
-      `【テンプレ】${cat.name}おすすめ比較ガイド（ダミー生成・APIキー未設定）`;
-
-    const body = [
-      `# ${fallbackTitle}`,
-      "",
-      "## まず結論：この3つから選べばOKです",
-      "",
-      `1. ${cat.exampleProducts[0]}：万能型で迷ったらコレ`,
-      `2. ${cat.exampleProducts[1]}：価格と性能のバランス重視なら`,
-      `3. ${cat.exampleProducts[2]}：こだわり派・ヘビーユース向け`,
-      "",
-      "## 選び方のポイント（要約）",
-      "- 予算と用途（ゲーム・動画編集・ビジネスなど）を先に決める",
-      "- スペック表の数字よりも、自分の使い方に合うかどうかを優先する",
-      "- 安さだけで選ぶと、結果的に買い替えが早くなり損をしやすい",
-      "",
-      "※ この文章はAPIキー未設定環境用のテンプレートです。"
-    ].join("\n");
-
-    return res.status(200).json({
-      source: "template",
-      title: fallbackTitle,
-      categoryId,
-      model: null,
-      body
-    });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    const result = await generateWithLLM(categoryId, title);
+    return res.status(200).json({ source: 'llm', reviewRequired: true, ...result });
+  } catch {
+    return res.status(502).json({ error: 'generation_failed' });
   }
 }
-

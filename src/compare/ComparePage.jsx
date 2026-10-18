@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import SiteFooter from '../shared/SiteFooter.jsx';
+import { searchResponse } from '../shared/searchRequest.js';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
@@ -46,14 +48,15 @@ export default function ComparePage() {
   useEffect(() => {
     if (!query.q && !query.jan) return undefined;
     let alive = true;
+    const controller = new AbortController();
     const params = new URLSearchParams();
     for (const key of ['q', 'ref', 'jan']) if (query[key]) params.set(key, query[key]);
     setState({ loading: true, data: null, error: '' });
-    fetch('/api/compare?' + params)
+    searchResponse('/api/compare?' + params, { signal: controller.signal })
       .then(response => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
       .then(data => { if (alive) setState({ loading: false, data, error: '' }); })
       .catch(() => { if (alive) setState({ loading: false, data: null, error: '価格データを取得できませんでした。下のリンクから各ショップで確認できます。' }); });
-    return () => { alive = false; };
+    return () => { alive = false; controller.abort(); };
   }, [query]);
 
   function submit(e) {
@@ -87,7 +90,7 @@ export default function ComparePage() {
       <section className="cp-hero">
         <div className="cp-wrap">
           <span className="cp-kicker">✳ PRICE COMPARISON — ALL STORES</span>
-          <h1>同じ商品を、<em>全ショップ</em>で最安比較。</h1>
+          <h1>買う前に、<em>主要ショップ</em>の価格を比較。</h1>
           <p>楽天市場・Yahoo!ショッピングの実際の販売価格を、ポイント還元後の「実質価格」で並べます。Amazon・家電量販店・フリマも同じキーワードでまとめて確認できます。</p>
           <form className="cp-search" role="search" onSubmit={submit}>
             <label htmlFor="cp-q" className="cp-visually-hidden">商品名・型番・JANコード</label>
@@ -119,10 +122,11 @@ export default function ComparePage() {
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
           {state.error && <p className="cp-error">{state.error}</p>}
           {cheapest && <div className="cp-summary">
-            <div><span>{same.length ? '同じ商品の最安（実質）' : '近い商品の最安（実質）'}</span><strong>{yen(cheapest.effectivePrice)}</strong><small>{cheapest.storeName}・{cheapest.shopName}</small></div>
+            <div><span>{same.length ? '取得した同じ出品で最安（実質）' : '取得した近い商品の最安（実質）'}</span><strong>{yen(cheapest.effectivePrice)}</strong><small>{cheapest.storeName}・{cheapest.shopName}</small></div>
             <div><span>価格の幅</span><strong>{yen(Math.min(...main.map(o => o.effectivePrice)))}〜{yen(Math.max(...main.map(o => o.effectivePrice)))}</strong><small>{main.length}件の出品</small></div>
             <div><span>比較したショップ</span><strong>{[sources.rakuten === 'ok' && '楽天', sources.yahoo === 'ok' && 'Yahoo!'].filter(Boolean).join('・') || '—'}</strong><small>{sources.yahoo === 'disabled' ? 'Yahoo!は価格自動取得の準備中' : 'APIで取得した実際の価格'}</small></div>
           </div>}
+          {cheapest && <div className="cp-next-step"><strong>{cheapest.storeName}で販売条件を確認</strong><p>表示価格は送料や個別のクーポン適用後の総額ではありません。購入前に型番・送料・納期・返品条件を確認してください。</p><a className="vl-primary" href={cheapest.url} target="_blank" rel={cheapest.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'products', merchant: cheapest.store === 'yahoo' ? 'yahoo-shopping' : 'rakuten', placement: 'compare-top-offer', sponsored: cheapest.sponsored })}>この出品の価格・在庫を確認 ↗{cheapest.sponsored && <small>PR</small>}</a></div>}
           {!state.loading && state.data && !same.length && main.length > 0 && <p className="cp-note">型番が一致する出品が見つからなかったため、近い商品を表示しています。型番やJANコードで検索すると精度が上がります。</p>}
           {main.length > 0 && <ol className="cp-offers">{main.slice(0, 15).map((offer, index) => <OfferRow key={offer.store + offer.url} offer={offer} rank={index + 1} cheapest={index === 0} />)}</ol>}
           {!state.loading && state.data && offers.length === 0 && <p className="cp-muted">価格を取得できる出品が見つかりませんでした。下のショップで直接探してください。</p>}
@@ -147,11 +151,12 @@ export default function ComparePage() {
 
         <section className="cp-disclosure">
           <h2>広告・データについて</h2>
-          <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で購入が成立すると、比較ラボがショップやASPから紹介料を受け取る場合があります。価格の並び順は実質価格（価格−付与ポイント）で決めており、報酬額は使っていません。</p>
+          <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で購入が成立すると、VivlicaがショップやASPから紹介料を受け取る場合があります。価格の並び順は実質価格（価格−付与ポイント）で決めており、報酬額は使っていません。</p>
           <p>価格・ポイント・送料・在庫は各ショップの公式APIから取得した時点の情報です。購入前に販売ページで最新の条件を確認してください。APIのないショップの価格を自動収集（スクレイピング）することはしていません。</p>
         </section>
       </div>
     </main>
+    <SiteFooter />
     <SiteConcierge section="products" />
   </div>;
 }

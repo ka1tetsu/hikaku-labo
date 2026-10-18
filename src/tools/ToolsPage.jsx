@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import SiteFooter from '../shared/SiteFooter.jsx';
+import { useEffect, useRef, useState } from 'react';
+import DecisionBar from '../shared/DecisionBar.jsx';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { CATEGORIES, LAST_REVIEWED } from './catalog.js';
@@ -22,7 +24,7 @@ const PRIORITIES = [
 ];
 const ICON = { website: '◧', shop: '▦', wordpress: '◉' };
 
-function OfficialLink({ service, compact = false }) {
+function OfficialLink({ service, compact = false, placement = 'service-card' }) {
   const destination = outboundLink(service);
   return (
     <a
@@ -30,7 +32,7 @@ function OfficialLink({ service, compact = false }) {
       href={destination.url}
       target="_blank"
       rel={destination.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'}
-      onClick={() => recordOutbound(service, destination.sponsored)}
+      onClick={() => recordOutbound(service, destination.sponsored, placement)}
     >
       {destination.sponsored ? '広告リンクで公式サイトへ' : '公式サイトで確認'}
       <span aria-hidden="true"> ↗</span>
@@ -78,7 +80,7 @@ function PlanCard({ service, index, selected, toggle }) {
       <div className="tl-card-actions">
         <OfficialLink service={service} />
         {typeof A8_AD_PLACEMENTS[service.id] === 'string' && A8_AD_PLACEMENTS[service.id].trim() && (
-          <div className="tl-a8-placement" aria-label="A8.netアフィリエイト広告">
+          <div className="tl-a8-placement" aria-label="A8.netアフィリエイト広告" onClick={event => { if (event.target.closest('a')) recordOutbound(service, true, 'a8-service-card'); }}>
             <span className="tl-a8-label">広告・PR（A8.net）</span>
             <div dangerouslySetInnerHTML={{ __html: A8_AD_PLACEMENTS[service.id] }} />
           </div>
@@ -108,6 +110,7 @@ export default function ToolsPage() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [onlySelection, setOnlySelection] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const recommendationRef = useRef(null);
   const ranking = rankServices({ category, budget, priority });
   const displayed = onlySelection ? ranking.filter(service => selectedIds.includes(service.id)) : ranking;
   const comparison = ranking.filter(service => selectedIds.includes(service.id));
@@ -210,6 +213,12 @@ export default function ToolsPage() {
                 <div><span className="tl-overline">YOUR RECOMMENDATIONS</span><h3>{CATEGORIES.find(x => x.id === category).title} — 比較結果</h3><p>公開された機能と参考価格から独自ルールで点数化。AI生成による根拠の捏造はしません。</p></div>
                 <span className="tl-result-count">{ranking.length}件を比較</span>
               </div>
+              <div ref={recommendationRef} className="vl-tool-pick">
+                <span>この条件での最初の候補</span><strong>{ranking[0].name}</strong><p>{ranking[0].reasons[0]}</p>
+                <small>{ranking[0].price.label} · {ranking[0].price.detail}</small>
+                <OfficialLink service={ranking[0]} placement="tool-top-pick" />
+                <small>予算内かどうか、年払い・手数料の条件を公式で確認してください。</small>
+              </div>
               <div className="tl-results-actions">
                 <span>並び順：条件適合スコア順</span>
                 <button type="button" disabled={selectedIds.length === 0} onClick={() => setOnlySelection(v => !v)}>{onlySelection ? 'すべて表示' : '選択した候補のみ表示'}（{selectedIds.length}/3）</button>
@@ -252,7 +261,7 @@ export default function ToolsPage() {
 
       <footer className="tl-footer">
         <div className="tl-wrap tl-footer-top">
-          <div><div className="tl-footer-brand"><span>✳</span> 比較ラボ / tools</div><p>必要なものを、必要なだけ。<br/>納得できるサービス選びのために。</p></div>
+          <div><div className="tl-footer-brand"><span>✳</span> Vivlica / tools</div><p>必要なものを、必要なだけ。<br/>納得できるサービス選びのために。</p></div>
           <div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="#selector">無料診断</a><a href="#disclosure">広告の開示</a></div>
           <div><b>情報の注意事項</b><p>情報確認日：{LAST_REVIEWED}</p><p>料金と提供機能は予告なく変更されることがあります。</p></div>
         </div>
@@ -260,11 +269,13 @@ export default function ToolsPage() {
           <h3>広告・アフィリエイトに関する開示</h3>
           <p>当サイトは広告・アフィリエイトプログラムから報酬を受け取る場合があります。提携が承認された広告リンクには「広告リンク」と表示します。広告契約のないサービスも掲載し、ランキングには広告報酬額を使用しません。現時点でリンクの承認・報酬発生は保証されません。</p>
           <h3>プライバシー</h3>
-          <p>診断で選んだ条件はこのページ内で処理し、氏名・メールアドレスを収集しません。公式サイトへのクリック時にはサービスIDと広告リンクの有無だけを、運営上の集計目的で当サイトに送信します。外部サイトでのデータ取扱いはリンク先の規定をご確認ください。</p>
+          <p>診断で選んだ条件はこのページ内で処理し、氏名・メールアドレスを収集しません。ページ種別、外部リンクのサービスID・配置・広告リンクの有無を、運営上の集計目的で当サイトに送信します。外部サイトでのデータ取扱いはリンク先の規定をご確認ください。</p>
         </div>
-        <div className="tl-wrap tl-footer-bottom">© 2026 比較ラボ <a href="#selector">ページ上部へ ↑</a></div>
+        <div className="tl-wrap tl-footer-bottom">© 2026 Vivlica <a href="#selector">ページ上部へ ↑</a></div>
       </footer>
+      <DecisionBar anchorRef={recommendationRef} name={ranking[0].name} detail={ranking[0].price.label} section="tools" merchant={ranking[0].id} link={outboundLink(ranking[0])} placement="tools-decision-bar" caution="年払い・手数料などの条件を確認" />
       <SiteConcierge section="tools" />
+    <SiteFooter />
     </div>
   );
 }

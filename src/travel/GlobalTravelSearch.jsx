@@ -100,7 +100,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
     <section className="gx-hero" aria-labelledby="gx-headline">
       <div className="tv-wrap gx-hero-grid">
         <div className="gx-lede">
-          <div className="gx-overline"><span>✳</span> HIKAKU LABO TRAVEL / GLOBAL SEARCH</div>
+          <div className="gx-overline"><span>✳</span> VIVLICA TRAVEL / GLOBAL SEARCH</div>
           <h1 id="gx-headline">旅の「行きたい」を、<br/><em>もっと自由に、もっと賢く。</em></h1>
           <p>国内・海外の旅行先を探して、航空券・ホテル・現地体験まで比較。希望条件を自然な言葉で入力し、検索先をまとめて整理できます。</p>
           <form onSubmit={searchText} className="gx-hero-search" role="search">

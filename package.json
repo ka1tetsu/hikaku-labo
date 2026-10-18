@@ -11,7 +11,10 @@
     "generate:articles": "node scripts/generate-articles.mjs",
     "test:tools": "node --test tests/tools.test.mjs",
     "test:travel": "node --test tests/travel.test.mjs tests/travel-discovery.test.mjs tests/travel-world.test.mjs",
-    "test:all": "node --test tests/*.test.mjs"
+    "test:all": "node --test tests/*.test.mjs",
+    "audit:affiliate": "node scripts/audit-affiliate.mjs",
+    "report:revenue": "node scripts/revenue-report.mjs",
+    "verify:build": "node scripts/verify-build.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

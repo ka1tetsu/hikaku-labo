@@ -40,7 +40,7 @@ test('tracker endpoint enforces origin and logs no identification fields', () =>
     return {status,payload};
   }
   try {
-    const good={method:'POST',headers:{host:'hikaku-labo.vercel.app',origin:'https://hikaku-labo.vercel.app','content-length':'110'},body:{event:'outbound',section:'travel',merchant:'yahoo-travel',placement:'banner234',sponsored:true}};
+    const good={method:'POST',headers:{host:'vivlica.com',origin:'https://vivlica.com','content-length':'110'},body:{event:'outbound',section:'travel',merchant:'yahoo-travel',placement:'banner234',sponsored:true}};
     assert.equal(request(good).status,204);
     assert.equal(events.length,1);
     assert.deepEqual(Object.keys(events[0]).sort(), ['merchant','placement','section','sponsored','timestamp','type'].sort());
@@ -53,9 +53,9 @@ test('tracker endpoint enforces origin and logs no identification fields', () =>
 test('all public guide URLs are crawlable and not disguised affiliate tracking', () => {
   const sitemap=content('public/sitemap.xml');
   const robots=content('public/robots.txt');
-  assert.match(robots,/Sitemap: https:\/\/hikaku-labo\.vercel\.app\/sitemap\.xml/);
+  assert.match(robots,/Sitemap: https:\/\/vivlica\.com\/sitemap\.xml/);
   for (const path of ['/', '/compare/', '/tools/', '/life/', '/sim/', '/hikari/', '/card/', '/hoken/', '/travel/', '/guides/travel-budget/', '/guides/website-tools/']) {
-    assert.ok(sitemap.includes('https://hikaku-labo.vercel.app'+path));
+    assert.ok(sitemap.includes('https://vivlica.com'+path));
   }
   const a=content('guides/travel-budget/index.html');
   const b=content('guides/website-tools/index.html');
@@ -90,7 +90,7 @@ test('anonymous page views are accepted so click-through rate can be computed', 
 test('every public page has OGP image, Twitter card and structured data', () => {
   for (const path of ['index.html', 'compare/index.html', 'tools/index.html', 'life/index.html', 'sim/index.html', 'hikari/index.html', 'card/index.html', 'hoken/index.html', 'travel/index.html']) {
     const html = content(path);
-    assert.match(html, /og:image" content="https:\/\/hikaku-labo\.vercel\.app\/og\/\w+\.png"/, path);
+    assert.match(html, /og:image" content="https:\/\/vivlica\.com\/og\/\w+\.png"/, path);
     assert.match(html, /twitter:card/, path);
     assert.match(html, /application\/ld\+json/, path);
   }

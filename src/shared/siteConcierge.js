@@ -1,4 +1,4 @@
-// Site-wide concierge for 比較ラボ: routes free text to travel, shopping or web-tool
+// Site-wide concierge for Vivlica: routes free text to travel, shopping or web-tool
 // advice. Pure rule-based logic in the browser — no AI API, nothing sent to a server
 // except the ordinary product search the shopping page already uses.
 import { conciergeReply, parseTravelRequest } from '../travel/concierge.js';
@@ -25,7 +25,7 @@ export function welcomeMessage(section = 'site') {
   }[section] || '';
   return {
     role: 'assistant', domain: 'site',
-    text: [`こんにちは！比較ラボのAIコンシェルジュです。${lead}旅行・お買い物・Webサービス選び、ざっくりした相談でも、具体的な条件でも大丈夫です。`],
+    text: [`こんにちは！VivlicaのAIコンシェルジュです。${lead}旅行・お買い物・Webサービス選び、ざっくりした相談でも、具体的な条件でも大丈夫です。`],
     chips: [...new Set([...(SITE_CHIPS[section] || []).slice(0, 3), ...SITE_CHIPS.site])].slice(0, 5),
   };
 }
@@ -137,7 +137,7 @@ export function siteReply(input, state = {}, { section = 'site', now = new Date(
   if (!text) return { message: welcomeMessage(section), state };
   if (/^(リセット|最初から|やり直)/.test(text)) return { message: { ...welcomeMessage(section), text: ['会話をリセットしました。旅行・お買い物・Webサービス選び、なんでも相談してください。'] }, state: {} };
   if (/^(こんにちは|こんばんは|おはよう|はじめまして|hello|hi)\W*$/i.test(text) || /(何ができ|使い方|ヘルプ)/.test(text)) {
-    return { message: { ...welcomeMessage(section), text: ['こんにちは！比較ラボのAIコンシェルジュです。次のような相談ができます。'],
+    return { message: { ...welcomeMessage(section), text: ['こんにちは！VivlicaのAIコンシェルジュです。次のような相談ができます。'],
       bullets: ['旅行：「12月に3泊で温泉とグルメ」「パリの航空券」→ 旅先提案・モデルコース・航空券/ホテル比較', 'お買い物：「1万円以下のワイヤレスイヤホン」「母の日のプレゼント」→ 楽天市場から条件に合う商品', 'Webサービス：「ネットショップを無料で始めたい」→ 目的と予算に合うサービス比較'] }, state };
   }
   if (/^(ありがとう|サンキュー|助か)/.test(text)) return { message: { role: 'assistant', domain: 'site', text: ['どういたしまして！ほかにも気になることがあれば気軽にどうぞ。'], chips: SITE_CHIPS[section] || SITE_CHIPS.site }, state };

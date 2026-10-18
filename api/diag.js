@@ -2,7 +2,7 @@
 // 本番で「なぜ商品が取れないのか」を切り分けるためのもの。
 // シークレット(accessKey)そのものは絶対に返さず、設定の有無と長さだけを返す。
 
-import { detectPlatform, OPENAPI_ENDPOINT } from './rakutenCredentials.js';
+import { detectPlatform, OPENAPI_ENDPOINT } from '../server/rakutenCredentials.js';
 
 const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '4c29f89d-b874-4910-a38b-1d8e0314c2a3';
 const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '432a9f67.243910f6.432a9f68.e28a199a';

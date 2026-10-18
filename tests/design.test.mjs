@@ -19,7 +19,7 @@ test('shared navigation supports screen readers and route-specific current item'
   const header = text('src/shared/SiteHeader.jsx');
   assert.match(header, /aria-current=/);
   assert.match(header, /href="#main-content"/);
-  assert.match(header, /aria-label="比較ラボのサイト内ナビゲーション"/);
+  assert.match(header, /aria-label="Vivlicaのサイト内ナビゲーション"/);
   for (const page of ['src/App.jsx', 'src/tools/ToolsPage.jsx', 'src/travel/TravelPage.jsx']) {
     assert.match(text(page), /id="main-content"/);
   }

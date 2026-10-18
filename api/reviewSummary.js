@@ -1,3 +1,4 @@
+import { paidAiAccess } from '../server/paidAiAccess.js';
 // /api/reviewSummary.js
 // 実際のレビュー文を受け取り、「メリット・デメリット・おすすめな人」を3行で返すAPI
 
@@ -30,6 +31,7 @@ ${joined}
       { role: "system", content: system },
       { role: "user", content: user }
     ],
+    max_completion_tokens: 600,
     temperature: 0.3
   };
 
@@ -39,7 +41,8 @@ ${joined}
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!res.ok) {
@@ -68,49 +71,19 @@ ${joined}
   return result;
 }
 
-function summarizeTemplate(reviews) {
-  const sample = (reviews || []).slice(0, 3);
-  const joined = sample.join(" / ").slice(0, 120);
-
-  return {
-    pros: "多くのユーザーが「コスパの良さ」と「使い勝手の良さ」を評価しており、総じて満足度は高い傾向です。",
-    cons: "一部のレビューでは「初期設定の分かりづらさ」や「細かな部分の作りの甘さ」が指摘されています。",
-    who: "価格を抑えつつ、日常利用でストレスなく使える製品を探している人に向いています。参考レビュー抜粋: " + joined
-  };
-}
-
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  if (req.method === "OPTIONS") return res.status(200).end();
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+  if (!paidAiAccess(req, res, 'POST')) return;
+  let body;
+  try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
+  catch { return res.status(400).json({ error: 'invalid_json' }); }
+  const reviews = body?.reviews;
+  if (!Array.isArray(reviews) || reviews.length < 1 || reviews.length > 20 || reviews.some(review => typeof review !== 'string' || !review.trim() || review.length > 1000)) {
+    return res.status(400).json({ error: 'Provide 1 to 20 reviews of at most 1000 characters each.' });
   }
-
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body;
-    const reviews = Array.isArray(body.reviews) ? body.reviews : [];
-
-    if (!reviews.length) {
-      return res.status(400).json({ error: "reviews (string配列) を1件以上指定してください。" });
-    }
-
-    const llmResult = await summarizeWithLLM(reviews);
-    if (llmResult) {
-      return res.status(200).json({
-        source: "llm",
-        ...llmResult
-      });
-    }
-
-    const fallback = summarizeTemplate(reviews);
-    return res.status(200).json({
-      source: "template",
-      ...fallback
-    });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    const result = await summarizeWithLLM(reviews);
+    return res.status(200).json({ source: 'llm', reviewRequired: true, ...result });
+  } catch {
+    return res.status(502).json({ error: 'summary_failed' });
   }
 }
-

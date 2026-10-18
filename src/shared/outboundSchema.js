@@ -18,15 +18,28 @@ export function validOutboundEvent(body) {
   if (body.section === 'products' && !STORE_MERCHANTS.includes(body.merchant)) return false;
   if (body.section === 'life' && !SERVICE_IDS.includes(body.merchant)) return false;
   if (body.section === 'tools' && !['studio', 'wix', 'base', 'shopify', 'xserver-wp', 'kinsta'].includes(body.merchant)) return false;
-  return Object.keys(body).every(key => ['event','section','merchant','sponsored','placement'].includes(key));
+  if (body.page !== undefined && !validPageId(body.page)) return false;
+  return Object.keys(body).every(key => ['event','section','merchant','sponsored','placement','page'].includes(key));
 }
 
 // Page views (no identifiers) so outbound clicks can be turned into a click-through rate.
 export const PAGE_IDS = Object.freeze({
+  '/about/': 'about', '/editorial-policy/': 'editorial-policy', '/privacy/': 'privacy',
   '/': 'home', '/compare/': 'compare', '/tools/': 'tools', '/life/': 'life', '/sim/': 'sim', '/hikari/': 'hikari',
   '/card/': 'card', '/hoken/': 'hoken', '/travel/': 'travel', '/guides/travel-budget/': 'guide-travel-budget', '/guides/website-tools/': 'guide-website-tools',
 });
 export function validViewEvent(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return false;
   return body.event === 'view' && [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(body.page) && Object.keys(body).every(key => ['event', 'page'].includes(key));
+}
+
+export function pageId(path) {
+  return PAGE_IDS[path] || (/^\/sim\/vs\/[a-z0-9-]+\/$/.test(path) ? 'sim-vs' : /^\/hikari\/area\/[a-z]+\/$/.test(path) ? 'hikari-area' : null);
+}
+export function validPageId(page) {
+  return [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(page);
+}
+export const FUNNEL_ACTIONS = Object.freeze(['savings_complete', 'savings_compare', 'selector_change']);
+export function validFunnelEvent(body) {
+  return Boolean(body && typeof body === 'object' && !Array.isArray(body) && body.event === 'funnel' && validPageId(body.page) && FUNNEL_ACTIONS.includes(body.action) && Object.keys(body).every(key => ['event', 'page', 'action'].includes(key)));
 }

@@ -259,7 +259,7 @@ const HELP_CHIPS = ['12月に3泊、温泉とグルメ。予算1人10万円', '�
 export const CONCIERGE_WELCOME = Object.freeze({
   role: 'assistant',
   text: [
-    `こんにちは！比較ラボトラベルの旅行コンシェルジュです。行きたい時期・日数・人数・予算・やりたいことを、ふだんの言葉で書いてください。国内外${DESTINATION_CATALOG.length}都市から候補を選び、モデルコースや航空券・ホテルの探し方まで案内します。`,
+    `こんにちは！Vivlica Travelの旅行コンシェルジュです。行きたい時期・日数・人数・予算・やりたいことを、ふだんの言葉で書いてください。国内外${DESTINATION_CATALOG.length}都市から候補を選び、モデルコースや航空券・ホテルの探し方まで案内します。`,
   ],
   chips: HELP_CHIPS,
 });

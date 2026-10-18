@@ -1,3 +1,4 @@
+import { searchResponse } from './shared/searchRequest.js';
 
 const AMAZON_TAG = 'kuronekosanta-22';
 const YAHOO_SID = '3506307';
@@ -112,7 +113,7 @@ export async function searchRakutenItems(keyword, genreId = '', page = 1, option
     if (options.sort && options.sort !== 'standard') params.append('sort', options.sort);
     if (options.freeShipping) params.append('postageFlag', '1');
 
-    const res = await fetch(`/api/search?${params}`);
+    const res = await searchResponse(`/api/search?${params}`, { signal: options.signal });
     if (!res.ok) {
         const detail = await res.text().catch(() => '');
         throw new Error(`楽天APIの取得に失敗しました (${res.status}) ${detail.slice(0, 200)}`);

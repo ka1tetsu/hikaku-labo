@@ -2,10 +2,11 @@
 // visible before JavaScript runs. Runs after `vite build`.
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createServer } from 'vite';
+import { SITE_ORIGIN, siteOrigin } from '../src/shared/site.js';
 
 // SITE_ORIGIN (e.g. https://example.jp) switches canonical / OGP / sitemap URLs to a custom domain.
-const DEFAULT_ORIGIN = 'https://hikaku-labo.vercel.app';
-const SITE = (process.env.SITE_ORIGIN || DEFAULT_ORIGIN).replace(/\/$/, '');
+const DEFAULT_ORIGIN = SITE_ORIGIN;
+const SITE = siteOrigin(process.env.SITE_ORIGIN || DEFAULT_ORIGIN);
 const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
 try {
   const { render, PAGES, STATIC_PAGES, renderStatic } = await vite.ssrLoadModule('/src/ssr.jsx');
@@ -26,7 +27,7 @@ try {
   const escape = text => text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   for (const page of STATIC_PAGES) {
     const url = SITE + page.path;
-    const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [['/', '比較ラボ'], ...page.crumbs].map(([href, name], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + href })) };
+    const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [['/', 'Vivlica'], ...page.crumbs].map(([href, name], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + href })) };
     const html = `<!doctype html>
 <html lang="ja">
 <head>
@@ -37,7 +38,7 @@ try {
 <title>${escape(page.title)}</title>
 <meta name="description" content="${escape(page.description)}"/>
 <link rel="canonical" href="${url}"/>
-<meta property="og:locale" content="ja_JP"/><meta property="og:type" content="article"/><meta property="og:site_name" content="比較ラボ"/>
+<meta property="og:locale" content="ja_JP"/><meta property="og:type" content="article"/><meta property="og:site_name" content="Vivlica"/>
 <meta property="og:title" content="${escape(page.title)}"/><meta property="og:description" content="${escape(page.description)}"/>
 <meta property="og:url" content="${url}"/><meta property="og:image" content="${SITE}/og/${page.og}.png"/><meta name="twitter:card" content="summary_large_image"/>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>

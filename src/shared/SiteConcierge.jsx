@@ -4,7 +4,7 @@ import './concierge-launcher.css';
 // The chat (and the travel data behind it) loads only when someone opens it.
 const ConciergeChat = lazy(() => import('./ConciergeChat.jsx'));
 
-// Floating "AIに相談" button shown on every page of 比較ラボ.
+// Floating "AIに相談" button shown on every page of Vivlica.
 export default function SiteConcierge({ section = 'site' }) {
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -33,7 +33,7 @@ export default function SiteConcierge({ section = 'site' }) {
   }, []);
 
   return <div className="hcl-root">
-    {(open || loaded) && <div className={'hcl-panel' + (open ? ' is-open' : '')} role="dialog" aria-modal="false" aria-label="比較ラボ AIコンシェルジュ" hidden={!open}>
+    {(open || loaded) && <div className={'hcl-panel' + (open ? ' is-open' : '')} role="dialog" aria-modal="false" aria-label="Vivlica AIコンシェルジュ" hidden={!open}>
       <div className="hcl-panel-head">
         <span className="hcl-panel-mark" aria-hidden="true">✳</span>
         <div><strong>AIコンシェルジュ</strong><small>旅行・お買い物・Webサービス、なんでも相談</small></div>

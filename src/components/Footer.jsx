@@ -12,7 +12,7 @@ export default function Footer() {
             <div className="container">
                 <div className="footer-grid">
                     <div>
-                        <h3>比較ラボとは</h3>
+                        <h3>Vivlicaとは</h3>
                         <p>楽天市場の商品情報をもとに価格やポイントを整理し、ほかのサービスも比較するための情報を提供しています。販売先の最新条件をご確認ください。</p>
                     </div>
                     <div>
@@ -59,7 +59,7 @@ export default function Footer() {
                 <div className="footer-affiliate-note">
                     ※ 商品の価格・在庫・ポイント倍率は楽天市場APIの取得時点の情報です。最新の内容は各商品ページでご確認ください。
                 </div>
-                <div className="footer-copy">© 2026 比較ラボ All Rights Reserved.</div>
+                <div className="footer-copy">© 2026 Vivlica All Rights Reserved.</div>
             </div>
         </footer>
     );

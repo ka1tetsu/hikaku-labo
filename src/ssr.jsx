@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import App from './App.jsx';
+import InfoPage from './shared/InfoPages.jsx';
+import { INFO_PAGES } from './shared/infoContent.js';
 import ToolsPage from './tools/ToolsPage.jsx';
 import TravelPage from './travel/TravelPage.jsx';
 import ComparePage from './compare/ComparePage.jsx';
@@ -29,9 +31,10 @@ export function render(file) {
 // Long-tail pages that exist only as static HTML (no React hydration).
 const simName = id => SIM_SERVICES.find(s => s.id === id).name;
 export const STATIC_PAGES = [
+  ...INFO_PAGES.map(page => ({ ...page, title: page.title + '｜Vivlica', og: 'default', crumbs: [['/', 'Vivlica'], [page.path, page.title]], element: () => <InfoPage page={page} /> })),
   ...SIM_PAIRS.map(pair => ({
     path: pair.path,
-    title: `${simName(pair.a)}と${simName(pair.b)}の比較【2026年10月】料金・通話・サポートの違い｜比較ラボ`,
+    title: `${simName(pair.a)}と${simName(pair.b)}の比較【2026年10月】料金・通話・サポートの違い｜Vivlica`,
     description: `${simName(pair.a)}と${simName(pair.b)}を、データ量ごとの月額料金・通話・店舗サポートで比較。どちらが安いかを使い方別に結論から解説します。`,
     og: 'sim',
     crumbs: [['/life/', '通信・お金の比較'], ['/sim/', '格安SIM比較'], [pair.path, pair.title]],
@@ -39,7 +42,7 @@ export const STATIC_PAGES = [
   })),
   ...AREA_PAGES.map(page => ({
     path: page.path,
-    title: `${areaLabel(page.area)}の光回線比較【2026年10月】スマホ別のおすすめとセット割｜比較ラボ`,
+    title: `${areaLabel(page.area)}の光回線比較【2026年10月】スマホ別のおすすめとセット割｜Vivlica`,
     description: `${areaLabel(page.area)}で申し込める主な光回線を、ドコモ・au・ソフトバンク・楽天モバイルなど使っているスマホ別にセット割と提供エリアで整理。`,
     og: 'hikari',
     crumbs: [['/life/', '通信・お金の比較'], ['/hikari/', '光回線比較'], [page.path, page.title]],

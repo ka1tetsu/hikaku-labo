@@ -1,6 +1,8 @@
+import SiteFooter from './shared/SiteFooter.jsx';
 import { recordOutboundClick } from './shared/outboundClient.js';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
+import SavingsPlanner from './services/SavingsPlanner.jsx';
 import SectionDirectory from './shared/SectionDirectory.jsx';
 import SiteConcierge from './shared/SiteConcierge.jsx';
 import { describeProductRequest, parseProductRequest } from './shared/productAdvisor.js';
@@ -40,6 +42,9 @@ export default function App() {
   const [compareList, setCompareList] = useState([]);
   // Natural-language search ("母の日のプレゼント 3000円くらい") → keyword + filters.
   const [smart, setSmart] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const searchController = useRef(null);
+  useEffect(() => () => searchController.current?.abort(), []);
 
   const MAX_COMPARE = 4;
 
@@ -74,22 +79,24 @@ export default function App() {
 
   const doSearch = useCallback(async (kw, genre, pg = 1, options = {}) => {
     if (!kw && !genre) return;
+    searchController.current?.abort();
+    const controller = new AbortController();
+    searchController.current = controller;
+    setHasSearched(true);
     setLoading(true);
     setError(null);
     try {
-      const data = await searchRakutenItems(kw, genre, pg, options);
+      const data = await searchRakutenItems(kw, genre, pg, { ...options, signal: controller.signal });
+      if (controller.signal.aborted) return;
       setProducts(data.items);
       setTotalPages(Math.min(data.pageCount, 100));
       setPage(pg);
-      if (data.items.length > 0 && !data.affiliateActive) {
-        console.warn('[hikaku-labo] 楽天APIが affiliateUrl を返していません。affiliateId の設定を確認してください。');
-      }
     } catch (e) {
-      // モックで取り繕わず、実際の失敗を伝える（偽の商品で比較させないため）
+      if (controller.signal.aborted) return;
       setError(e.message || '商品データの取得に失敗しました。');
       setProducts([]);
     } finally {
-      setLoading(false);
+      if (searchController.current === controller && !controller.signal.aborted) setLoading(false);
     }
   }, []);
 
@@ -106,8 +113,6 @@ export default function App() {
       const matched = CATEGORIES.find(c => c.genreId === genre);
       if (matched) setActiveCategory(matched);
       doSearch(kw || matched?.label || '', genre, 1);
-    } else {
-      doSearch('おすすめ 人気', '', 1);
     }
   }, [doSearch]);
 
@@ -176,7 +181,7 @@ export default function App() {
     ? `「${activeCategory.label}」の人気商品・最安値`
     : query
       ? `「${query}」の検索結果`
-      : '注目の人気商品';
+      : '商品名・型番から価格を調べる';
 
   return (
     <div className="app-wrapper">
@@ -194,6 +199,7 @@ export default function App() {
 
       <main id="main-content" className="main-content container">
         <SectionDirectory />
+        <SavingsPlanner />
 
         {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
@@ -258,6 +264,7 @@ export default function App() {
           </div>
         )}
 
+        {!hasSearched && <div className="hl-search-intro"><h3>買いたい商品が決まっていますか？</h3><p>上の検索窓に商品名や型番を入力してください。価格取得に対応していないショップも、検索結果へのリンクから確認できます。</p><a className="vl-primary" href="/compare/">ショップを横断して価格を比較 →</a></div>}
         {loading && (
           <div className="loading-state">
             <div className="spinner"></div>
@@ -268,15 +275,17 @@ export default function App() {
         {error && (
           <div className="error-box">
             <strong>商品データを取得できませんでした。</strong>
-            <p className="error-detail">{error}</p>
-            <p className="error-hint">
-              原因の切り分けは <a href="/api/diag" target="_blank" rel="noopener noreferrer">/api/diag</a> で確認できます。
-              楽天APIのHTTPステータスとエラー本文、アフィリエイト計測の有無が表示されます。
-            </p>
+            <p>現在、商品情報を読み込めません。検索条件を変えるか、各ショップの検索結果で価格・在庫を確認してください。</p>
+            <div className="affiliate-bar-links">{[
+              ['rakuten', '楽天市場で探す', buildRakutenSearchAffiliateUrl(query || activeCategory?.label || 'おすすめ')],
+              ['amazon', 'Amazonで探す', buildAmazonAffiliateUrl(query || activeCategory?.label || 'おすすめ')],
+              ['yahoo-shopping', 'Yahoo!で探す', buildYahooAffiliateUrl(query || activeCategory?.label || 'おすすめ')],
+            ].map(([merchant, label, href]) => <a key={merchant} className="kw-link" href={href} target="_blank" rel="sponsored noopener noreferrer" onClick={() => recordOutboundClick({ section: 'products', merchant, placement: 'search-fallback', sponsored: true })}>{label} ↗ <small>PR</small></a>)}</div>
+            <button type="button" className="page-btn" onClick={() => doSearch(query || activeCategory?.label || 'おすすめ 人気', activeCategory?.genreId || '', page, smart?.options || {})}>もう一度読み込む</button>
           </div>
         )}
 
-        {!loading && !error && products.length === 0 && (
+        {!loading && !error && hasSearched && products.length === 0 && (
           <div className="empty-state">
             <p>🔍 商品が見つかりませんでした。別のキーワードをお試しください。</p>
           </div>
@@ -342,6 +351,7 @@ export default function App() {
       </main>
 
       <Footer />
+    <SiteFooter />
       <SiteConcierge section="products" />
     </div>
   );
