@@ -65,6 +65,12 @@ jobs:
               }
             fi
           done
+          status=$(curl -sS --max-time 20 -X POST -H 'Content-Type: application/json' --data '{"event":"invalid"}' -o /tmp/vivlica-track-check.json -w '%{http_code}' "$PUBLIC_SITE_URL/api/track")
+          if [ "$status" != "400" ]; then
+            echo "::error::Production tracking function returned HTTP $status for an invalid event; expected 400."
+            exit 1
+          fi
+          python3 -c 'import json; assert json.load(open("/tmp/vivlica-track-check.json"))["error"] == "invalid_event"'
       - name: Inspect requested Vivlica domain
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: python
