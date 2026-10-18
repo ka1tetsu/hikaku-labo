@@ -53,7 +53,7 @@ jobs:
               }
             fi
             if [ "$path" = "/sitemap.xml" ]; then
-              grep -q 'https://vivlica.com/guides/travel-budget/' /tmp/hikaku-check.html || {
+              grep -Fq "$PUBLIC_SITE_URL/guides/travel-budget/" /tmp/hikaku-check.html || {
                 echo "::error::Sitemap missing travel guide."
                 exit 1
               }
@@ -65,6 +65,42 @@ jobs:
               }
             fi
           done
+          status=$(curl -sS --max-time 20 -X POST -H 'Content-Type: application/json' --data '{"event":"invalid"}' -o /tmp/vivlica-track-check.json -w '%{http_code}' "$PUBLIC_SITE_URL/api/track")
+          if [ "$status" != "400" ]; then
+            echo "::error::Production tracking function returned HTTP $status for an invalid event; expected 400."
+            exit 1
+          fi
+          python3 -c 'import json; assert json.load(open("/tmp/vivlica-track-check.json"))["error"] == "invalid_event"'
+      - name: Inspect requested Vivlica domain
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: python
+        run: |
+          import json, re, socket, subprocess, urllib.request, urllib.error
+          for host in ['vivlica.com', 'www.vivlica.com']:
+              result = {'host': host}
+              try:
+                  result['addresses'] = sorted({entry[4][0] for entry in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)})
+              except socket.gaierror:
+                  result['dns'] = 'not_resolved'
+              try:
+                  ns = subprocess.run(['dig', '+short', 'NS', host], capture_output=True, text=True, timeout=8)
+                  result['nameservers'] = ns.stdout.split()
+              except Exception:
+                  result['nameservers'] = []
+              try:
+                  req = urllib.request.Request('https://' + host, headers={'User-Agent': 'Vivlica-domain-readiness-check'})
+                  with urllib.request.urlopen(req, timeout=10) as response:
+                      result['http_status'] = response.status
+                      result['final_host'] = urllib.parse.urlparse(response.url).hostname
+                      html = response.read(16000).decode('utf-8', errors='replace')
+                      title = re.search(r'<title[^>]*>(.*?)</title>', html, re.I | re.S)
+                      result['title'] = re.sub(r'\s+', ' ', title.group(1)).strip()[:160] if title else ''
+              except urllib.error.HTTPError as error:
+                  result['http_status'] = error.code
+              except Exception as error:
+                  result['connection'] = type(error).__name__
+              message = json.dumps(result, ensure_ascii=True).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::notice title=Vivlica domain inspection::' + message)
       - name: Audit production npm dependencies
         run: npm audit --omit=dev --audit-level=high
       - name: Check advertising setup (not actual revenue)
