@@ -26,7 +26,7 @@ test('hotel cancellation guide cites its statistics and leads to the planner wit
   const section = guide.slice(bridge, end);
   assert.match(section, /href="\/travel\/#planner"/);
   assert.match(section, /PR・広告/);
-  // No invented prices, rates or availability in the bridge copy.
-  assert.doesNotMatch(section, /[0-9０-９]/);
+  // No invented prices, rates or availability in the bridge copy (tag names such as h2/h3 are not copy).
+  assert.doesNotMatch(section.replace(/<[^>]*>/g, ''), /[0-9０-９]/);
   assert.doesNotMatch(guide, /a8\.net|a8mat=/);
 });
