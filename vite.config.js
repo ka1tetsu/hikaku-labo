@@ -22,6 +22,7 @@ export default defineConfig({
         'guide-travel-budget': fileURLToPath(new URL('./guides/travel-budget/index.html', import.meta.url)),
         'guide-website-tools': fileURLToPath(new URL('./guides/website-tools/index.html', import.meta.url)),
         'guide-hotel-cancellation': fileURLToPath(new URL('./guides/hotel-cancellation/index.html', import.meta.url)),
+        'guide-lodging-tax': fileURLToPath(new URL('./guides/lodging-tax/index.html', import.meta.url)),
       },
     },
   },
