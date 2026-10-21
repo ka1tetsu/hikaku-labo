@@ -21,6 +21,7 @@ export default defineConfig({
         hoken: fileURLToPath(new URL('./hoken/index.html', import.meta.url)),
         'guide-travel-budget': fileURLToPath(new URL('./guides/travel-budget/index.html', import.meta.url)),
         'guide-website-tools': fileURLToPath(new URL('./guides/website-tools/index.html', import.meta.url)),
+        'guide-hotel-cancellation': fileURLToPath(new URL('./guides/hotel-cancellation/index.html', import.meta.url)),
       },
     },
   },
