@@ -24,7 +24,7 @@ export function inspectReferralMarkup(html) {
   return { referralAnchors: Object.values(hosts).reduce((sum, n) => sum + n, 0), hosts };
 }
 
-export async function auditLive({ origin = 'https://hikaku-labo.vercel.app', fetcher = fetch, includePrices = true, expectedCommit, releaseAttempts = 8, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
+export async function auditLive({ origin = SITE_ORIGIN, fetcher = fetch, includePrices = true, expectedCommit, releaseAttempts = 8, wait = ms => new Promise(resolve => setTimeout(resolve, ms)) } = {}) {
   const base = siteOrigin(origin), checks = [], findings = [];
   async function request(path, options = {}) {
     try {

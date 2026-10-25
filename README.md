@@ -1,7 +1,7 @@
 # Vivlica
 
 商品・通信・IT・旅行を、予算と使い方から比較する React / Vite サイト。
-現在の本番URLは `https://hikaku-labo.vercel.app`。移管先は `https://vivlica.com` で、DNS・ドメイン接続確認後に切り替えます。旧「比較ラボ」のパスを維持します。
+本番URLは `https://vivlica.com` です。ドメイン登録はムームードメイン、DNSとサイト配信はVercelを使用します。旧「比較ラボ」のパスを維持します。
 
 ```sh
 npm ci

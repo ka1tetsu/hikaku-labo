@@ -1,9 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "SITE_ORIGIN=${SITE_ORIGIN:-https://hikaku-labo.vercel.app} npm run build",
+  "buildCommand": "SITE_ORIGIN=https://vivlica.com npm run build",
   "outputDirectory": "dist",
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "hikaku-labo.vercel.app" }],
+      "destination": "https://vivlica.com/:path*",
+      "permanent": true
+    },
     {
       "source": "/:path*",
       "has": [

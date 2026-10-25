@@ -32,7 +32,7 @@ jobs:
         if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
         shell: bash
         env:
-          PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
+          PUBLIC_SITE_URL: https://vivlica.com
         run: |
           set -euo pipefail
           for path in "/" "/compare/" "/life/" "/sim/" "/hikari/" "/card/" "/hoken/" "/tools/" "/travel/" "/guides/travel-budget/" "/guides/website-tools/" "/robots.txt" "/sitemap.xml"; do
@@ -103,7 +103,7 @@ jobs:
               print('::notice title=Vivlica domain inspection::' + message)
       - name: Audit live revenue readiness
         if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
-        run: npm run audit:live -- --origin https://hikaku-labo.vercel.app --output /tmp/vivlica-live-revenue.json --summary "$GITHUB_STEP_SUMMARY" --require-monetization
+        run: npm run audit:live -- --origin https://vivlica.com --output /tmp/vivlica-live-revenue.json --summary "$GITHUB_STEP_SUMMARY" --require-monetization
       - name: Save live revenue audit
         if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
         uses: actions/upload-artifact@v4
@@ -117,5 +117,5 @@ jobs:
       - name: Check advertising setup (not actual revenue)
         if: always()
         env:
-          SITE_ORIGIN: https://hikaku-labo.vercel.app
+          SITE_ORIGIN: https://vivlica.com
         run: node scripts/audit-affiliate.mjs
