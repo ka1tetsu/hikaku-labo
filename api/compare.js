@@ -6,12 +6,23 @@
 import { upstreamResponse } from '../server/upstream.js';
 import { fetchRakutenSearch } from './search.js';
 import { normalizeRakutenOffer, normalizeYahooOffer, rankOffers, summarizeOffers } from '../src/shared/priceCompare.js';
+import { RAKUTEN_AFFILIATE_ID } from '../src/api.js';
 
 const YAHOO_ENDPOINT = 'https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch';
 const YAHOO_CLIENT_ID = process.env.YAHOO_SHOPPING_CLIENT_ID || '';
 // ValueCommerce IDs for Yahoo!ショッピング (same public values as the client-side links).
 const VC_SID = process.env.YAHOO_VC_SID || '3506307';
 const VC_PID = process.env.YAHOO_VC_PID || '888496181';
+
+export function wrapRakuten(url) {
+  const id = process.env.RAKUTEN_AFFILIATE_ID || RAKUTEN_AFFILIATE_ID;
+  try {
+    const destination = new URL(url);
+    if (!id || destination.protocol !== 'https:' || destination.username || destination.password || !['item.rakuten.co.jp', 'search.rakuten.co.jp'].includes(destination.hostname)) return url;
+    const encoded = encodeURIComponent(destination.href);
+    return `https://hb.afl.rakuten.co.jp/hgc/${id}/?pc=${encoded}&m=${encoded}`;
+  } catch { return url; }
+}
 
 export function wrapYahoo(url) {
   if (!/^https:\/\/([a-z0-9-]+\.)*shopping\.yahoo\.co\.jp\//.test(url || '') && !/^https:\/\/store\.shopping\.yahoo\.co\.jp\//.test(url || '')) return url;
@@ -29,7 +40,9 @@ async function rakutenOffers(q) {
   if (!result.ok) return { status: 'error', offers: [] };
   const data = JSON.parse(result.text);
   const items = (data.Items || []).map(entry => entry.Item ?? entry);
-  return { status: 'ok', offers: items.map(normalizeRakutenOffer) };
+  // The provider can omit affiliateUrl after its affiliate-parameter fallback.
+  // Keep the same public-ID referral fallback used by product cards.
+  return { status: 'ok', offers: items.map(item => normalizeRakutenOffer(item, wrapRakuten)) };
 }
 
 async function yahooOffers(q, jan) {
@@ -53,7 +66,7 @@ export default async function handler(req, res) {
   if (!q && !jan) return res.status(400).json({ error: 'q_or_jan_required' });
 
   const [rakuten, yahoo] = await Promise.all([
-    q ? rakutenOffers(q).catch(() => ({ status: 'error', offers: [] })) : { status: 'skipped', offers: [] },
+    rakutenOffers(q || jan).catch(() => ({ status: 'error', offers: [] })),
     yahooOffers(q, jan),
   ]);
   const offers = rankOffers([...rakuten.offers, ...yahoo.offers], ref || q, jan).slice(0, 40);

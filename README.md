@@ -32,3 +32,5 @@ npm run audit:affiliate
 送客レポートの `nextActions` は、通常リンクへの送客、診断結果からの移動、入力した確定報酬と実費に基づいて確認対象を示します。
 
 本番の収益導線とAPIの状態は `npm run audit:live` で確認できます。[実行状況と本人接続が必要な作業](docs/REVENUE-NEXT-ACTIONS.md) に外部設定の確認先をまとめています。
+
+[収益化の原因分析と改善](docs/MONETIZATION-ANALYSIS.md)に、再現した不具合、修正内容、毎日の自動監査、実績確認が必要な項目をまとめています。`audit:live -- --require-monetization` は、ページが応答していても収益導線に要対応があれば終了コード2を返します。

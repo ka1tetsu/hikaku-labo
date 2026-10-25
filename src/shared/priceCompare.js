@@ -21,6 +21,15 @@ function tokens(title) {
   return cleanTitle(title).toLowerCase().split(/\s+/).filter(t => t.length >= 2 && !STOP.has(t));
 }
 
+// A model mentioned as a compatibility target is not the product being sold.
+// Ignore included cases so a genuine headset with a carry case still matches.
+function accessoryKind(title) {
+  const text = String(title).normalize('NFKC').replace(/(?:収納|保護|専用|キャリング|充電)?ケース(?:付き|付属|同梱)/g, '');
+  return /イヤーパッド|イヤークッション|交換パッド|(?:保護|収納|専用|キャリング|充電)ケース|保護フィルム|カバー|交換用|互換バッテリー|変換アダプター|ケーブル|ear\s*pads?|replacement|carrying case|protective case/i.test(text);
+}
+
+const normalizedCode = code => code.replace(/[-‐/\s]/g, '');
+
 // Search phrase for other stores: brand-ish first word + model code, else the leading words.
 export function deriveProductQuery(title = '') {
   const cleaned = cleanTitle(title);
@@ -36,10 +45,12 @@ export function deriveProductQuery(title = '') {
 // 0–100: how likely two listings are the same product.
 export function matchScore(reference, candidate, { referenceJan = '', candidateJan = '' } = {}) {
   if (referenceJan && candidateJan) return referenceJan === candidateJan ? 100 : 0;
+  if (accessoryKind(reference) !== accessoryKind(candidate)) return 0;
   const refCodes = extractModelCodes(reference);
-  const candCodes = extractModelCodes(candidate);
+  const candCodes = [...extractModelCodes(candidate), ...extractModelCodes(String(candidate).replace(/([A-Z0-9])\(([A-Z])\)/gi, '$1-$2'))];
   if (refCodes.length) {
-    const shared = refCodes.some(code => candCodes.includes(code) || cleanTitle(candidate).toUpperCase().replace(/[-\s]/g, '').includes(code.replace(/[-\s]/g, '')));
+    // Compare whole model tokens: WH-1000XM50 must not match WH-1000XM5.
+    const shared = refCodes.some(code => candCodes.some(other => normalizedCode(code) === normalizedCode(other)));
     if (!shared) return Math.min(30, overlap(reference, candidate));
     return 85 + Math.round(overlap(reference, candidate) * 0.15);
   }
@@ -54,14 +65,15 @@ function overlap(a, b) {
 
 export const SAME_PRODUCT = 80;
 
-export function normalizeRakutenOffer(raw) {
+export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
   const price = Number(raw.itemPrice) || 0;
   const pointRate = Number(raw.pointRate) || 1;
   const point = Math.floor(price * pointRate / 100);
+  const url = raw.affiliateUrl || wrapUrl(raw.itemUrl);
   return {
     store: 'rakuten', storeName: '楽天市場', shopName: raw.shopName || '', title: raw.itemName || '',
     price, shippingFree: raw.postageFlag === 0, point, effectivePrice: price - point,
-    url: raw.affiliateUrl || raw.itemUrl, sponsored: Boolean(raw.affiliateUrl),
+    url, sponsored: Boolean(raw.affiliateUrl) || Boolean(url && url !== raw.itemUrl),
     image: (raw.mediumImageUrls?.[0]?.imageUrl || raw.mediumImageUrls?.[0] || '').toString().replace('_ex=128x128', '_ex=200x200'),
     reviewAverage: Number(raw.reviewAverage) || 0, reviewCount: Number(raw.reviewCount) || 0, jan: '',
   };

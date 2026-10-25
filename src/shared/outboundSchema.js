@@ -1,5 +1,6 @@
 import { SERVICE_IDS } from '../services/catalog.js';
 import { TRAVEL_PROVIDERS } from '../travel/providers.js';
+import { AREA_PAGES, SIM_PAIRS } from '../services/pages.js';
 
 // First-party, cookie-free event logger for deliberate outbound clicks.
 // No IP, user agent, session IDs, search terms, destination URLs or query strings.
@@ -27,19 +28,24 @@ export const PAGE_IDS = Object.freeze({
   '/about/': 'about', '/editorial-policy/': 'editorial-policy', '/privacy/': 'privacy',
   '/': 'home', '/compare/': 'compare', '/tools/': 'tools', '/life/': 'life', '/sim/': 'sim', '/hikari/': 'hikari',
   '/card/': 'card', '/hoken/': 'hoken', '/travel/': 'travel', '/guides/travel-budget/': 'guide-travel-budget', '/guides/website-tools/': 'guide-website-tools',
+  '/guides/hotel-cancellation/': 'guide-hotel-cancellation', '/guides/lodging-tax/': 'guide-lodging-tax', '/guides/long-weekends/': 'guide-long-weekends',
+  ...Object.fromEntries(SIM_PAIRS.map(pair => [pair.path, 'sim-vs-' + pair.slug])),
+  ...Object.fromEntries(AREA_PAGES.map(page => [page.path, 'hikari-area-' + page.area])),
 });
+// Keep historical aggregate IDs readable; new events use registered page IDs.
+const VALID_PAGE_IDS = new Set([...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area']);
 export function validViewEvent(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return false;
-  return body.event === 'view' && [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(body.page) && Object.keys(body).every(key => ['event', 'page'].includes(key));
+  return body.event === 'view' && validPageId(body.page) && Object.keys(body).every(key => ['event', 'page'].includes(key));
 }
 
 export function pageId(path) {
-  return PAGE_IDS[path] || (/^\/sim\/vs\/[a-z0-9-]+\/$/.test(path) ? 'sim-vs' : /^\/hikari\/area\/[a-z]+\/$/.test(path) ? 'hikari-area' : null);
+  return Object.hasOwn(PAGE_IDS, path) ? PAGE_IDS[path] : null;
 }
 export function validPageId(page) {
-  return [...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area'].includes(page);
+  return VALID_PAGE_IDS.has(page);
 }
-export const FUNNEL_ACTIONS = Object.freeze(['savings_complete', 'savings_compare', 'selector_change']);
+export const FUNNEL_ACTIONS = Object.freeze(['savings_complete', 'savings_compare', 'selector_change', 'guide_compare']);
 export function validFunnelEvent(body) {
   return Boolean(body && typeof body === 'object' && !Array.isArray(body) && body.event === 'funnel' && validPageId(body.page) && FUNNEL_ACTIONS.includes(body.action) && Object.keys(body).every(key => ['event', 'page', 'action'].includes(key)));
 }

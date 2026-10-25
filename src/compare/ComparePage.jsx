@@ -81,7 +81,8 @@ export default function ComparePage() {
   const main = same.length ? same : similar;
   const rest = same.length ? similar : [];
   const cheapest = main[0];
-  const stores = storeLinks(query.q || input, { env: ENV, reference: query.ref });
+  const searchTerm = query.q || query.jan || input.trim();
+  const stores = storeLinks(searchTerm, { env: ENV, reference: query.ref });
   const sources = state.data?.sources || {};
 
   return <div className="cp-page">
@@ -126,7 +127,7 @@ export default function ComparePage() {
             <div><span>価格の幅</span><strong>{yen(Math.min(...main.map(o => o.effectivePrice)))}〜{yen(Math.max(...main.map(o => o.effectivePrice)))}</strong><small>{main.length}件の出品</small></div>
             <div><span>比較したショップ</span><strong>{[sources.rakuten === 'ok' && '楽天', sources.yahoo === 'ok' && 'Yahoo!'].filter(Boolean).join('・') || '—'}</strong><small>{sources.yahoo === 'disabled' ? 'Yahoo!は価格自動取得の準備中' : 'APIで取得した実際の価格'}</small></div>
           </div>}
-          {cheapest && <div className="cp-next-step"><strong>{cheapest.storeName}で販売条件を確認</strong><p>表示価格は送料や個別のクーポン適用後の総額ではありません。購入前に型番・送料・納期・返品条件を確認してください。</p><a className="vl-primary" href={cheapest.url} target="_blank" rel={cheapest.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'products', merchant: cheapest.store === 'yahoo' ? 'yahoo-shopping' : 'rakuten', placement: 'compare-top-offer', sponsored: cheapest.sponsored })}>この出品の価格・在庫を確認 ↗{cheapest.sponsored && <small>PR</small>}</a></div>}
+          {cheapest && <div className="cp-next-step"><strong>{cheapest.storeName}で販売条件を確認</strong><p>型番・JANによる照合は、色・容量・新品／中古・付属品の一致を保証しません。表示価格は送料や個別のクーポン適用後の総額ではありません。購入前に型番・送料・納期・返品条件を確認してください。</p><a className="vl-primary" href={cheapest.url} target="_blank" rel={cheapest.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'products', merchant: cheapest.store === 'yahoo' ? 'yahoo-shopping' : 'rakuten', placement: 'compare-top-offer', sponsored: cheapest.sponsored })}>この出品の価格・在庫を確認 ↗{cheapest.sponsored && <small>PR</small>}</a></div>}
           {!state.loading && state.data && !same.length && main.length > 0 && <p className="cp-note">型番が一致する出品が見つからなかったため、近い商品を表示しています。型番やJANコードで検索すると精度が上がります。</p>}
           {main.length > 0 && <ol className="cp-offers">{main.slice(0, 15).map((offer, index) => <OfferRow key={offer.store + offer.url} offer={offer} rank={index + 1} cheapest={index === 0} />)}</ol>}
           {!state.loading && state.data && offers.length === 0 && <p className="cp-muted">{Object.values(sources).some(status => status === 'ok') ? '今回の取得結果に表示できる出品がありません。下のショップでも確認できます。' : '現在はショップの価格を自動取得できません。各ショップの検索結果で価格・在庫を直接確認してください。'}</p>}
@@ -137,7 +138,7 @@ export default function ComparePage() {
           <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 迷ったらAIコンシェルジュに相談</button>
         </section>}
 
-        {(query.q || input.trim()) && <section className="cp-stores">
+        {searchTerm && <section className="cp-stores">
           <h2>ほかのショップでも探す</h2>
           <p>同じキーワードの検索結果を開きます。これらのショップは価格を自動取得していないため、価格・送料はリンク先で確認してください。</p>
           {Object.entries(MERCHANT_KINDS).map(([kind, label]) => {

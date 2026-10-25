@@ -27,7 +27,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
   const pages = new Map(), placements = new Map(), merchants = new Map();
   let unattributedClicks = 0, ignoredRecords = 0, includedRecords = 0;
   const rowFor = page => {
-    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0 });
+    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0 });
     return pages.get(page);
   };
   for (const record of events) {
@@ -51,7 +51,8 @@ export function revenueReport(events, { from, to, finance } = {}) {
       placements.get(key).clicks++;
     } else if (type === 'hikaku_funnel' && validFunnelEvent({ event: 'funnel', ...fields })) {
       const row = rowFor(fields.page);
-      row[fields.action === 'savings_complete' ? 'savingsCompleted' : fields.action === 'savings_compare' ? 'savingsComparisons' : 'selectorChanges']++;
+      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons' }[fields.action];
+      row[counter]++;
     } else { ignoredRecords++; continue; }
     includedRecords++;
   }
@@ -69,6 +70,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
     nextActions.push({ action: 'review_referral_setup', merchant: merchant.merchant, officialClicks: merchant.officialClicks, variable: affiliateEnvKey(merchant.merchant), message: '通常リンクへの送客が記録されています。提携の可否と承認済み素材の設定を確認してください。報酬の取り逃し額を示すものではありません。' });
   }
   for (const row of pages.values()) if (row.savingsCompleted > 0 && row.savingsComparisons === 0 && row.savingsDirectClicks === 0) nextActions.push({ action: 'review_savings_next_step', page: row.page, completedInteractions: row.savingsCompleted, message: '診断完了はありますが、結果からの移動が記録されていません。表示と計測を確認してください。利用者単位の離脱率ではありません。' });
+  for (const row of pages.values()) if (row.page.startsWith('guide-') && row.views > 0 && row.guideComparisons === 0 && row.outboundClicks === 0) nextActions.push({ action: 'review_guide_next_step', page: row.page, views: row.views, message: '記事の閲覧はありますが比較・予約先への移動が記録されていません。記事の目的と次の手順、計測の欠損を確認してください。' });
   return {
     interval: { from: from || null, to: to || null, endExclusive: true }, includedRecords, ignoredRecords, unattributedClicks,
     pages: [...pages.values()].map(row => ({ ...row, outboundClicksPer100Views: row.views ? Math.round(row.outboundClicks / row.views * 10000) / 100 : null })),

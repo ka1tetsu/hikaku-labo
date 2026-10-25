@@ -41,7 +41,7 @@ test('comparison handoff validates each parameter against the selector enums', (
 
 test('page attribution and funnel schema reject identifiers and financial inputs', () => {
   assert.equal(pageId('/compare/'),'compare');
-  assert.equal(pageId('/hikari/area/kansai/'),'hikari-area');
+  assert.equal(pageId('/hikari/area/kansai/'),'hikari-area-kansai');
   assert.equal(pageId('/private/'),null);
   const event = {event:'funnel',page:'home',action:'savings_complete'};
   assert.equal(validFunnelEvent(event),true);

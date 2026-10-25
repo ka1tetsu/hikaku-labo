@@ -6,7 +6,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: '0 3 * * 1'  # weekly, Monday 12:00 JST
+    - cron: '0 3 * * *'  # daily, 12:00 JST
 
 permissions:
   contents: read
@@ -102,21 +102,20 @@ jobs:
               message = json.dumps(result, ensure_ascii=True).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
               print('::notice title=Vivlica domain inspection::' + message)
       - name: Audit live revenue readiness
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
-        run: npm run audit:live -- --origin https://hikaku-labo.vercel.app --output /tmp/vivlica-live-revenue.json
+        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
+        run: npm run audit:live -- --origin https://hikaku-labo.vercel.app --output /tmp/vivlica-live-revenue.json --summary "$GITHUB_STEP_SUMMARY" --require-monetization
       - name: Save live revenue audit
-        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule')
+        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
         uses: actions/upload-artifact@v4
         with:
           name: live-revenue-readiness
           path: /tmp/vivlica-live-revenue.json
-          retention-days: 14
+          retention-days: 30
           if-no-files-found: error
       - name: Audit production npm dependencies
         run: npm audit --omit=dev --audit-level=high
       - name: Check advertising setup (not actual revenue)
         if: always()
+        env:
+          SITE_ORIGIN: https://hikaku-labo.vercel.app
         run: node scripts/audit-affiliate.mjs
-      - name: Require approved ads before claiming monetization
-        if: always() && github.event_name == 'workflow_dispatch'
-        run: node scripts/audit-affiliate.mjs --require-placements
