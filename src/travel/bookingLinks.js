@@ -55,7 +55,7 @@ export function addDays(iso, days) {
   const [y, m, d] = iso.split('-').map(Number);
   return isoDate(new Date(y, m - 1, d + days));
 }
-const validIso = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value + 'T00:00:00').getTime());
+const validIso = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + 'T00:00:00Z')) && new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value;
 // Fill missing / invalid / reversed dates with sensible defaults (≈1 month ahead).
 export function tripDates({ depart, ret, nights = 2, today = new Date() } = {}) {
   const start = validIso(depart) ? depart : addDays(isoDate(today), 30);
@@ -64,7 +64,7 @@ export function tripDates({ depart, ret, nights = 2, today = new Date() } = {}) 
   return { depart: start, ret: end };
 }
 
-const clampAdults = n => Math.max(1, Math.min(9, Math.floor(Number(n) || 1)));
+const clampAdults = (n, max = 9) => Math.max(1, Math.min(max, Math.floor(Number(n) || 1)));
 
 function link(provider, label, href, sponsored, merchant, note = '') {
   return { provider, label, href, sponsored, merchant, note };
@@ -109,11 +109,12 @@ export function buildFlightLinks({ originCode = 'TYO', destination, depart, ret,
 
 // Hotel search links for a curated destination or a free-text place.
 export function buildStayLinks({ destination = null, query = '', checkin, checkout, nights, adults = 2, rooms = 1, config = travelLinkConfig() } = {}) {
+  if (nights !== undefined && Number(nights) === 0) return [];
   const nameJa = destination?.name || String(query).trim();
   const nameEn = destination?.nameEn || String(query).trim();
   if (!nameJa) return [];
   const dates = tripDates({ depart: checkin, ret: checkout, nights });
-  const people = clampAdults(adults);
+  const people = clampAdults(adults, 30);
   const roomCount = Math.max(1, Math.min(9, Math.floor(Number(rooms) || 1)));
   const out = [];
 
@@ -122,8 +123,8 @@ export function buildStayLinks({ destination = null, query = '', checkin, checko
     const domesticUrl = `https://kw.travel.rakuten.co.jp/keyword/Search.do?charset=utf-8&f_max=30&f_query=${kw}`;
     const overseasUrl = `https://kw.travel.rakuten.co.jp/keyword_overseas/Search.do?keywordsearchtype=0&charset=utf-8&f_max=30&f_query=${kw}`;
     // A free-text place could be in Japan or abroad, so offer both keyword searches.
-    if (!destination || destination.area === 'domestic') out.push(link('rakuten', destination ? '楽天トラベル' : '楽天トラベル（国内）', rakutenWrap(domesticUrl, config.rakutenId), true, 'rakuten-travel', '国内の宿・ホテルをキーワード検索'));
-    if (!destination || destination.area !== 'domestic') out.push(link('rakuten-overseas', destination ? '楽天トラベル' : '楽天トラベル（海外）', rakutenWrap(overseasUrl, config.rakutenId), true, 'rakuten-travel', '海外ホテルをキーワード検索'));
+    if (!destination || destination.area === 'domestic') out.push(link('rakuten', destination ? '楽天トラベル' : '楽天トラベル（国内）', rakutenWrap(domesticUrl, config.rakutenId), true, 'rakuten-travel', '行き先を引継ぎ。日付・人数・部屋数は予約先で設定'));
+    if (!destination || destination.area !== 'domestic') out.push(link('rakuten-overseas', destination ? '楽天トラベル' : '楽天トラベル（海外）', rakutenWrap(overseasUrl, config.rakutenId), true, 'rakuten-travel', '海外の行き先を引継ぎ。日付・人数・部屋数は予約先で設定'));
   }
 
   const booking = new URL('https://www.booking.com/searchresults.ja.html');
@@ -139,8 +140,8 @@ export function buildStayLinks({ destination = null, query = '', checkin, checko
 }
 
 // Destinations without an airport (or the departure city itself): rail + hotel packages.
-export function buildRailLinks({ destination, config = travelLinkConfig() } = {}) {
-  if (!config.rakutenId || destination?.area !== 'domestic') return [];
+export function buildRailLinks({ destination, nights, config = travelLinkConfig() } = {}) {
+  if (Number(nights) === 0 || !config.rakutenId || destination?.area !== 'domestic') return [];
   return [link('rakuten-jr', '楽天トラベル', rakutenWrap('https://travel.rakuten.co.jp/package/jr/', config.rakutenId), true, 'rakuten-travel', 'JR・新幹線＋宿のセットプラン')];
 }
 

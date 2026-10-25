@@ -10,6 +10,7 @@ import { openConcierge } from './shared/conciergeActions.js';
 import './shared/home-refresh.css';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
+import ProductSearchLinks from './components/ProductSearchLinks.jsx';
 import CategoryNav from './components/CategoryNav';
 import RankingSection from './components/RankingSection';
 import ArticleSection from './components/ArticleSection';
@@ -85,6 +86,7 @@ export default function App() {
     setHasSearched(true);
     setLoading(true);
     setError(null);
+    document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     try {
       const data = await searchRakutenItems(kw, genre, pg, { ...options, signal: controller.signal });
       if (controller.signal.aborted) return;
@@ -174,7 +176,6 @@ export default function App() {
 
   const handlePage = (newPage) => {
     doSearch(query, activeCategory?.genreId || '', newPage, smart?.options || {});
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const searchTitle = activeCategory
@@ -256,6 +257,8 @@ export default function App() {
           )}
         </div>
 
+        {hasSearched && <ProductSearchLinks keyword={query || activeCategory?.label || ''} />}
+
         {smart && (
           <div className="hl-smart-search" role="status">
             <p><strong>「{smart.original}」</strong>を、<strong>{smart.keyword}</strong>{smart.summary.filter(item => !item.startsWith('検索:') && item !== smart.keyword).length > 0 && <>（{smart.summary.filter(item => !item.startsWith('検索:')).join('・')}）</>}で検索しました。</p>
@@ -275,12 +278,7 @@ export default function App() {
         {error && (
           <div className="error-box">
             <strong>商品データを取得できませんでした。</strong>
-            <p>現在、商品情報を読み込めません。検索条件を変えるか、各ショップの検索結果で価格・在庫を確認してください。</p>
-            <div className="affiliate-bar-links">{[
-              ['rakuten', '楽天市場で探す', buildRakutenSearchAffiliateUrl(query || activeCategory?.label || 'おすすめ')],
-              ['amazon', 'Amazonで探す', buildAmazonAffiliateUrl(query || activeCategory?.label || 'おすすめ')],
-              ['yahoo-shopping', 'Yahoo!で探す', buildYahooAffiliateUrl(query || activeCategory?.label || 'おすすめ')],
-            ].map(([merchant, label, href]) => <a key={merchant} className="kw-link" href={href} target="_blank" rel="sponsored noopener noreferrer" onClick={() => recordOutboundClick({ section: 'products', merchant, placement: 'search-fallback', sponsored: true })}>{label} ↗ <small>PR</small></a>)}</div>
+            <p>現在、商品情報を読み込めません。上のショップ検索から価格・在庫を直接確認できます。</p>
             <button type="button" className="page-btn" onClick={() => doSearch(query || activeCategory?.label || 'おすすめ 人気', activeCategory?.genreId || '', page, smart?.options || {})}>もう一度読み込む</button>
           </div>
         )}

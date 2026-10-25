@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "SITE_ORIGIN=https://hikaku-labo.vercel.app npm run build",
+  "buildCommand": "SITE_ORIGIN=${SITE_ORIGIN:-https://hikaku-labo.vercel.app} npm run build",
   "outputDirectory": "dist",
   "redirects": [
     {

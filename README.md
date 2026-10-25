@@ -34,3 +34,5 @@ npm run audit:affiliate
 本番の収益導線とAPIの状態は `npm run audit:live` で確認できます。[実行状況と本人接続が必要な作業](docs/REVENUE-NEXT-ACTIONS.md) に外部設定の確認先をまとめています。
 
 [収益化の原因分析と改善](docs/MONETIZATION-ANALYSIS.md)に、再現した不具合、修正内容、毎日の自動監査、実績確認が必要な項目をまとめています。`audit:live -- --require-monetization` は、ページが応答していても収益導線に要対応があれば終了コード2を返します。
+
+追加の[短期利益改善と実行内容](docs/IMMEDIATE-PROFIT-PLAN.md)、[vivlica.comへの無料統合手順](docs/VIVLICA-FREE-DOMAIN.md)も参照してください。無料統合はホスティングの利用条件とAPI移植の有無を分けて判断します。

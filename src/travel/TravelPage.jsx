@@ -11,6 +11,9 @@ import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { runConciergeAction } from '../shared/conciergeActions.js';
 import GlobalTravelSearch from './GlobalTravelSearch.jsx';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
+import { BookingLinkList } from './BookingLinks.jsx';
+import { addDays, buildStayLinks, isoDate, tripDates } from './bookingLinks.js';
+import { LINK_CONFIG } from './linkConfig.js';
 import './travel.css';
 import '../shared/travel-refresh.css';
 import './travel-discovery.css';
@@ -65,6 +68,7 @@ export default function TravelPage() {
   const [selectedPlaceName, setSelectedPlaceName] = useState(() => param('place') || DESTINATION_CATALOG.find(item => item.id === param('destination'))?.name || '京都');
   const [travelers, setTravelers] = useState(2);
   const [rooms, setRooms] = useState(1);
+  const [depart, setDepart] = useState(() => tripDates().depart);
   const [perRoomNight, setPerRoomNight] = useState(15000);
   const [travelPerPerson, setTravelPerPerson] = useState(10000);
   const [foodPerPersonDay, setFoodPerPersonDay] = useState(3500);
@@ -77,6 +81,7 @@ export default function TravelPage() {
     { name: 'その他', total: budget.other, color: 'gray' },
   ];
   const place = DESTINATION_CATALOG.find(x => x.id === destination) || DESTINATION_CATALOG[0];
+  const stays = useMemo(() => buildStayLinks({ destination: place, checkin: depart, checkout: addDays(depart, nights), nights, adults: travelers, rooms, config: LINK_CONFIG }), [place, depart, nights, travelers, rooms]);
   const chooseDomestic = id => { const match = DESTINATION_CATALOG.find(item => item.id === id); if (!match) return; setDestination(id); setSelectedPlaceName(match.name); };
   // The concierge can open its suggested plan (or the budget planner) on the page.
   function showFromConcierge(action) {
@@ -102,11 +107,11 @@ export default function TravelPage() {
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
-      <TravelDiscovery selectedId={destination} onSelect={chooseDomestic} nights={nights} setNights={setNights} travelers={travelers} budget={budget}
+      <TravelDiscovery selectedId={destination} onSelect={chooseDomestic} nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} depart={depart} setDepart={setDepart} budget={budget}
         pace={pace} setPace={setPace} styleChoice={styleChoice} setStyleChoice={setStyleChoice}
         concierge={<Concierge onShow={showFromConcierge}/>}/>
       <GlobalTravelSearch showHero={false} onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName}
-        nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers}/>
+        nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} departureDate={depart} setDepartureDate={setDepart}/>
 
       <section className="tv-wrap tv-planner-section" id="planner">
         <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
@@ -132,13 +137,19 @@ export default function TravelPage() {
             <div className="tv-total">{yen(budget.total)}<small> / 全員分</small></div><p className="tv-per-person">1人あたり 約 <b>{yen(budget.perPerson)}</b></p>
             <div className="tv-cost-bar">{rows.map(row=><div key={row.name} className={'tv-bar-'+row.color} style={{flex:row.total, display:row.total?'block':'none'}}/>)}{budget.total===0&&<div style={{background:'#e2e6e0',flex:1}}/>}</div>
             <div className="tv-cost-breakdown">{rows.map(row=><div key={row.name}><span><i className={'tv-cost-dot tv-bar-'+row.color}/>{row.name}</span><strong>{yen(row.total)}</strong></div>)}</div>
-            <div className="tv-result-booking"><strong>次は宿泊プランを比較</strong><p>宿泊費の目安 {yen(budget.lodging)} に合わせて、日付・人数・食事条件などを揃えてチェック。</p><BookingAd variant="banner234"/></div>
+            {nights > 0 ? <div className="tv-result-booking"><strong>{place.name}の宿泊プランを確認</strong>
+              <p>{nights}泊・大人{travelers}名・{rooms}室。入力した宿泊予算は合計{yen(budget.lodging)}です。販売価格の検索条件に予算は自動反映されません。</p>
+              <label className="tv-booking-date">チェックイン<input type="date" value={depart} min={isoDate(new Date())} onChange={e => e.target.value && setDepart(e.target.value)} /></label>
+              <p>チェックアウト：{addDays(depart, nights)}。楽天は行き先のみ引き継ぎます。日付・人数・食事・支払総額を予約先で確認してください。</p>
+              <BookingLinkList links={stays} placement="budget-stays" />
+              {place.area === 'domestic' && <BookingAd variant="banner234"/>}
+            </div> : <div className="tv-result-booking"><strong>日帰りの予算です</strong><p>宿泊費は含みません。交通手段や現地での移動を確認してください。</p><a href="#booking">交通手段を確認する →</a></div>}
           </aside>
         </div>
       </section>
 
       <section className="tv-guide" id="guide"><div className="tv-wrap"><span className="tv-eyebrow">BEFORE YOU BOOK</span><h2>予約前に確かめたい、<br/>3つのチェックポイント。</h2><div className="tv-guide-cards">{ADVICE.map(item=><article key={item.number}><span>{item.number}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div></div></section>
-      <section className="tv-wrap tv-booking-cta"><div><span className="tv-eyebrow">FIND YOUR STAY</span><h2>実際の宿泊プランを、<br/>自分の条件で探そう。</h2><p>Yahoo!トラベルではエリア・宿泊日・人数などで探せます。表示価格やポイントの適用条件、キャンセル規定は予約前に公式サイトで確認してください。</p></div><BookingAd variant="banner300"/></section>
+      {nights > 0 && place.area === 'domestic' && <section className="tv-wrap tv-booking-cta"><div><span className="tv-eyebrow">FIND YOUR STAY</span><h2>実際の宿泊プランを、<br/>自分の条件で探そう。</h2><p>Yahoo!トラベルではエリア・宿泊日・人数などで探せます。表示価格やポイントの適用条件、キャンセル規定は予約前に公式サイトで確認してください。</p></div><BookingAd variant="banner300"/></section>}
       <div className="tv-wrap tv-editorial-link"><div><strong>予約前に失敗しないための比較ガイド</strong><p>宿泊費・交通費・食費に加えて、支払総額やキャンセル条件も確認。</p></div><a href="/guides/travel-budget/">宿泊予約のチェックリストを見る ↗</a></div>
       <section className="tv-wrap tv-faq"><span className="tv-eyebrow">Q & A</span><h2>宿泊予約について</h2>
         <details><summary>表示された料金は最新の宿泊料金ですか？</summary><p>いいえ。入力した単価をもとに計算した予算の目安です。実際のプラン価格、空室、ポイント適用条件は予約サイトでご確認ください。</p></details>

@@ -30,7 +30,7 @@ export const TRAVEL_PROVIDERS=Object.freeze([
 export const APPROVED_TRAVEL_PARTNER_LINKS=Object.freeze({
   // example: 'exact-unmodified-link-issued-by-the-approved-program',
 });
-export function providerTarget(provider){
+export function providerTarget(provider, { stayLinks = [] } = {}){
   const approved=APPROVED_TRAVEL_PARTNER_LINKS[provider.id];
   if(typeof approved==='string'){
     try{
@@ -38,6 +38,8 @@ export function providerTarget(provider){
       if(url.protocol==='https:'&&!url.username&&!url.password)return {url:url.href,sponsored:true};
     }catch{ /* invalid partner URL => official homepage */ }
   }
+  const stay = provider.type === 'hotel' && stayLinks.find(item => item.merchant === provider.id);
+  if (stay) return { url: stay.href, sponsored: stay.sponsored, note: stay.note };
   return {url:provider.url,sponsored:false};
 }
 export const TRAVEL_PROVIDER_TYPES=Object.freeze([

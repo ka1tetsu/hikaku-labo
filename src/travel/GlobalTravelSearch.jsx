@@ -2,16 +2,17 @@ import { useMemo, useState } from 'react';
 import { ALL_TRAVEL_DESTINATIONS, autocompleteDestinations, findDestination, parseTravelQuery, buildGeneralItinerary } from './globalSearch.js';
 import { TRAVEL_PROVIDERS, TRAVEL_PROVIDER_TYPES, providerTarget } from './providers.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
+import { buildStayLinks } from './bookingLinks.js';
+import { LINK_CONFIG } from './linkConfig.js';
 import './global-travel.css';
 
 const yen=n=>'¥'+n.toLocaleString('ja-JP');
 const LOCAL_IATA={tokyo:'TYO',osaka:'OSA',sapporo:'SPK',fukuoka:'FUK',naha:'OKA',niigata:'KIJ',nagoya:'NGO',sendai:'SDJ',hakodate:'HKD',hiroshima:'HIJ',nagasaki:'NGS'};
 
-export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, showHero = true }) {
+export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, rooms, departureDate, setDepartureDate, showHero = true }) {
   const [query,setQuery]=useState('');
   const [parsed,setParsed]=useState(null);
   const [origin,setOrigin]=useState('東京');
-  const [departureDate,setDepartureDate]=useState('');
   const [returnDate,setReturnDate]=useState('');
   const [maxBudget,setMaxBudget]=useState('');
   const [nonstop,setNonstop]=useState(false);
@@ -26,6 +27,10 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
   const [fares,setFares]=useState(null);
   const [loadingFares,setLoadingFares]=useState(false);
   const location=useMemo(()=>findDestination(destination),[destination]);
+  const stayLinks = useMemo(() => buildStayLinks({
+    destination: location ? { ...location, area: location.area || (location.international ? 'overseas' : 'domestic') } : null,
+    query: destination, checkin: departureDate, checkout: returnDate || undefined, nights, adults: travelers, rooms, config: LINK_CONFIG,
+  }).filter(link => location || link.merchant !== 'rakuten-travel'), [location, destination, departureDate, returnDate, nights, travelers, rooms]);
   const supported=useMemo(()=>ALL_TRAVEL_DESTINATIONS.filter(d=>d.country!=='日本'),[]);
   const suggestions=useMemo(()=>autocompleteDestinations(destination,6),[destination]);
   const providers=useMemo(()=>TRAVEL_PROVIDERS.filter(p=>p.type===category),[category]);
@@ -59,7 +64,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
   function choosePlace(item) {
     setDestination(item.name);
     setFares(null);
-    if(!item.international && onDomesticDestination)onDomesticDestination(item.id);
+    if(onDomesticDestination)onDomesticDestination(item.id);
   }
   function summaryText(){
     return [
@@ -175,10 +180,10 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
       <div className="gx-type-tabs" role="tablist" aria-label="旅行サービスの分類">{TRAVEL_PROVIDER_TYPES.map(type=>
         <button role="tab" aria-selected={category===type.id} key={type.id} type="button" onClick={()=>{setCategory(type.id);setFares(null);}} className={category===type.id?'active':''}>{type.emoji} {type.label} <small>{TRAVEL_PROVIDERS.filter(p=>p.type===type.id).length}社</small></button>)}</div>
       <div className="gx-provider-grid">{providers.map(provider=>{
-        const target=providerTarget(provider);
+        const target=providerTarget(provider, { stayLinks });
         return <article key={provider.id} className="gx-provider-card">
           <div className="gx-provider-top"><span className="gx-provider-avatar">{provider.name.slice(0,1)}</span><div><strong>{provider.name}</strong><small>{provider.capabilities.join('・')}</small></div></div>
-          <p>公式サイトに移動し、上の検索条件で最終支払額を確認。</p>
+          <p>{target.note || '公式サイトに移動し、上の検索条件を設定して最終支払額を確認。'}</p>
           <div className="gx-provider-bottom"><span>{target.sponsored?'PR・成果報酬リンク':'公式リンク / 報酬計測なし'}</span>
             <a href={target.url} target="_blank" rel={target.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
               onClick={()=>providerClick(provider,target.sponsored)}>{target.sponsored?'提携ページを見る':'公式サイトで調べる'} ↗</a></div>

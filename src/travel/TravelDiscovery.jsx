@@ -15,7 +15,7 @@ const PAGE = 12;
 const placeLabel = d => d.area==='domestic' ? '国内・'+d.region : (countryByCode(d.country)?.name||d.region);
 const costLabel = level => '¥'.repeat(level)+'·'.repeat(5-level);
 
-export default function TravelDiscovery({ selectedId, onSelect, nights, setNights, travelers, budget, pace, setPace, styleChoice, setStyleChoice, concierge }) {
+export default function TravelDiscovery({ selectedId, onSelect, nights, setNights, travelers, setTravelers, rooms, setRooms, depart, setDepart, budget, pace, setPace, styleChoice, setStyleChoice, concierge }) {
   const [area,setArea] = useState('all');
   const [region,setRegion] = useState('すべて');
   const [scope,setScope] = useState(null);
@@ -95,6 +95,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           <h1 id="tvx-title">世界中から、<br/><em>ぴったりの旅</em>を見つけよう。</h1>
           <p className="tvx-hero-lead">国内も海外も、都市名・国名・名所・「やりたいこと」で検索。AIコンシェルジュに相談すれば、モデルコースから航空券・ホテルの比較、旅の予算までひとつの画面で。</p>
           <TravelSearchBox onDestination={goToDestination} onScope={applyScope} onExternal={setExternal}/>
+          <nav className="tv-booking-shortcuts" aria-label="旅行先が決まっている方へ"><a href="#booking">宿・航空券を探す →</a><a href="#planner">旅行予算を計算する →</a></nav>
           {external&&<div className="tvw-external" role="region" aria-label="掲載外の場所の検索">
             <div className="tvw-external-head"><strong>「{external}」を世界中の予約サイトで検索</strong><button type="button" onClick={()=>setExternal('')} aria-label="閉じる">×</button></div>
             <p>編集部のモデルコースは未掲載の場所です。情報を作り話で補わず、宿・航空券・地図を直接検索できるリンクを用意しました。</p>
@@ -227,7 +228,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           </div>)}</div>
           <div className="tvx-itinerary-source"><span>現地で確認：</span><a href={destination.source} target="_blank" rel="noopener noreferrer">{destination.sourceLabel} ↗</a><span>{destination.note}</span></div>
         </div>
-        <BookingHub key={destination.id} destination={destination} nights={nights} travelers={travelers}/>
+        <BookingHub key={destination.id} destination={destination} nights={nights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} depart={depart} setDepart={setDepart}/>
         <div className="tvx-plan-bottom">
           <div><strong>旅費も一緒に考える。</strong><p>この旅を実現するための宿泊費・交通費を、ご自身の予算から計算できます。</p></div>
           <a href="#planner" className="tvx-plan-budget-link">この旅の予算を計算する →</a>

@@ -57,3 +57,9 @@
 .tv-page .tv-editorial-link p{font-size:13px;margin:7px 0 0;color:#5b7965}
 .tv-page .tv-editorial-link a{background:#166449;color:#fff!important;border-radius:9px;padding:12px 17px;font-size:13px;font-weight:850;white-space:nowrap;text-decoration:none}
 @media(max-width:670px){.tv-page .tv-editorial-link{flex-direction:column;align-items:stretch;padding:20px}.tv-page .tv-editorial-link a{text-align:center;white-space:normal}}
+.tv-booking-shortcuts{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.tv-booking-shortcuts a{display:inline-flex;align-items:center;min-height:44px;border:1px solid #bad2c4;border-radius:8px;padding:10px 14px;color:#155f48;background:#fff;font-size:13px;font-weight:750;text-decoration:none}
+.tv-booking-date{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;margin:14px 0}
+.tv-booking-date input{box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:10px;border:1px solid #c4d9ca;border-radius:7px;background:#fff;color:#234c35;font:inherit}
+.tv-result-booking .tvw-links{margin:12px 0}
+.tv-result-booking .tvw-links a{min-width:0;overflow-wrap:anywhere}
