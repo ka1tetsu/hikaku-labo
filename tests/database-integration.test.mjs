@@ -10,6 +10,7 @@ test('every database page, asset and API prefix maps to the existing service wit
   const { rewrites } = databaseRoutes(manifest);
   for (const path of ['/database', '/screener', '/company', '/osint', '/signals', '/data', '/_next', '/api/v1', '/api/health', '/api/osint', '/v1', '/mcp']) {
     assert.ok(rewrites.some(rule => rule.source === path + '/:path*' && rule.destination === manifest.upstream + path + '/:path*'), path);
+    if (path !== manifest.entry) assert.ok(rewrites.some(rule => rule.source === path && rule.destination === manifest.upstream + path), 'bare ' + path);
   }
   const roots = new Set(rewrites.filter(rule => !rule.has).map(rule => rule.source));
   for (const path of ['/', '/compare', '/tools', '/travel', '/life', '/sim', '/hikari', '/card', '/hoken', '/about', '/privacy', '/api/search', '/api/track', '/api/compare']) assert.equal(roots.has(path + '/:path*'), false, path);

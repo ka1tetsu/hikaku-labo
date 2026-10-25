@@ -14,9 +14,17 @@ export function databaseRoutes(manifest) {
       // a simultaneous release of the independent database application.
       { source: entry, destination: upstream + '/' },
       ...['q', 'status'].map(key => ({ source: '/', has: [{ type: 'query', key }], destination: upstream + '/' })),
-      ...publicPrefixes.map(prefix => ({ source: prefix + '/:path*', destination: upstream + prefix + '/:path*' })),
+      // Match the bare prefix separately: an empty wildcard otherwise adds a
+      // trailing slash, which changes Next's exact public API paths.
+      ...publicPrefixes.flatMap(prefix => [
+        { source: prefix, destination: upstream + prefix },
+        { source: prefix + '/:path*', destination: upstream + prefix + '/:path*' },
+      ]),
     ],
-    redirects: privatePaths.map(prefix => ({ source: prefix + '/:path*', destination: upstream + prefix + '/:path*', permanent: false })),
+    redirects: privatePaths.flatMap(prefix => [
+      { source: prefix, destination: upstream + prefix, permanent: false },
+      { source: prefix + '/:path*', destination: upstream + prefix + '/:path*', permanent: false },
+    ]),
     headers: privatePaths.map(prefix => ({ source: prefix + '/:path*', headers: [{ key: 'Cache-Control', value: 'no-store' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }] })),
   };
 }
