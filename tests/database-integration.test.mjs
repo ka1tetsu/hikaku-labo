@@ -17,7 +17,7 @@ test('every database page, asset and API prefix maps to the existing service wit
   assert.equal(rewrites.some(rule => rule.source === '/'), false);
   for (const key of ['q', 'status']) assert.deepEqual(redirects.find(rule => rule.source === '/' && rule.has?.[0].key === key), { source: '/', has: [{ type: 'query', key }], destination: '/database', permanent: false });
   assert.equal(rewrites.filter(rule => rule.source === '/database').length, 1);
-  assert.equal(rewrites.find(rule => rule.source === '/database').destination, manifest.upstream + '/');
+  assert.equal(rewrites.find(rule => rule.source === '/database').destination, manifest.upstream + '/?__vivlica_proxy=1');
   const sitemap = databaseSitemap(manifest);
   assert.match(sitemap, /<loc>https:\/\/vivlica.com\/database<\/loc>/);
   assert.doesNotMatch(sitemap, /workers\.dev|\/owner|\/billing|\/console/);

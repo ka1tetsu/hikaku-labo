@@ -237,7 +237,7 @@
   "rewrites": [
     {
       "source": "/database",
-      "destination": "https://vivlica.vivlica.workers.dev/"
+      "destination": "https://vivlica.vivlica.workers.dev/?__vivlica_proxy=1"
     },
     {
       "source": "/database/:path*",

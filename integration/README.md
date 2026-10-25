@@ -29,3 +29,9 @@ Cookieのスコープ、StripeのWebhook、署名用の秘密は変更しない�
 
 切り戻す場合は本変更を通常のGit revertで戻してVercelに公開する。
 Cloudflare WorkerやDBの削除、DNSの切り替えは不要。
+
+旧Workerトップの転送では、Vercelの取得先に `?__vivlica_proxy=1` を付ける。
+通常の旧トップへのGET/HEADは `https://vivlica.com/database` に308で転送するが、
+この中継リクエストは本文を返す。マーカーはルーティング専用で認証権限を付与しない。
+WorkerはNextへ渡す前にマーカーを除去する。検索クエリは維持する。
+先にVercel側を公開して中継を確認し、それからWorkerを公開する。

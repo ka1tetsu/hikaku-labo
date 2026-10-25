@@ -11,7 +11,10 @@ export function databaseRoutes(manifest) {
     rewrites: [
       // Use the already deployed landing page; integration must not depend on
       // a simultaneous release of the independent database application.
-      { source: entry, destination: upstream + '/' },
+      // Public visits to the old root redirect here. The origin marker keeps
+      // this backend fetch serving content instead of redirecting in a loop.
+      // It is not an authentication credential.
+      { source: entry, destination: upstream + '/?__vivlica_proxy=1' },
       // Match the bare prefix separately: an empty wildcard otherwise adds a
       // trailing slash, which changes Next's exact public API paths.
       ...publicPrefixes.flatMap(prefix => [
