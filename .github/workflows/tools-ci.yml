@@ -24,3 +24,7 @@ jobs:
       - run: npm run build
       - run: npm run verify:build
       - run: npm run audit:affiliate
+      - name: Check Cloudflare app and redirect deployments without publishing
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: npm run check:cloudflare

@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vivlica-hikaku-labo",
+  "main": "cloudflare/worker.js",
+  "compatibility_date": "2026-10-25",
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "keep_vars": true,
+  "build": { "command": "npm run build:cloudflare" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "force-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api", "/api/*"]
+  },
+  "routes": [{ "pattern": "vivlica.com", "custom_domain": true }],
+  "vars": { "SITE_URL": "https://vivlica.com" },
+  "observability": { "enabled": true, "head_sampling_rate": 1 }
+}
