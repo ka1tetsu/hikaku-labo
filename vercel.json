@@ -214,10 +214,6 @@
   ],
   "rewrites": [
     {
-      "source": "/database/sitemap.xml",
-      "destination": "https://vivlica.vivlica.workers.dev/sitemap.xml"
-    },
-    {
       "source": "/database",
       "destination": "https://vivlica.vivlica.workers.dev/"
     },
@@ -240,10 +236,6 @@
         }
       ],
       "destination": "https://vivlica.vivlica.workers.dev/"
-    },
-    {
-      "source": "/database",
-      "destination": "https://vivlica.vivlica.workers.dev/database"
     },
     {
       "source": "/database/:path*",

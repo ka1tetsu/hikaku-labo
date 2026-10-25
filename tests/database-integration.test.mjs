@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { databaseRoutes, syncDatabaseRoutes } from '../scripts/sync-database-routes.mjs';
+import { databaseRoutes, databaseSitemap, syncDatabaseRoutes } from '../scripts/sync-database-routes.mjs';
 
 const read = async path => JSON.parse(await readFile(new URL('../' + path, import.meta.url), 'utf8'));
 
@@ -15,8 +15,12 @@ test('every database page, asset and API prefix maps to the existing service wit
   const roots = new Set(rewrites.filter(rule => !rule.has).map(rule => rule.source));
   for (const path of ['/', '/compare', '/tools', '/travel', '/life', '/sim', '/hikari', '/card', '/hoken', '/about', '/privacy', '/api/search', '/api/track', '/api/compare']) assert.equal(roots.has(path + '/:path*'), false, path);
   assert.ok(rewrites.filter(rule => rule.source === '/').every(rule => rule.has?.length === 1 && ['q', 'status'].includes(rule.has[0].key)));
-  assert.equal(rewrites.find(rule => rule.source === '/database/sitemap.xml').destination, manifest.upstream + '/sitemap.xml');
+  assert.equal(rewrites.filter(rule => rule.source === '/database').length, 1);
   assert.equal(rewrites.find(rule => rule.source === '/database').destination, manifest.upstream + '/');
+  const sitemap = databaseSitemap(manifest);
+  assert.match(sitemap, /<loc>https:\/\/vivlica.com\/database<\/loc>/);
+  assert.doesNotMatch(sitemap, /workers\.dev|\/owner|\/billing|\/console/);
+  assert.equal(rewrites.some(rule => rule.source === manifest.sitemap), false);
 });
 
 test('private login and billing stay on the established authenticated origin with nonpersistent redirects', async () => {

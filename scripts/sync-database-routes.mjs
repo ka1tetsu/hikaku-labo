@@ -2,14 +2,13 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 export function databaseRoutes(manifest) {
-  const { upstream, entry, pages, resources, apis, private: privatePaths, sitemap } = manifest;
+  const { upstream, entry, pages, resources, apis, private: privatePaths } = manifest;
   const url = new URL(upstream);
   if (url.origin !== 'https://vivlica.vivlica.workers.dev' || url.href !== upstream + '/' || url.username || url.password) throw new Error('Unexpected database upstream');
   const publicPrefixes = [...pages, ...resources, ...apis];
   if (new Set([...publicPrefixes, ...privatePaths]).size !== publicPrefixes.length + privatePaths.length) throw new Error('Duplicate database routes');
   return {
     rewrites: [
-      { source: sitemap, destination: upstream + '/sitemap.xml' },
       // Use the already deployed landing page; integration must not depend on
       // a simultaneous release of the independent database application.
       { source: entry, destination: upstream + '/' },
@@ -17,7 +16,7 @@ export function databaseRoutes(manifest) {
       // Match the bare prefix separately: an empty wildcard otherwise adds a
       // trailing slash, which changes Next's exact public API paths.
       ...publicPrefixes.flatMap(prefix => [
-        { source: prefix, destination: upstream + prefix },
+        ...(prefix === entry ? [] : [{ source: prefix, destination: upstream + prefix }]),
         { source: prefix + '/:path*', destination: upstream + prefix + '/:path*' },
       ]),
     ],
@@ -29,10 +28,22 @@ export function databaseRoutes(manifest) {
   };
 }
 
+export function databaseSitemap(manifest) {
+  const paths = manifest.sitemapPages;
+  if (!paths?.length || new Set(paths).size !== paths.length || paths.some(path => !/^\/[a-z0-9/-]+$/.test(path) || !manifest.pages.some(prefix => path === prefix || path.startsWith(prefix + '/')))) throw new Error('Invalid database sitemap paths');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + paths.map(path => `  <url><loc>https://vivlica.com${path}</loc></url>`).join('\n') + '\n</urlset>\n';
+}
+
 export async function syncDatabaseRoutes({ check = false } = {}) {
   const root = new URL('../', import.meta.url);
   const manifest = JSON.parse(await readFile(new URL('integration/vividatabase.json', root), 'utf8'));
   const configPath = new URL('vercel.json', root);
+  if (manifest.sitemap !== '/sitemap-database.xml') throw new Error('Unexpected database sitemap filename');
+  const sitemapPath = new URL('public' + manifest.sitemap, root);
+  const sitemap = databaseSitemap(manifest);
+  const previousSitemap = await readFile(sitemapPath, 'utf8').catch(error => { if (error.code === 'ENOENT') return ''; throw error; });
+  if (check && sitemap !== previousSitemap) throw new Error('Run npm run sync:database-routes and commit the database sitemap');
+  if (!check && sitemap !== previousSitemap) await writeFile(sitemapPath, sitemap);
   const previous = await readFile(configPath, 'utf8'), config = JSON.parse(previous);
   const generated = databaseRoutes(manifest);
   // Keep existing Vivlica redirects and headers. Only replace this upstream's
