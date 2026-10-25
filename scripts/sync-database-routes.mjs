@@ -12,7 +12,6 @@ export function databaseRoutes(manifest) {
       // Use the already deployed landing page; integration must not depend on
       // a simultaneous release of the independent database application.
       { source: entry, destination: upstream + '/' },
-      ...['q', 'status'].map(key => ({ source: '/', has: [{ type: 'query', key }], destination: upstream + '/' })),
       // Match the bare prefix separately: an empty wildcard otherwise adds a
       // trailing slash, which changes Next's exact public API paths.
       ...publicPrefixes.flatMap(prefix => [
@@ -20,10 +19,15 @@ export function databaseRoutes(manifest) {
         { source: prefix + '/:path*', destination: upstream + prefix + '/:path*' },
       ]),
     ],
-    redirects: privatePaths.flatMap(prefix => [
+    // Vercel serves its static / before a rewrite. Redirect legacy search and
+    // membership-return URLs to the distinct entry, preserving the query.
+    redirects: [
+      ...['q', 'status'].map(key => ({ source: '/', has: [{ type: 'query', key }], destination: entry, permanent: false })),
+      ...privatePaths.flatMap(prefix => [
       { source: prefix, destination: upstream + prefix, permanent: false },
       { source: prefix + '/:path*', destination: upstream + prefix + '/:path*', permanent: false },
-    ]),
+      ]),
+    ],
     headers: privatePaths.map(prefix => ({ source: prefix + '/:path*', headers: [{ key: 'Cache-Control', value: 'no-store' }, { key: 'X-Robots-Tag', value: 'noindex, nofollow' }] })),
   };
 }
@@ -48,7 +52,7 @@ export async function syncDatabaseRoutes({ check = false } = {}) {
   const generated = databaseRoutes(manifest);
   // Keep existing Vivlica redirects and headers. Only replace this upstream's
   // generated rules; the manifest is the reviewable list of proxied paths.
-  config.redirects = [...(config.redirects || []).filter(rule => !rule.destination.startsWith(manifest.upstream + '/')), ...generated.redirects];
+  config.redirects = [...(config.redirects || []).filter(rule => !rule.destination.startsWith(manifest.upstream + '/') && !(rule.source === '/' && rule.destination === manifest.entry && rule.has?.some(condition => ['q', 'status'].includes(condition.key)))), ...generated.redirects];
   config.rewrites = [...(config.rewrites || []).filter(rule => !rule.destination.startsWith(manifest.upstream + '/')), ...generated.rewrites];
   const privateSources = new Set(generated.headers.map(rule => rule.source));
   config.headers = [...(config.headers || []).filter(rule => !privateSources.has(rule.source)), ...generated.headers];

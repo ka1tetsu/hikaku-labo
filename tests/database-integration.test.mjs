@@ -7,14 +7,15 @@ const read = async path => JSON.parse(await readFile(new URL('../' + path, impor
 
 test('every database page, asset and API prefix maps to the existing service without replacing comparison routes', async () => {
   const manifest = await read('integration/vividatabase.json');
-  const { rewrites } = databaseRoutes(manifest);
+  const { rewrites, redirects } = databaseRoutes(manifest);
   for (const path of ['/database', '/screener', '/company', '/osint', '/signals', '/data', '/_next', '/api/v1', '/api/health', '/api/osint', '/v1', '/mcp']) {
     assert.ok(rewrites.some(rule => rule.source === path + '/:path*' && rule.destination === manifest.upstream + path + '/:path*'), path);
     if (path !== manifest.entry) assert.ok(rewrites.some(rule => rule.source === path && rule.destination === manifest.upstream + path), 'bare ' + path);
   }
   const roots = new Set(rewrites.filter(rule => !rule.has).map(rule => rule.source));
   for (const path of ['/', '/compare', '/tools', '/travel', '/life', '/sim', '/hikari', '/card', '/hoken', '/about', '/privacy', '/api/search', '/api/track', '/api/compare']) assert.equal(roots.has(path + '/:path*'), false, path);
-  assert.ok(rewrites.filter(rule => rule.source === '/').every(rule => rule.has?.length === 1 && ['q', 'status'].includes(rule.has[0].key)));
+  assert.equal(rewrites.some(rule => rule.source === '/'), false);
+  for (const key of ['q', 'status']) assert.deepEqual(redirects.find(rule => rule.source === '/' && rule.has?.[0].key === key), { source: '/', has: [{ type: 'query', key }], destination: '/database', permanent: false });
   assert.equal(rewrites.filter(rule => rule.source === '/database').length, 1);
   assert.equal(rewrites.find(rule => rule.source === '/database').destination, manifest.upstream + '/');
   const sitemap = databaseSitemap(manifest);

@@ -27,6 +27,28 @@
       "permanent": true
     },
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "q"
+        }
+      ],
+      "destination": "/database",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "status"
+        }
+      ],
+      "destination": "/database",
+      "permanent": false
+    },
+    {
       "source": "/owner",
       "destination": "https://vivlica.vivlica.workers.dev/owner",
       "permanent": false
@@ -215,26 +237,6 @@
   "rewrites": [
     {
       "source": "/database",
-      "destination": "https://vivlica.vivlica.workers.dev/"
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "query",
-          "key": "q"
-        }
-      ],
-      "destination": "https://vivlica.vivlica.workers.dev/"
-    },
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "query",
-          "key": "status"
-        }
-      ],
       "destination": "https://vivlica.vivlica.workers.dev/"
     },
     {
