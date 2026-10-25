@@ -2,3 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Sitemap: https://vivlica.com/sitemap.xml
+Sitemap: https://vivlica.com/database/sitemap.xml
+Disallow: /owner
+Disallow: /console
+Disallow: /billing/

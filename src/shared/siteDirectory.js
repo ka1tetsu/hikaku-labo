@@ -4,5 +4,6 @@ export const SITE_SECTIONS = Object.freeze([
   { id: 'tools', href: '/tools/', icon: 'device-desktop', nav: 'ITサービス診断', heading: 'ITツールを選ぶ', description: 'Web制作・EC・WordPress向けサービスを予算や重視条件から比較。', metric: '02 / SOFTWARE', action: '無料で診断する' },
   { id: 'life', href: '/life/', icon: 'wallet', nav: '通信・お金', heading: 'スマホ・回線・カードを見直す', description: '格安SIM・光回線・クレジットカード・保険を、公式料金と条件で比較。毎月の固定費を見直せます。', metric: '03 / LIFE COSTS', action: '固定費を見直す' },
   { id: 'travel', href: '/travel/', icon: 'plane', nav: 'Vivlica Travel', heading: '旅行先を比べてプランを探す', description: '国内外81都市・約200の国と地域から検索。航空券・ホテル・体験の予約サイト比較と、AIコンシェルジュのモデルコース・予算提案が無料。', metric: '04 / TRAVEL', action: 'おすすめの旅を探す' },
+  { id: 'database', href: '/database', icon: 'chart-bar', nav: '企業データ', heading: '企業・開示データを調べる', description: 'vividatabaseの企業調査、株式スクリーニング、官公需・EDINETの出典付きデータ。公開情報を無料で確認でき、有料API・会員機能は別契約です。', metric: '05 / DATABASE', action: '企業データを調べる' },
 ]);
 export function isActiveSection(id) { return SITE_SECTIONS.some(x => x.id === id); }

@@ -1,0 +1,10 @@
+{
+  "repository": "ka1tetsu/vividatabase",
+  "upstream": "https://vivlica.vivlica.workers.dev",
+  "entry": "/database",
+  "pages": ["/database", "/discover", "/osint", "/signals", "/reports", "/signals-ai", "/screener", "/map", "/rankings", "/company", "/data", "/quant", "/pricing", "/partners", "/docs/api", "/legal"],
+  "resources": ["/_next", "/samples", "/feed.xml", "/r", "/v1", "/mcp"],
+  "apis": ["/api/audit", "/api/companies", "/api/edinet", "/api/health", "/api/leads", "/api/metrics", "/api/osint", "/api/signals", "/api/status", "/api/sync", "/api/v1", "/api/mcp"],
+  "private": ["/owner", "/console", "/billing", "/api/owner", "/api/console", "/api/billing", "/api/membership"],
+  "sitemap": "/database/sitemap.xml"
+}

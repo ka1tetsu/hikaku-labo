@@ -96,7 +96,9 @@ test('IT tools use the same configurable approved referral links and official fa
 test('domain migration is host-scoped and cannot loop on Vivlica or redirect API paths locally', () => {
   const config=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
   assert.equal(config.outputDirectory,'dist');
-  for(const rule of config.redirects) {
+  const migrationRules = config.redirects.filter(rule => rule.destination === 'https://vivlica.com/:path*');
+  assert.equal(migrationRules.length, 2);
+  for(const rule of migrationRules) {
     assert.ok(rule.has.some(condition=>condition.type==='host'&&condition.value!=='vivlica.com'));
     assert.equal(rule.destination,'https://vivlica.com/:path*');
     assert.equal(rule.permanent,true);

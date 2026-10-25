@@ -20,6 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:all
+      - run: npm run sync:database-routes -- --check
       - run: npm run lint
       - run: npm run build
       - run: npm run verify:build

@@ -6,9 +6,9 @@ export default function SectionDirectory() {
       <div>
         <span className="hl-kicker"><span className="hl-kicker-dot"/> RESEARCH & COMPARISON</span>
         <h1 id="hl-directory-title">毎日の支出に、<em>納得できる選択</em>を。</h1>
-        <p>スマホ代を見直す、買い物を比べる、旅行を計画する。予算と使い方から選べる、{SITE_SECTIONS.length}つの無料比較ツール。</p>
+        <p>スマホ代を見直す、買い物を比べる、旅行を計画する、企業を調べる。目的に合わせて選べる、{SITE_SECTIONS.length}つの比較・調査サービス。</p>
       </div>
-      <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較カテゴリ</span><small>商品・IT・旅行・通信とお金</small></div>
+      <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較・調査カテゴリ</span><small>商品・IT・旅行・通信・企業データ</small></div>
     </div>
     <div className="hl-directory-start"><a href="#savings">スマホ代の年間差額を診断 →</a><a href="/compare/">型番で商品価格を比較 →</a></div>
     <div className="hl-directory-grid">

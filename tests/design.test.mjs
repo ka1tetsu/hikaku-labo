@@ -6,8 +6,8 @@ import { SITE_SECTIONS, isActiveSection } from '../src/shared/siteDirectory.js';
 const text = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
 test('all public sections have one shared route and Tabler icons', () => {
-  assert.deepEqual(SITE_SECTIONS.map(item => item.href), ['/', '/tools/', '/life/', '/travel/']);
-  assert.equal(new Set(SITE_SECTIONS.map(item => item.id)).size, 4);
+  assert.deepEqual(SITE_SECTIONS.map(item => item.href), ['/', '/tools/', '/life/', '/travel/', '/database']);
+  assert.equal(new Set(SITE_SECTIONS.map(item => item.id)).size, 5);
   for (const item of SITE_SECTIONS) {
     assert.equal(isActiveSection(item.id), true);
     assert.ok(existsSync(new URL('../public/icons/tabler/' + item.icon + '.svg', import.meta.url)));

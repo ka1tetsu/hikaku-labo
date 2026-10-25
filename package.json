@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "sync:database-routes": "node scripts/sync-database-routes.mjs",
     "build": "vite build && node scripts/prerender.mjs",
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
     "check:cloudflare": "wrangler deploy --dry-run --outdir /tmp/vivlica-cloudflare-bundle && wrangler deploy --config wrangler.www.json --dry-run --outdir /tmp/vivlica-cloudflare-www-bundle",

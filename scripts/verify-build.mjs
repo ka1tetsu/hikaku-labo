@@ -2,6 +2,10 @@
 import { readFile, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { siteOrigin, SITE_ORIGIN, LEGACY_ORIGIN } from '../src/shared/site.js';
+import { syncDatabaseRoutes } from './sync-database-routes.mjs';
+await syncDatabaseRoutes({ check: true });
+const database = JSON.parse(await readFile(new URL('../integration/vividatabase.json', import.meta.url), 'utf8'));
+const proxiedPaths = [...database.pages, ...database.resources];
 const origin = siteOrigin(process.env.SITE_ORIGIN || SITE_ORIGIN);
 const dist = new URL('../dist/', import.meta.url);
 const sitemap = await readFile(new URL('sitemap.xml', dist), 'utf8');
@@ -22,6 +26,8 @@ for (const value of urls) {
   for (const [, json] of ld) JSON.parse(json);
   for (const [, href] of html.matchAll(/(?:href|src)="(\/[^"?#]*)[?#]?[^\"]*"/g)) {
     if (href.startsWith('//') || href.startsWith('/api/')) continue;
+    // These links are served by the checked Vercel rewrites, not Vite files.
+    if (proxiedPaths.some(path => href === path || href.startsWith(path + '/'))) continue;
     const target = new URL(href.slice(1) + (href.endsWith('/') ? 'index.html' : ''), dist);
     try { await access(target); } catch { throw new Error(`Broken local reference ${href} in ${fileURLToPath(file)}`); }
   }
