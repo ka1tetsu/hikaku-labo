@@ -7,6 +7,7 @@ import { upstreamResponse } from '../server/upstream.js';
 import { fetchRakutenSearch } from './search.js';
 import { normalizeRakutenOffer, normalizeYahooOffer, rankOffers, summarizeOffers } from '../src/shared/priceCompare.js';
 import { RAKUTEN_AFFILIATE_ID } from '../src/api.js';
+import { compareBudget, withinCompareBudget } from '../src/shared/compareBudget.js';
 
 const YAHOO_ENDPOINT = 'https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch';
 const YAHOO_CLIENT_ID = process.env.YAHOO_SHOPPING_CLIENT_ID || '';
@@ -35,8 +36,8 @@ export function compareParams(query = {}) {
   return { q: clip(query.q, 80), ref: clip(query.ref, 200), jan };
 }
 
-async function rakutenOffers(q) {
-  const result = await fetchRakutenSearch({ keyword: q, genreId: '', page: 1, filters: { sort: '+itemPrice' } });
+async function rakutenOffers(q, budget) {
+  const result = await fetchRakutenSearch({ keyword: q, genreId: '', page: 1, filters: { sort: '+itemPrice', ...budget } });
   if (!result.ok) return { status: 'error', offers: [] };
   const data = JSON.parse(result.text);
   const items = (data.Items || []).map(entry => entry.Item ?? entry);
@@ -45,9 +46,11 @@ async function rakutenOffers(q) {
   return { status: 'ok', offers: items.map(item => normalizeRakutenOffer(item, wrapRakuten)) };
 }
 
-async function yahooOffers(q, jan) {
+async function yahooOffers(q, jan, budget) {
   if (!YAHOO_CLIENT_ID) return { status: 'disabled', offers: [] };
   const params = new URLSearchParams({ appid: YAHOO_CLIENT_ID, results: '30', sort: '+price', in_stock: 'true', condition: 'new', image_size: '146' });
+  if (budget.minPrice) params.set('price_from', budget.minPrice);
+  if (budget.maxPrice) params.set('price_to', budget.maxPrice);
   if (jan) params.set('jan_code', jan); else params.set('query', q);
   try {
     const response = await upstreamResponse(`${YAHOO_ENDPOINT}?${params}`, { headers: { 'User-Agent': 'hikaku-labo/1.0' } });
@@ -64,15 +67,18 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'method_not_allowed' });
   const { q, ref, jan } = compareParams(req.query);
   if (!q && !jan) return res.status(400).json({ error: 'q_or_jan_required' });
+  const budget = compareBudget(req.query);
+  if (budget.minPrice && budget.maxPrice && budget.minPrice > budget.maxPrice) return res.status(400).json({ error: 'invalid_price_range' });
 
   const [rakuten, yahoo] = await Promise.all([
-    rakutenOffers(q || jan).catch(() => ({ status: 'error', offers: [] })),
-    yahooOffers(q, jan),
+    rakutenOffers(q || jan, budget).catch(() => ({ status: 'error', offers: [] })),
+    yahooOffers(q, jan, budget),
   ]);
-  const offers = rankOffers([...rakuten.offers, ...yahoo.offers], ref || q, jan).slice(0, 40);
+  const offers = rankOffers([...rakuten.offers, ...yahoo.offers].filter(offer => withinCompareBudget(offer, budget)), ref || q, jan).slice(0, 40);
   res.setHeader('Cache-Control', [rakuten.status, yahoo.status].includes('ok') ? 's-maxage=300, stale-while-revalidate=300' : 'no-store');
   return res.status(200).json({
     query: q, reference: ref, jan,
+    ...budget,
     sources: { rakuten: rakuten.status, yahoo: yahoo.status },
     summary: summarizeOffers(offers),
     offers,

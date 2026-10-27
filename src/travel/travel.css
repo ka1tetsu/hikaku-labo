@@ -106,3 +106,21 @@ body {margin:0}
 @media(max-width:850px){.tv-header-inner{min-height:66px}.tv-navigation{gap:14px}.tv-navigation>a:nth-child(2),.tv-navigation>a:nth-child(3){display:none}.tv-hero-layout{grid-template-columns:1fr;gap:35px;padding:60px 0}.tv-art{max-width:520px;width:100%;justify-self:center}.tv-planner-grid{grid-template-columns:1fr}.tv-guide-cards{grid-template-columns:1fr}.tv-guide-cards article{min-height:auto}.tv-booking-cta{grid-template-columns:1fr;gap:25px}}
 @media(max-width:540px){.tv-wrap{width:calc(100% - 32px)}.tv-header-inner{gap:9px}.tv-logo{font-size:17px}.tv-logo small{display:none}.tv-navigation>a:not(.tv-header-button){display:none}.tv-header-button{font-size:10px;padding:9px 10px}.tv-hero h1{font-size:35px}.tv-hero-text>p{font-size:12px}.tv-art{height:240px}.tv-art-ticket{top:30px;padding:15px;width:68%}.tv-art-ticket>strong{font-size:16px;margin:12px 0}.tv-sun{width:100px;height:100px}.tv-art-star{font-size:52px}.tv-process{grid-template-columns:1fr;padding:15px 0}.tv-process>div{border:0;border-bottom:1px solid #e3ebe5;padding:10px 0}.tv-section-heading{display:block}.tv-free-chip{display:inline-block;margin-top:12px}.tv-planner-section{padding:40px 0 55px}.tv-form,.tv-result{padding:19px}.tv-fields{gap:14px 8px}.tv-number-field>span{font-size:11px}.tv-number-field select{padding:11px 5px;font-size:11px}.tv-total{font-size:36px}.tv-guide{padding:55px 0}.tv-booking-cta{padding:65px 0}.tv-footer-columns{grid-template-columns:1fr;gap:22px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.tv-hotel-ads{margin:18px 0;padding:18px;border:1px solid #d6e5da;border-radius:12px;background:#fff}
+.tv-hotel-ads h4{margin:0 0 8px;font-size:17px}
+.tv-hotel-ads>p{font-size:12px;line-height:1.7}
+.tv-hotel-ad{max-width:100%;overflow-x:auto;margin-top:12px}
+.tv-hotel-picker{margin-top:20px;padding-top:16px;border-top:1px solid #d6e5da}
+.tv-hotel-picker input[type=search]{display:block;max-width:100%;width:340px;margin:8px 0;padding:10px;border:1px solid #b9cdbf;border-radius:8px}
+.tv-hotel-picker p,.tv-hotel-compare p{font-size:12px;line-height:1.7}
+.tv-hotel-choices{display:grid;gap:10px;margin:14px 0}
+.tv-hotel-choices label{display:flex;gap:8px;align-items:center}
+.tv-hotel-table-scroll{overflow-x:auto;max-width:100%;margin:14px 0}
+.tv-hotel-compare table{border-collapse:collapse;min-width:500px;width:100%}
+.tv-hotel-compare caption{text-align:left;padding:8px;font-weight:700}
+.tv-hotel-compare th,.tv-hotel-compare td{border:1px solid #d6e5da;padding:12px;vertical-align:top;min-width:180px;text-align:left}
+.tv-hotel-compare th{background:#f2f8f4}
+.tv-hotel-compare input,.tv-hotel-compare textarea{width:100%;min-width:150px;box-sizing:border-box;padding:8px;border:1px solid #b9cdbf;border-radius:6px}
+.tv-hotel-compare textarea{min-height:85px}
+.tv-hotel-input-label{display:block;font-size:11px;margin-bottom:6px}
+.tv-hotel-compare button{margin-top:8px;border:1px solid #b9cdbf;border-radius:6px;background:#fff;padding:6px 10px;cursor:pointer}

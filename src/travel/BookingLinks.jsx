@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { ORIGINS, addDays, buildFlightLinks, buildRailLinks, buildStayLinks, isoDate } from './bookingLinks.js';
 import { LINK_CONFIG } from './linkConfig.js';
+import HotelAds from './HotelAds.jsx';
 
 export function BookingLinkList({ links, placement }) {
   if (!links?.length) return null;
@@ -54,7 +55,10 @@ export default function BookingHub({ destination, nights, travelers, setTraveler
     {activeTab === 'flights' && (flights.length
       ? <BookingLinkList links={flights} placement="hub-flights" />
       : <div className="tvw-hub-empty"><p>{destination.flight ? `${destination.name}は出発地と同じ空港エリアです。` : `${destination.name}には空港がありません（${destination.access}）。`}鉄道・バスでのアクセスがおすすめです。</p><BookingLinkList links={rail} placement="hub-rail" /></div>)}
-    {activeTab === 'stays' && <BookingLinkList links={stays} placement="hub-stays" />}
+    {activeTab === 'stays' && <>
+      <HotelAds destinationId={destination.id} nights={nights} travelers={adults} rooms={rooms} depart={depart} checkout={ret} />
+      <BookingLinkList links={stays} placement="hub-stays" />
+    </>}
     <AffiliateNote />
   </div>;
 }

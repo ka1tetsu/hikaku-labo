@@ -5,7 +5,7 @@ import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { MERCHANTS, MERCHANT_KINDS, storeLinks } from '../shared/merchants.js';
-import { parseProductRequest } from '../shared/productAdvisor.js';
+import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/compareBudget.js';
 import { openConcierge } from '../shared/conciergeActions.js';
 import './compare.css';
 
@@ -16,7 +16,7 @@ const ENV = import.meta.env;
 function readParams() {
   if (typeof window === 'undefined') return { q: '', ref: '', jan: '' };
   const params = new URLSearchParams(window.location.search);
-  return { q: params.get('q') || '', ref: params.get('ref') || '', jan: params.get('jan') || '' };
+  return { q: params.get('q') || '', ref: params.get('ref') || '', jan: params.get('jan') || '', ...compareBudget(Object.fromEntries(params)) };
 }
 
 function OfferRow({ offer, rank, cheapest }) {
@@ -50,7 +50,7 @@ export default function ComparePage() {
     let alive = true;
     const controller = new AbortController();
     const params = new URLSearchParams();
-    for (const key of ['q', 'ref', 'jan']) if (query[key]) params.set(key, query[key]);
+    for (const key of ['q', 'ref', 'jan', 'minPrice', 'maxPrice']) if (query[key]) params.set(key, query[key]);
     setState({ loading: true, data: null, error: '' });
     searchResponse('/api/compare?' + params, { signal: controller.signal })
       .then(response => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
@@ -64,9 +64,7 @@ export default function ComparePage() {
     const text = input.trim();
     if (!text) return;
     // "1万円以下のワイヤレスイヤホン" → search words; plain names stay as typed.
-    const request = parseProductRequest(text);
-    const q = request.need || request.maxPrice || request.minPrice ? request.keyword || text : text;
-    const next = { q, ref: '', jan: /^\d{8}$|^\d{13}$/.test(text) ? text : '' };
+    const next = comparisonInput(text);
     setQuery(next);
     setShowSimilar(false);
     const url = new URL(window.location.href);
@@ -75,7 +73,7 @@ export default function ComparePage() {
   }
   const pick = text => { setInput(text); setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
 
-  const offers = (state.data?.offers || []).filter(o => !freeOnly || o.shippingFree);
+  const offers = (state.data?.offers || []).filter(o => (!freeOnly || o.shippingFree) && withinCompareBudget(o, query));
   const same = offers.filter(o => o.sameProduct);
   const similar = offers.filter(o => !o.sameProduct);
   const main = same.length ? same : similar;
@@ -120,6 +118,7 @@ export default function ComparePage() {
               {state.data?.fetchedAt && <p>取得時刻：{new Date(state.data.fetchedAt).toLocaleString('ja-JP')}（価格・在庫は変動します）</p>}</div>
             <label className="cp-toggle"><input type="checkbox" checked={freeOnly} onChange={e => setFreeOnly(e.target.checked)} />送料無料のみ</label>
           </div>
+          {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
           {state.error && <p className="cp-error">{state.error}</p>}
           {cheapest && <div className="cp-summary">
