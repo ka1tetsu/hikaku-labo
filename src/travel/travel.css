@@ -124,3 +124,24 @@ body {margin:0}
 .tv-hotel-compare textarea{min-height:85px}
 .tv-hotel-input-label{display:block;font-size:11px;margin-bottom:6px}
 .tv-hotel-compare button{margin-top:8px;border:1px solid #b9cdbf;border-radius:6px;background:#fff;padding:6px 10px;cursor:pointer}
+.tv-stay-search{padding:28px;margin-top:24px;margin-bottom:24px;border:1px solid #b9cdbf;border-radius:16px;background:#fff;box-sizing:border-box}
+.tv-stay-search h2{margin:0 0 10px;font-size:clamp(22px,3vw,30px)}
+.tv-stay-search p{font-size:13px;line-height:1.8}
+.tv-stay-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}
+.tv-stay-form label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;min-width:0}
+.tv-stay-form input,.tv-stay-form select,.tv-stay-results-head select{width:100%;box-sizing:border-box;min-width:0;padding:10px;border:1px solid #b9cdbf;border-radius:8px;background:#fff;color:#182f27}
+.tv-stay-form .tv-stay-check{flex-direction:row;align-items:center}
+.tv-stay-check input{width:auto}
+.tv-stay-form button{grid-column:span 2;background:#155f48;color:#fff;border:0;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;min-height:44px}
+.tv-stay-form button:disabled{opacity:.65;cursor:wait}
+.tv-stay-note{color:#586d61}
+.tv-stay-results-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.tv-stay-table{border-collapse:collapse;width:100%;min-width:750px;font-size:13px}
+.tv-stay-table caption{text-align:left;padding:10px;font-weight:700}
+.tv-stay-table th,.tv-stay-table td{padding:14px;border:1px solid #d6e5da;text-align:left;vertical-align:top;min-width:100px}
+.tv-stay-table th{background:#f2f8f4}
+.tv-stay-table small{display:block;font-weight:400;margin-top:6px;line-height:1.7}
+.tv-stay-table a{color:#155f48;text-decoration:underline}
+.tv-stay-alternatives{margin-top:22px;border-top:1px solid #d6e5da;padding-top:12px}
+.tv-stay-search input:focus-visible,.tv-stay-search select:focus-visible,.tv-stay-search button:focus-visible,.tv-stay-search a:focus-visible{outline:3px solid #74c6a1;outline-offset:2px}
+@media(max-width:700px){.tv-stay-search{padding:18px}.tv-stay-form{grid-template-columns:repeat(2,minmax(0,1fr))}.tv-stay-form label:first-child{grid-column:1/-1}.tv-stay-form button{grid-column:1/-1}}

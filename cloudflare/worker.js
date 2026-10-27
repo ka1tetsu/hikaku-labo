@@ -3,6 +3,7 @@ import compare from '../api/compare.js';
 import track from '../api/track.js';
 import diagnostic from '../api/diag.js';
 import flightPrices from '../api/flight-prices.js';
+import stays from '../api/stays.js';
 import article from '../api/article.js';
 import reviewSummary from '../api/reviewSummary.js';
 import { runHandler } from './adapter.js';
@@ -10,6 +11,7 @@ import { runHandler } from './adapter.js';
 const routes = new Map([
   ['/api/search', search], ['/api/compare', compare], ['/api/track', track],
   ['/api/diag', diagnostic], ['/api/flight-prices', flightPrices],
+  ['/api/stays', stays],
   ['/api/article', article], ['/api/reviewSummary', reviewSummary],
 ]);
 

@@ -10,6 +10,7 @@ import Concierge from './Concierge.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { runConciergeAction } from '../shared/conciergeActions.js';
 import GlobalTravelSearch from './GlobalTravelSearch.jsx';
+import StaySearch from './StaySearch.jsx';
 import { travelAffiliateEnabled, YAHOO_TRAVEL_A8_CREATIVES } from './a8TravelAds.js';
 import { BookingLinkList } from './BookingLinks.jsx';
 import { addDays, buildStayLinks, isoDate, tripDates } from './bookingLinks.js';
@@ -109,7 +110,7 @@ export default function TravelPage() {
     <main id="main-content">
       <TravelDiscovery selectedId={destination} onSelect={chooseDomestic} nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} depart={depart} setDepart={setDepart} budget={budget}
         pace={pace} setPace={setPace} styleChoice={styleChoice} setStyleChoice={setStyleChoice}
-        concierge={<Concierge onShow={showFromConcierge}/>}/>
+        hotelSearch={<StaySearch />} concierge={<Concierge onShow={showFromConcierge}/>}/>
       <GlobalTravelSearch showHero={false} onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName}
         nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} departureDate={depart} setDepartureDate={setDepart}/>
 

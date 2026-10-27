@@ -21,6 +21,7 @@ npm run verify:build
 npm run audit:affiliate
 ```
 
+- 宿泊検索: `/travel/#stay-search`（国内・大人1室、日程・人数・朝食・温泉の条件で検索）。[接続と料金表示の範囲](docs/STAY-SEARCH.md)
 - 固定費診断: `/life/#savings`（トップページにも設置）
 - 比較: `/compare/`、`/sim/`、`/hikari/`、`/card/`、`/tools/`、`/travel/`
 - 比較方針: `/editorial-policy/`、`/about/`、`/privacy/`
