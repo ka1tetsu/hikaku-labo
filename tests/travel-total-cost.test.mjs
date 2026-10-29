@@ -57,7 +57,7 @@ test('travel page has the calculator with approved outbound referrals only',()=>
   const source=readFileSync(new URL('../src/travel/GlobalTravelSearch.jsx',import.meta.url),'utf8');
   const card=readFileSync(new URL('../src/travel/TotalCostComparator.jsx',import.meta.url),'utf8');
   assert.match(source,/TotalCostComparator/);
-  assert.match(card,/providerTarget/);
+  assert.match(card,/globalProviderTarget/);
   assert.match(card,/recordOutboundClick/);
   assert.match(card,/sponsored noopener noreferrer/);
   assert.match(card,/入力した候補/);
