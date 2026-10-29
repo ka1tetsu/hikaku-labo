@@ -86,6 +86,47 @@ try{
    await page.locator('.tvx-shortcuts button').filter({hasText:'京都'}).first().click();
    if(!page.url().includes('destination=kyoto'))throw Error('Choosing Kyoto did not update URL');
  });
+ await interaction('compact-mobile-concierge',{width:375,height:812},async page=>{
+   await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
+   const trigger=page.locator('.hcl-launcher');
+   await trigger.waitFor({timeout:6000});
+   const rect=await trigger.boundingBox();
+   if(!rect || rect.width>56 || rect.height>56)throw Error('Floating assistant blocks mobile comparison screen');
+   if((await trigger.getAttribute('aria-label'))!=='条件を相談')throw Error('Assistant has no mobile accessible name');
+   await trigger.click();
+   const dialog=page.getByRole('dialog',{name:'Vivlica 条件検索アシスタント'});
+   await dialog.waitFor({timeout:6000});
+   await page.keyboard.press('Escape');
+   if(await dialog.isVisible())throw Error('Escape failed to close assistant');
+ });
+ await interaction('cash-vs-points-shopping-order',{width:375,height:812},async page=>{
+   const makeOffer=(title,price,point,url)=>({
+     store:'rakuten',storeName:'楽天市場',shopName:'検証用の架空店',title,price,point,
+     effectivePrice:price-point,shippingFree:true,image:'',url,
+     sponsored:false,reviewCount:3,reviewAverage:4.2,sameProduct:true,match:95
+   });
+   await page.route('**/api/compare?**',async route=>{
+     const payload={
+       sources:{rakuten:'ok',yahoo:'disabled'},fetchedAt:'2026-10-29T06:00:00.000Z',
+       offers:[
+         makeOffer('WH-1000XM5 ポイント優先の例',45000,9000,'https://item.rakuten.co.jp/b/'),
+         makeOffer('WH-1000XM5 現金価格優先の例',40000,1000,'https://item.rakuten.co.jp/a/')
+       ]
+     };
+     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(payload)});
+   });
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   const rows=page.locator('.cp-offers .cp-offer');
+   await rows.first().waitFor({timeout:8000});
+   if(!(await rows.first().innerText()).includes('現金価格優先の例'))throw Error('Default is not cash-price-first');
+   const cash=await rows.first().locator('.cp-offer-price strong').innerText();
+   if(cash!=='¥40,000')throw Error('Purchase price was not shown as ¥40,000');
+   await page.locator('#cp-price-sort').selectOption('points');
+   if(!(await rows.first().innerText()).includes('ポイント優先の例'))throw Error('Points criterion did not reorder results');
+   if(!(await rows.first().innerText()).includes('参考額'))throw Error('Reward-adjusted value was not marked as an estimate');
+   if(!(await page.locator('.cp-criteria-note').innerText()).includes('購入時の支払額ではありません'))throw Error('Missing points disclaimer');
+   await page.locator('.cp-results').screenshot({path:path.join(out,'interaction-cash-vs-points.png'),animations:'disabled'});
+ });
  await interaction('price-search',{width:1440,height:900},async page=>{
    await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
    await page.locator('#cp-q').fill('WH-1000XM5');

@@ -43,9 +43,9 @@ export default function SiteConcierge({ section = 'site' }) {
         <ConciergeChat section={section} compact autoFocus={open} storageKey="hikaku-concierge" pending={pending} />
       </Suspense>
     </div>}
-    <button type="button" className={'hcl-launcher' + (open ? ' is-open' : '')} aria-expanded={open} aria-haspopup="dialog"
+    <button type="button" className={'hcl-launcher' + (open ? ' is-open' : '')} aria-expanded={open} aria-haspopup="dialog" aria-label={open ? "条件検索を閉じる" : "条件を相談"}
       onClick={() => { setOpen(value => !value); setLoaded(true); }}>
-      <span aria-hidden="true">{open ? '×' : '✳'}</span>{open ? '閉じる' : '条件を相談'}
+      <span aria-hidden="true">{open ? '×' : '✳'}</span><span className="hcl-launcher-label">{open ? '閉じる' : '条件を相談'}</span>
     </button>
   </div>;
 }
