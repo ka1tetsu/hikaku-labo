@@ -26,7 +26,6 @@ function normalizeFile(item){
   let p=String(item.file||item.path||item.filename||item.location?.file||item.source?.file||'unknown').replaceAll('\\','/');
   const m=p.match(/(?:^|\/)(src|guides|tools|travel|compare|life|sim|hikari|card|hoken|public)\/.+$/);
   if(m)p=p.slice(p.length-m[0].length+(m[0].startsWith('/')?1:0));
-  if(p.endsWith('/index.html')&&!p.includes('src/'))p=p.replace(/^.*\/(index\.html)$/,'$1');
   return p;
 }
 function key(item){return String(item.ruleId||item.rule_id||item.rule||item.id||item.code||'unknown-rule')+'|'+normalizeFile(item);}
