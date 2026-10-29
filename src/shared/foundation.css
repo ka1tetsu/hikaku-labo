@@ -8,7 +8,7 @@
   --hl-paper:#fff;--hl-line:#dce5e1;--hl-line-strong:#bdccc5;
   --hl-radius:14px;--hl-radius-lg:20px;
   --hl-shadow:0 9px 25px rgba(20,40,32,.052);
-  --hl-focus:#14664f;
+  --hl-focus:#14664f;--hl-space-1:8px;--hl-space-2:16px;--hl-space-3:24px;--hl-measure:70ch;
 }
 html{scroll-padding-top:120px}
 .hl-chrome,.hl-chrome *{box-sizing:border-box}
@@ -72,3 +72,7 @@ html{scroll-padding-top:120px}
 .hl-evidence-details>a{display:inline-block;margin:2px 3px 17px;color:var(--hl-brand)!important;font-size:12px;font-weight:800}
 .hl-evidence-details summary:focus-visible,.hl-evidence-details>a:focus-visible{outline:3px solid var(--hl-focus);outline-offset:3px}
 @media(max-width:630px){.hl-evidence-details{width:calc(100% - 28px)}.hl-evidence-details dl{grid-template-columns:1fr}.hl-evidence-details summary span{display:block;flex:1 1 100%;margin-left:22px}}
+
+/* Shared keyboard and reduced-motion contract for the site-wide chrome. */
+.hl-chrome :is(a,button,input,select,textarea,summary):focus-visible{outline:3px solid var(--hl-focus);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.hl-chrome *, .hl-chrome *::before,.hl-chrome *::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}

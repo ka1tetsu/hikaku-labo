@@ -1,3 +1,4 @@
+import DecisionEvidence from '../shared/DecisionEvidence.jsx';
 import { useMemo, useRef, useState } from 'react';
 import { DESTINATION_CATALOG, DOMESTIC_REGIONS, INTERESTS, OVERSEAS_REGIONS } from './destinations.js';
 import { COUNTRY_INDEX, countryByCode, flagOf } from './countries.js';
@@ -105,14 +106,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           <div className="tvx-shortcuts"><span>人気の目的地</span>{['kyoto','naha','seoul','taipei','bangkok','honolulu','paris'].map(id=>{const d=getCity(id);return <button key={id} type="button" onClick={()=>goToDestination(d)}>{d.emoji} {d.name}</button>;})}</div>
           <p className="tvx-hero-note">登録不要 · 国内{DOMESTIC_COUNT}都市＋海外{OVERSEAS_COUNT}都市のモデルコース · {COUNTRY_INDEX.length}の国と地域から検索（宿・交通の予約は各予約サイトで）</p>
         </div>
-        <div className="tvx-hero-art" aria-hidden="true">
-          <div className="tvx-art-orbit tvx-art-orbit-one"/><div className="tvx-art-orbit tvx-art-orbit-two"/>
-          <span className="tvx-art-title">FIND YOUR<br/>NEXT ESCAPE<span>✦</span></span>
-          <span className="tvx-art-spot tvx-art-spot-a">⛩️<small>KYOTO</small></span>
-          <span className="tvx-art-spot tvx-art-spot-b">🗼<small>PARIS</small></span>
-          <span className="tvx-art-spot tvx-art-spot-c">🌺<small>HAWAII</small></span>
-          <span className="tvx-art-compass">↗</span>
-        </div>
+        <DecisionEvidence section="travel"/>
       </div>
     </section>
     <div className="tv-wrap tvx-trust-strip" aria-label="このサイトでできること">
@@ -124,7 +118,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
     {concierge}
 
     <section className="tv-wrap tvx-discover" id="destinations" aria-labelledby="tvx-discover-title" ref={listRef}>
-      <div className="tvx-section-header"><div><span className="tvx-kicker">EXPLORE DESTINATIONS</span><h2 id="tvx-discover-title">次の旅先を見つける。</h2><p>エリア・行きたい月・移動時間・旅費感で絞り込み。好きなテーマを選ぶと相性の良い順に並びます。</p></div><span className="tvx-count">国内 {DOMESTIC_COUNT} ＋ 海外 {OVERSEAS_COUNT} 都市</span></div>
+      <div className="tvx-section-header"><div><span className="tvx-kicker">旅行先を探す</span><h2 id="tvx-discover-title">次の旅先を見つける。</h2><p>エリア・行きたい月・移動時間・旅費感で絞り込み。好きなテーマを選ぶと相性の良い順に並びます。</p></div><span className="tvx-count">国内 {DOMESTIC_COUNT} ＋ 海外 {OVERSEAS_COUNT} 都市</span></div>
       <div className="tvx-filter-panel">
         <div className="tvw-area-tabs" role="group" aria-label="国内・海外">
           {[['all','すべて'],['domestic','🗾 国内'],['overseas','🌏 海外']].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} className={area===id?'active':''}

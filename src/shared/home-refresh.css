@@ -134,3 +134,12 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
 .hl-shop-search>div{display:flex;flex-wrap:wrap;gap:9px}
 .hl-shop-search a{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;min-height:44px;border:1px solid #b8d4c3;border-radius:8px;background:#fff;color:#174a37;font-size:13px;font-weight:750;text-decoration:none}
 .hl-shop-search small{font-size:10px;color:#53695b}
+
+/* Editorial navigation: choices as readable ruled entries, not nested AI cards. */
+.hl-directory-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 38px}
+.hl-directory-card{min-height:190px;padding:19px 0 22px;background:transparent;border:0;border-top:2px solid #c4d5ca;border-radius:0;box-shadow:none;transition:border-color .16s,color .16s}
+.hl-directory-card:hover{transform:none;box-shadow:none;border-top-color:#14664f}
+.hl-directory-icon{width:32px;height:32px;border-radius:0;background:transparent}
+.hl-directory-card p{line-height:1.85;max-width:46ch}
+.hl-directory-action{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:650px){.hl-directory-grid{grid-template-columns:minmax(0,1fr);gap:0}.hl-directory-card{min-height:0;padding:18px 0}.hl-directory-card:last-child{grid-column:auto}}

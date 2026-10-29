@@ -4,7 +4,7 @@ export default function SectionDirectory() {
   return <section className="hl-directory" aria-labelledby="hl-directory-title">
     <div className="hl-directory-head">
       <div>
-        <span className="hl-kicker"><span className="hl-kicker-dot"/> RESEARCH & COMPARISON</span>
+        <span className="hl-kicker"><span className="hl-kicker-dot"/> 比較の入口</span>
         <h1 id="hl-directory-title">何にいくらかかる？<em>条件をそろえて比べる。</em></h1>
         <p>スマホの基本料金、同じ型番の販売価格、宿泊の支払総額。値段の意味が違うものを混ぜず、条件・出典・見落としやすい費用を確認できる{SITE_SECTIONS.length}つの入口です。</p>
       </div>

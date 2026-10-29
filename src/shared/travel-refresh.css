@@ -1,7 +1,7 @@
 /* Consistent, readable decision support visuals on the trip budgeting page. */
 .tv-page{--ink:#19332b;--muted:#546d60;--brand:#14664f;--border:#dbe6df;background:#f5f7f5;color:#1a332b;font-size:15px;line-height:1.85}
 .tv-page .hl-chrome{position:relative;z-index:50}
-.tv-page .tv-hero{background:linear-gradient(120deg,#142f2a,#15533f 56%,#28725b)}
+.tv-page .tv-hero{background:#193e34}
 .tv-page .tv-hero h1{letter-spacing:-.045em}
 .tv-page .tv-hero-text>p{font-size:15px;color:#e0ebe5}
 .tv-page .tv-hero-minor{font-size:12px;color:#e1f1e5}
