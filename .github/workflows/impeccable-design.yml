@@ -1,0 +1,55 @@
+name: Impeccable site-wide design gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  design-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DO_NOT_TRACK: '1'
+      IMPECCABLE_NO_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Scan current and base with Impeccable 4.8.0
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="$BASE_SHA"
+          if [[ -z "$BASE" || "$BASE" =~ ^0+$ ]]; then BASE="$(git rev-parse HEAD^)"; fi
+          git worktree add --detach "$RUNNER_TEMP/impeccable-base" "$BASE"
+          set +e
+          (cd "$RUNNER_TEMP/impeccable-base" && npx --yes impeccable@4.8.0 detect --json . > "$RUNNER_TEMP/impeccable-base.json" 2> "$RUNNER_TEMP/impeccable-base.stderr")
+          echo "$?" > "$RUNNER_TEMP/impeccable-base.status"
+          npx --yes impeccable@4.8.0 detect --json . > "$RUNNER_TEMP/impeccable-head.json" 2> "$RUNNER_TEMP/impeccable-head.stderr"
+          echo "$?" > "$RUNNER_TEMP/impeccable-head.status"
+          set -e
+          node scripts/impeccable-gate.mjs \
+            "$RUNNER_TEMP/impeccable-base.json" "$RUNNER_TEMP/impeccable-head.json" \
+            "$RUNNER_TEMP/impeccable-base.status" "$RUNNER_TEMP/impeccable-head.status" \
+            "$RUNNER_TEMP/impeccable-base" "$GITHUB_WORKSPACE"
+      - name: Upload findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: impeccable-findings
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/impeccable-base.json
+            ${{ runner.temp }}/impeccable-head.json
+            ${{ runner.temp }}/impeccable-base.stderr
+            ${{ runner.temp }}/impeccable-head.stderr
