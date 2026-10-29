@@ -31,7 +31,7 @@ export async function capture({commit,origin=ORIGIN,folder='artifacts/live-relea
         if(!response || response.status()!==200 || new URL(page.url()).origin!==origin || new URL(page.url()).pathname!==shot.route)
           throw Error(`Unexpected response for ${shot.route}: ${response?.status()}`);
         await page.locator('#main-content').first().waitFor({timeout:12000});
-        await page.evaluate(async()=>{if(document.fonts?.ready)await document.fonts.ready;});
+        await page.evaluate(async()=>{if(globalThis.document.fonts?.ready)await globalThis.document.fonts.ready;});
         const output=path.join(folder,shot.name);
         await page.screenshot({path:output,animations:'disabled'});
         report.screenshots.push({page:shot.route,viewport:shot.viewport,file:shot.name,httpStatus:response.status()});
