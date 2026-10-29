@@ -80,10 +80,10 @@ export default function StaySearch(){
       <label>場所・駅名・宿名<input type="search" required minLength="2" maxLength="80" placeholder="例：函館、草津温泉、京都駅" value={form.place} onChange={edit('place')} /></label>
       <label>チェックイン<input type="date" required min={today} value={form.checkin} onChange={edit('checkin')} /></label>
       <label>チェックアウト<input type="date" required min={addDays(form.checkin||today,1)} value={form.checkout} onChange={edit('checkout')} /></label>
-      <label>大人（1室）<select value={form.adults} onChange={edit('adults')}>{Array.from({length:10},(_,i)=><option key={i+1} value={i+1}>{i+1}名</option>)}</select></label>
+      <label>大人の人数（1室）<select value={form.adults} onChange={edit('adults')}>{Array.from({length:10},(_,i)=><option key={i+1} value={i+1}>{i+1}名</option>)}</select></label>
       <label className="tv-stay-check"><input type="checkbox" checked={form.breakfast==='true'} onChange={edit('breakfast')}/>朝食付き希望</label>
       <label className="tv-stay-check"><input type="checkbox" checked={form.onsen==='true'} onChange={edit('onsen')}/>温泉あり希望</label>
-      <button className="vl-primary" disabled={state.loading} type="submit">{state.loading?'空室を確認中…':'条件に合う宿を探す ↗'}</button>
+      <button className="vl-primary" disabled={state.loading} type="submit">{state.loading?'空室を確認中…':'空室のある宿を探す ↗'}</button>
     </form>
     <p className="tv-stay-note">国内・大人のみ・1室の検索です。複数室・お子様の人数は予約先で指定してください。すべての宿泊施設の網羅は保証しません。</p>
     <div aria-live="polite" aria-busy={state.loading}>
