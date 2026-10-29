@@ -70,9 +70,10 @@ export async function findStays(search, { env = process.env, request = upstreamR
     return data;
   }
   try {
-    const keyword = await call('KeywordHotelSearch', { keyword: search.place, hits: '30', responseType: 'middle' });
+    const keyword = await call('KeywordHotelSearch', { keyword: search.place, hits: '30', page: String(search.page||1), responseType: 'middle' });
     const ids = candidateHotelIds(keyword);
-    if (!ids.length) return { status: 'ok', offers: [], candidatesChecked: 0 };
+    const pages = Math.min(100, Math.max(1, Number(keyword.pagingInfo?.pageCount)||1));
+    if (!ids.length) return { status: 'ok', offers: [], candidatesChecked: 0, page: search.page||1, pageCount: pages };
     const conditions = [search.breakfast && 'breakfast', search.onsen && 'onsen'].filter(Boolean).join(',');
     const groups = [ids.slice(0, 15), ids.slice(15)].filter(group => group.length);
     const responses = await Promise.all(groups.map(group => call('VacantHotelSearch', {
@@ -83,7 +84,7 @@ export async function findStays(search, { env = process.env, request = upstreamR
     // A failed batch is reported as an error rather than as no vacancies.
     const allowed = new Set(ids);
     const offers = responses.flatMap(response => normalizeStays(response, search)).filter(offer => allowed.has(offer.hotelNo) && (!search.breakfast || offer.breakfast));
-    return { status: 'ok', offers: [...new Map(offers.map(offer => [offer.id, offer])).values()], candidatesChecked: ids.length };
+    return { status: 'ok', offers: [...new Map(offers.map(offer => [offer.id, offer])).values()], candidatesChecked: ids.length, page: search.page||1, pageCount: pages };
   } catch (error) {
     const reasons = ['site_registration_rejected', 'rate_limited', 'provider_rejected'];
     return { status: reasons.includes(error.message) ? error.message : 'temporarily_unavailable', offers: [] };
