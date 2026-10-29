@@ -5,6 +5,7 @@ import InfoPage from './shared/InfoPages.jsx';
 import { INFO_PAGES } from './shared/infoContent.js';
 import ToolsPage from './tools/ToolsPage.jsx';
 import TravelPage from './travel/TravelPage.jsx';
+import HotelDetailPage from './travel/HotelDetailPage.jsx';
 import ComparePage from './compare/ComparePage.jsx';
 import ServicesPage from './services/ServicesPage.jsx';
 import { HikariAreaPage, SimPairPage } from './services/StaticPages.jsx';
@@ -16,6 +17,7 @@ export const PAGES = {
   'index.html': () => <App />,
   'tools/index.html': () => <ToolsPage />,
   'travel/index.html': () => <TravelPage />,
+  'travel/hotels/index.html': () => <HotelDetailPage />,
   'compare/index.html': () => <ComparePage />,
   'life/index.html': () => <ServicesPage category="life" />,
   'sim/index.html': () => <ServicesPage category="sim" />,
