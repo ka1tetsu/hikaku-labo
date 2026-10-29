@@ -145,3 +145,16 @@ body {margin:0}
 .tv-stay-alternatives{margin-top:22px;border-top:1px solid #d6e5da;padding-top:12px}
 .tv-stay-search input:focus-visible,.tv-stay-search select:focus-visible,.tv-stay-search button:focus-visible,.tv-stay-search a:focus-visible{outline:3px solid #74c6a1;outline-offset:2px}
 @media(max-width:700px){.tv-stay-search{padding:18px}.tv-stay-form{grid-template-columns:repeat(2,minmax(0,1fr))}.tv-stay-form label:first-child{grid-column:1/-1}.tv-stay-form button{grid-column:1/-1}}
+
+/* Faster hotel price selection without overstating limited provider data. */
+.tv-stay-best{display:flex;align-items:center;justify-content:space-between;gap:20px;background:#eaf5ed;border:1px solid #bcdcc7;border-radius:14px;padding:20px;margin:19px 0}
+.tv-stay-best>div{min-width:0;flex:1}
+.tv-stay-best span{font-size:12px;font-weight:850;color:#27694b}
+.tv-stay-best strong{display:block;margin:6px 0;color:#1b4630;font-size:18px}
+.tv-stay-best p{font-size:13px;color:#375f45;margin:5px 0}
+.tv-stay-best b{font-size:23px;color:#145e44;font-variant-numeric:tabular-nums}
+.tv-stay-best small{font-size:11px;color:#617866;line-height:1.75;display:block}
+.tv-stay-best>a,.tv-stay-compare-action{border-radius:9px;min-height:45px;background:#176348;color:#fff!important;padding:12px 16px;text-decoration:none!important;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:850;text-align:center}
+.tv-stay-compare-action{margin-top:18px}
+.tv-stay-alternatives .yt-ad-placement{margin:14px 0}
+@media(max-width:650px){.tv-stay-best{flex-direction:column;align-items:stretch;padding:16px}.tv-stay-best>a,.tv-stay-compare-action{width:100%}}
