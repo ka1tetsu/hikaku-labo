@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: vivlica-production-auto-recovery
@@ -19,7 +20,7 @@ jobs:
   recover:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 17
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -52,6 +53,8 @@ jobs:
             echo "retry=false" >> "$GITHUB_OUTPUT"
           elif [ "$code" -eq 2 ]; then
             echo "Current production metadata is valid, but the commit is stale."
+            # Refuse to deploy a broken/untested main commit merely because it is newer.
+            GITHUB_TOKEN="${{ github.token }}" node scripts/recovery-preflight.mjs "$(git rev-parse HEAD)"
             echo "retry=true" >> "$GITHUB_OUTPUT"
           else
             echo "::error::Production identity cannot be verified; refusing to spend build quota on an unknown target."
@@ -84,10 +87,31 @@ jobs:
           printf 'new_sha=%s\n' "$new_sha" >> "$GITHUB_OUTPUT"
           echo "Requeued Vercel build for main $new_sha"
       - name: Verify new production commit
+        id: verify
         if: steps.trigger.outputs.new_sha != ''
         env:
           PUBLISHED_SHA: ${{ steps.trigger.outputs.new_sha }}
         run: node scripts/release-recovery.mjs wait "$PUBLISHED_SHA"
+      - name: Install pinned browser tooling for live screenshots
+        if: steps.verify.outcome == 'success'
+        shell: bash
+        run: |
+          npm install --no-save --no-package-lock playwright@1.64.1
+          npx playwright install --with-deps chromium
+      - name: Capture 4 live pages at desktop and mobile sizes
+        id: capture
+        if: steps.verify.outcome == 'success'
+        env:
+          PUBLISHED_SHA: ${{ steps.trigger.outputs.new_sha }}
+        run: node scripts/capture-live-preview.mjs "$PUBLISHED_SHA"
+      - name: Upload verified live-page screenshots
+        if: steps.capture.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vivlica-verified-live-pages
+          path: artifacts/live-release/
+          if-no-files-found: error
+          retention-days: 30
       - name: Summarize outcome
         if: always()
         env:
@@ -102,4 +126,6 @@ jobs:
             echo '- Deploy is **verified only** when /release.json matches the new full main SHA.'
             echo '- GitHub Actions restored + Vercel quota restored + working Git integration are required.'
             echo '- Never interpret a queued build as a confirmed publication.'
+            echo '- The release is pictured only after SHA match, successful CI preflight, and a second production SHA match after capture.'
+            echo "- Screenshots (if successful): https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID} (artifact: vivlica-verified-live-pages)"
           } >> "$GITHUB_STEP_SUMMARY"

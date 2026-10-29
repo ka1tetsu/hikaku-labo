@@ -22,3 +22,15 @@
 
 ## 最新UIのレビュー
 過去のブラウザQA画像は[GitHub Actionsアーティファクト](https://github.com/ka1tetsu/hikaku-labo/actions/runs/40834042185)にも残してある。最新画面の検証済み画像と、実際にVercel上に公開されていることは別。
+## 再デプロイの安全ゲート（追補）
+- 2026年11月以降の再試行前に、**最新mainのpushコミットに対する3つの成功済みGitHub Actions**をGitHub APIで確認する。
+- 必須: `Tools selector CI`、`Impeccable sitewide design gate`、`Vivlica real-browser design QA`。別SHAのPRだけ成功していても不可。
+- `Production and affiliate readiness audit`は旧サイトでSHAがずれている間、失敗し得るため公開前ゲートから除外。公開後はリリースSHA一致を必須とする。
+- GitHub APIの検証が不能・権限不足・テスト未完了・失敗の場合は**デプロイを開始しない**。
+
+## 公開が完了したときのスクリーンショット
+- 最新の`release.json`が新しいmain SHAと一致したときだけ、匿名のPlaywright Chromiumでホーム、商品価格比較、ITツール比較、旅行比較の**計8画面（デスクトップ＋モバイル）**を撮影する。
+- `/api/track`への計測リクエストを止め、広告・アフィリエイトのリンクをクリックしない。
+- 全画面がHTTP 200で指定ドメイン内に残り、最後の再照合でも同じSHAであった場合に限って、GitHub Actionsの`vivlica-verified-live-pages`アーティファクトへ画像と`report.json`を保存する（30日保存）。
+- ジョブ結果のURLから本人がページを確認できる。**スクリーンショットは実サイトの確認資料であり、本番デプロイ自体は別途SHA照合で判断する。**
+- 公開成功の通知には、最新GitHub Actionsの実行URL・確認コミット・8枚のアーティファクト案内を添える。
