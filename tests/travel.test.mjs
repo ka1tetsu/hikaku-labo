@@ -23,11 +23,12 @@ test('travel budgets sanitize negative and impossible inputs', () => {
 });
 
 test('ad rendering is active after owner confirms site registration and can be disabled', () => {
-  assert.equal(travelAffiliateEnabled({}), false);
-  assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'false' }), false);
+  assert.equal(travelAffiliateEnabled({}), true);
+  assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'false' }), true);
   assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'true' }), false);
   assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_REGISTERED_ORIGIN: 'https://vivlica.com' }), true);
-  assert.equal(travelAffiliateEnabled({ VITE_SITE_ORIGIN: 'https://hikaku-labo.vercel.app' }), true);
+  assert.equal(travelAffiliateEnabled({ VITE_SITE_ORIGIN: 'https://hikaku-labo.vercel.app' }), false);
+  assert.equal(travelAffiliateEnabled({ VITE_SITE_ORIGIN: 'https://hikaku-labo.vercel.app', VITE_A8_TRAVEL_REGISTERED_ORIGIN: 'https://hikaku-labo.vercel.app' }), true);
 });
 
 test('supplied A8 ad materials have matching tracking IDs and untouched view pixels', () => {
