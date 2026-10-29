@@ -20,7 +20,8 @@
     "report:revenue": "node scripts/revenue-report.mjs",
     "verify:build": "node scripts/verify-build.mjs",
     "audit:live": "node scripts/audit-live.mjs",
-    "ads:import": "node scripts/import-travel-ad.mjs"
+    "ads:import": "node scripts/import-travel-ad.mjs",
+    "audit:activation": "node scripts/monetization-checklist.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

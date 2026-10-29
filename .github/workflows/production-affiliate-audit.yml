@@ -114,6 +114,11 @@ jobs:
           if-no-files-found: error
       - name: Audit production npm dependencies
         run: npm audit --omit=dev --audit-level=high
+      - name: Publish prioritized monetization activation checklist
+        if: always()
+        env:
+          SITE_ORIGIN: https://vivlica.com
+        run: npm run audit:activation
       - name: Check advertising setup (not actual revenue)
         if: always()
         env:

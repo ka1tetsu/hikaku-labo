@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ALL_TRAVEL_DESTINATIONS, autocompleteDestinations, findDestination, parseTravelQuery, buildGeneralItinerary } from './globalSearch.js';
-import { TRAVEL_PROVIDERS, TRAVEL_PROVIDER_TYPES, providerTarget } from './providers.js';
+import { TRAVEL_PROVIDERS, TRAVEL_PROVIDER_TYPES } from './providers.js';
+import { globalProviderTarget } from './searchLinkAdapter.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { buildStayLinks } from './bookingLinks.js';
 import { LINK_CONFIG } from './linkConfig.js';
@@ -180,13 +181,13 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
       <div className="gx-type-tabs" role="tablist" aria-label="旅行サービスの分類">{TRAVEL_PROVIDER_TYPES.map(type=>
         <button role="tab" aria-selected={category===type.id} key={type.id} type="button" onClick={()=>{setCategory(type.id);setFares(null);}} className={category===type.id?'active':''}>{type.emoji} {type.label} <small>{TRAVEL_PROVIDERS.filter(p=>p.type===type.id).length}社</small></button>)}</div>
       <div className="gx-provider-grid">{providers.map(provider=>{
-        const target=providerTarget(provider, { stayLinks });
+        const target=globalProviderTarget(provider, { stayLinks, originCode: fromIata, destination: location, departureDate, returnDate, nights, travelers, config: LINK_CONFIG });
         return <article key={provider.id} className="gx-provider-card">
           <div className="gx-provider-top"><span className="gx-provider-avatar">{provider.name.slice(0,1)}</span><div><strong>{provider.name}</strong><small>{provider.capabilities.join('・')}</small></div></div>
           <p>{target.note || '公式サイトに移動し、上の検索条件を設定して最終支払額を確認。'}</p>
-          <div className="gx-provider-bottom"><span>{target.sponsored?'PR・成果報酬リンク':'公式リンク / 報酬計測なし'}</span>
+          <div className="gx-provider-bottom"><span>{target.sponsored?'PR・成果報酬リンク':'公式リンク / 報酬計測なし'}{target.carriesSearch?' · 一部検索条件を引継ぎ':''}</span>
             <a href={target.url} target="_blank" rel={target.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
-              onClick={()=>providerClick(provider,target.sponsored)}>{target.sponsored?'提携ページを見る':'公式サイトで調べる'} ↗</a></div>
+              onClick={()=>providerClick(provider,target.sponsored)}>{target.carriesSearch?'条件を引き継いで検索':target.sponsored?'提携ページを見る':'公式サイトで調べる'} ↗</a></div>
         </article>;
       })}</div>
       <div className="gx-live-prices">
