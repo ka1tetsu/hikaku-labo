@@ -1,16 +1,19 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import { recordPageView } from './outboundClient.js';
 
-// ビルド時に静的HTML（scripts/prerender.mjs）が埋め込まれていればハイドレーションし、
-// そうでなければ（開発サーバー等）通常どおり描画する。
-// クエリ付きURL（?keyword=…）は静的HTMLと初期表示が異なるため、作り直して描画する。
+// Pages are prerendered at build time (scripts/prerender.mjs) so search engines and
+// first paint see real content; the browser then hydrates the same markup.
 export function mount(element) {
-  const container = document.getElementById('root');
-  const app = <StrictMode>{element}</StrictMode>;
-  if (container.hasChildNodes() && !window.location.search) {
-    hydrateRoot(container, app);
-  } else {
-    container.textContent = '';
-    createRoot(container).render(app);
+  recordPageView();
+  const root = document.getElementById('root');
+  const tree = <StrictMode>{element}</StrictMode>;
+  // URL parameters (?destination=, ?q=, ?keyword=…) change the first render, so the
+  // prerendered default markup is replaced instead of hydrated.
+  if (root.firstElementChild && !window.location.search) {
+    hydrateRoot(root, tree);
+    return;
   }
+  root.textContent = '';
+  createRoot(root).render(tree);
 }

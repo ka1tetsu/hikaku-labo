@@ -5,10 +5,10 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist', '.ssr-build'] },
-  // api/ と scripts/ は Vercel のサーバーサイド実行なので Node のグローバルを許可する
+  { ignores: ['dist'] },
+  // api/・server/ と scripts/ は Vercel のサーバーサイド実行なので Node のグローバルを許可する
   {
-    files: ['api/**/*.js', 'scripts/**/*.mjs'],
+    files: ['api/**/*.js', 'server/**/*.js', 'cloudflare/**/*.js', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: globals.node,
       parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },

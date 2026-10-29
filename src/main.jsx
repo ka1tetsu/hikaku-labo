@@ -1,5 +1,5 @@
+import { mount } from './shared/mount.jsx';
+import App from './App.jsx';
 import './index.css'
-import App from './App.jsx'
-import { mount } from './shared/mount.jsx'
 
-mount(<App />)
+mount(<App />);

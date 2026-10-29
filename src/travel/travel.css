@@ -62,7 +62,7 @@ body {margin:0}
 .tv-calculator-note{font-size:10px;color:#8b9991;line-height:1.9;background:#f6f8f6;border-radius:9px;padding:14px;margin-top:23px}
 .tv-result{background:linear-gradient(160deg,#fff 76%,#f0f9f2)}
 .tv-result h3{font-size:20px;margin:7px 0 6px}
-.tv-total{font-size:clamp(36px,4vw,52px);font-family:Inter,Arial,sans-serif;font-weight:900;letter-spacing:-.04em;color:#18694f;line-height:1.3;margin:16px 0}
+.tv-total{font-size:clamp(36px,4vw,52px);font-family:'Noto Sans JP',Arial,sans-serif;font-weight:900;letter-spacing:-.04em;color:#18694f;line-height:1.3;margin:16px 0}
 .tv-total small{font:normal 12px 'Noto Sans JP',sans-serif;color:#789185;letter-spacing:0}
 .tv-per-person{background:#ecf5ed;color:#547566;padding:9px 16px;border-radius:10px;font-size:12px;display:inline-block}
 .tv-per-person b{color:#174d39}
@@ -72,7 +72,7 @@ body {margin:0}
 .tv-bar-purple{background:#8b8cca}
 .tv-bar-gray{background:#b3c5b7}
 .tv-cost-breakdown>div{display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid #edf1ed;padding:14px 0;color:#536c5e;font-size:13px}
-.tv-cost-breakdown strong{color:#213e30;font-family:Inter,Arial,sans-serif;font-size:16px}
+.tv-cost-breakdown strong{color:#213e30;font-family:'Noto Sans JP',Arial,sans-serif;font-size:16px}
 .tv-cost-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:10px}
 .tv-result-booking{padding-top:22px}
 .tv-result-booking>strong{font-size:15px}
@@ -87,7 +87,7 @@ body {margin:0}
 .tv-guide h2{margin-top:10px}
 .tv-guide-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:35px}
 .tv-guide-cards article{background:#fff;padding:28px;border-radius:14px;min-height:200px}
-.tv-guide-cards article>span{font:900 21px Inter,Arial,sans-serif;color:#2e9470}
+.tv-guide-cards article>span{font:900 21px 'Noto Sans JP',Arial,sans-serif;color:#2e9470}
 .tv-guide-cards h3{font-size:18px;margin:13px 0 8px}
 .tv-guide-cards p{font-size:12px;color:#6f8778;line-height:2}
 .tv-booking-cta{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center;padding-block:110px;border-bottom:1px solid #e4ebe2}
@@ -106,3 +106,55 @@ body {margin:0}
 @media(max-width:850px){.tv-header-inner{min-height:66px}.tv-navigation{gap:14px}.tv-navigation>a:nth-child(2),.tv-navigation>a:nth-child(3){display:none}.tv-hero-layout{grid-template-columns:1fr;gap:35px;padding:60px 0}.tv-art{max-width:520px;width:100%;justify-self:center}.tv-planner-grid{grid-template-columns:1fr}.tv-guide-cards{grid-template-columns:1fr}.tv-guide-cards article{min-height:auto}.tv-booking-cta{grid-template-columns:1fr;gap:25px}}
 @media(max-width:540px){.tv-wrap{width:calc(100% - 32px)}.tv-header-inner{gap:9px}.tv-logo{font-size:17px}.tv-logo small{display:none}.tv-navigation>a:not(.tv-header-button){display:none}.tv-header-button{font-size:10px;padding:9px 10px}.tv-hero h1{font-size:35px}.tv-hero-text>p{font-size:12px}.tv-art{height:240px}.tv-art-ticket{top:30px;padding:15px;width:68%}.tv-art-ticket>strong{font-size:16px;margin:12px 0}.tv-sun{width:100px;height:100px}.tv-art-star{font-size:52px}.tv-process{grid-template-columns:1fr;padding:15px 0}.tv-process>div{border:0;border-bottom:1px solid #e3ebe5;padding:10px 0}.tv-section-heading{display:block}.tv-free-chip{display:inline-block;margin-top:12px}.tv-planner-section{padding:40px 0 55px}.tv-form,.tv-result{padding:19px}.tv-fields{gap:14px 8px}.tv-number-field>span{font-size:11px}.tv-number-field select{padding:11px 5px;font-size:11px}.tv-total{font-size:36px}.tv-guide{padding:55px 0}.tv-booking-cta{padding:65px 0}.tv-footer-columns{grid-template-columns:1fr;gap:22px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.tv-hotel-ads{margin:18px 0;padding:18px;border:1px solid #d6e5da;border-radius:12px;background:#fff}
+.tv-hotel-ads h4{margin:0 0 8px;font-size:17px}
+.tv-hotel-ads>p{font-size:12px;line-height:1.7}
+.tv-hotel-ad{max-width:100%;overflow-x:auto;margin-top:12px}
+.tv-hotel-picker{margin-top:20px;padding-top:16px;border-top:1px solid #d6e5da}
+.tv-hotel-picker input[type=search]{display:block;max-width:100%;width:340px;margin:8px 0;padding:10px;border:1px solid #b9cdbf;border-radius:8px}
+.tv-hotel-picker p,.tv-hotel-compare p{font-size:12px;line-height:1.7}
+.tv-hotel-choices{display:grid;gap:10px;margin:14px 0}
+.tv-hotel-choices label{display:flex;gap:8px;align-items:center}
+.tv-hotel-table-scroll{overflow-x:auto;max-width:100%;margin:14px 0}
+.tv-hotel-compare table{border-collapse:collapse;min-width:500px;width:100%}
+.tv-hotel-compare caption{text-align:left;padding:8px;font-weight:700}
+.tv-hotel-compare th,.tv-hotel-compare td{border:1px solid #d6e5da;padding:12px;vertical-align:top;min-width:180px;text-align:left}
+.tv-hotel-compare th{background:#f2f8f4}
+.tv-hotel-compare input,.tv-hotel-compare textarea{width:100%;min-width:150px;box-sizing:border-box;padding:8px;border:1px solid #b9cdbf;border-radius:6px}
+.tv-hotel-compare textarea{min-height:85px}
+.tv-hotel-input-label{display:block;font-size:11px;margin-bottom:6px}
+.tv-hotel-compare button{margin-top:8px;border:1px solid #b9cdbf;border-radius:6px;background:#fff;padding:6px 10px;cursor:pointer}
+.tv-stay-search{padding:28px;margin-top:24px;margin-bottom:24px;border:1px solid #b9cdbf;border-radius:16px;background:#fff;box-sizing:border-box}
+.tv-stay-search h2{margin:0 0 10px;font-size:clamp(22px,3vw,30px)}
+.tv-stay-search p{font-size:13px;line-height:1.8}
+.tv-stay-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}
+.tv-stay-form label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;min-width:0}
+.tv-stay-form input,.tv-stay-form select,.tv-stay-results-head select{width:100%;box-sizing:border-box;min-width:0;padding:10px;border:1px solid #b9cdbf;border-radius:8px;background:#fff;color:#182f27}
+.tv-stay-form .tv-stay-check{flex-direction:row;align-items:center}
+.tv-stay-check input{width:auto}
+.tv-stay-form button{grid-column:span 2;background:#155f48;color:#fff;border:0;border-radius:9px;padding:12px;font-weight:700;cursor:pointer;min-height:44px}
+.tv-stay-form button:disabled{opacity:.65;cursor:wait}
+.tv-stay-note{color:#586d61}
+.tv-stay-results-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.tv-stay-table{border-collapse:collapse;width:100%;min-width:750px;font-size:13px}
+.tv-stay-table caption{text-align:left;padding:10px;font-weight:700}
+.tv-stay-table th,.tv-stay-table td{padding:14px;border:1px solid #d6e5da;text-align:left;vertical-align:top;min-width:100px}
+.tv-stay-table th{background:#f2f8f4}
+.tv-stay-table small{display:block;font-weight:400;margin-top:6px;line-height:1.7}
+.tv-stay-table a{color:#155f48;text-decoration:underline}
+.tv-stay-alternatives{margin-top:22px;border-top:1px solid #d6e5da;padding-top:12px}
+.tv-stay-search input:focus-visible,.tv-stay-search select:focus-visible,.tv-stay-search button:focus-visible,.tv-stay-search a:focus-visible{outline:3px solid #74c6a1;outline-offset:2px}
+@media(max-width:700px){.tv-stay-search{padding:18px}.tv-stay-form{grid-template-columns:repeat(2,minmax(0,1fr))}.tv-stay-form label:first-child{grid-column:1/-1}.tv-stay-form button{grid-column:1/-1}}
+
+/* Faster hotel price selection without overstating limited provider data. */
+.tv-stay-best{display:flex;align-items:center;justify-content:space-between;gap:20px;background:#eaf5ed;border:1px solid #bcdcc7;border-radius:14px;padding:20px;margin:19px 0}
+.tv-stay-best>div{min-width:0;flex:1}
+.tv-stay-best span{font-size:12px;font-weight:850;color:#27694b}
+.tv-stay-best strong{display:block;margin:6px 0;color:#1b4630;font-size:18px}
+.tv-stay-best p{font-size:13px;color:#375f45;margin:5px 0}
+.tv-stay-best b{font-size:23px;color:#145e44;font-variant-numeric:tabular-nums}
+.tv-stay-best small{font-size:11px;color:#617866;line-height:1.75;display:block}
+.tv-stay-best>a,.tv-stay-compare-action{border-radius:9px;min-height:45px;background:#176348;color:#fff!important;padding:12px 16px;text-decoration:none!important;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:850;text-align:center}
+.tv-stay-compare-action{margin-top:18px}
+.tv-stay-alternatives .yt-ad-placement{margin:14px 0}
+@media(max-width:650px){.tv-stay-best{flex-direction:column;align-items:stretch;padding:16px}.tv-stay-best>a,.tv-stay-compare-action{width:100%}}

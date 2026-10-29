@@ -1,0 +1,86 @@
+/* 比較ラボ — 全ショップ価格比較 */
+body{margin:0}
+.cp-page{background:#f5f7f5;color:#1a332b;font:15px/1.8 'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;overflow-x:clip}
+.cp-page *{box-sizing:border-box}
+.cp-page a{text-decoration:none}
+.cp-wrap{max-width:1100px;width:calc(100% - 32px);margin:auto}
+.cp-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.cp-kicker{font:800 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:#2b8c6b}
+.cp-hero{background:#193e34;color:#fff;padding:56px 0 48px}
+.cp-hero .cp-kicker{color:#bfe8d4}
+.cp-hero h1{font-size:clamp(30px,4.4vw,50px);font-weight:900;letter-spacing:-.04em;line-height:1.35;margin:14px 0 12px}
+.cp-hero h1 em{font-style:normal;color:#e1eead}
+.cp-hero p{font-size:14px;color:#dfefe5;max-width:720px;margin:0}
+.cp-search{display:flex;gap:8px;background:#fff;border-radius:14px;padding:8px;margin-top:24px;max-width:720px;box-shadow:0 2px 10px #091f1919}
+.cp-search input{flex:1;min-width:0;border:0;outline:0;font:600 15px 'Noto Sans JP',sans-serif;color:#1a3a2c;padding:10px 12px;background:transparent}
+.cp-search button{border:0;background:#14634a;color:#fff;border-radius:10px;padding:0 20px;min-height:48px;font-size:14px;font-weight:850;cursor:pointer;white-space:nowrap}
+.cp-search:focus-within{outline:3px solid #a8d5bc;outline-offset:2px}
+.cp-examples{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:14px;font-size:12px;color:#c6e0d2}
+.cp-examples button{background:#ffffff17;color:#e9f3ed;border:1px solid #ffffff4b;border-radius:30px;padding:6px 12px;cursor:pointer;font-size:12px}
+.cp-body{padding:36px 0 80px;display:flex;flex-direction:column;gap:28px}
+.cp-intro,.cp-results,.cp-stores,.cp-disclosure{background:#fff;border:1px solid #dce7df;border-radius:18px;padding:26px;box-shadow:0 9px 26px #183b250c}
+.cp-intro h2,.cp-stores h2,.cp-disclosure h2{font-size:20px;letter-spacing:-.02em;margin:0 0 12px;color:#182f27}
+.cp-intro ol{margin:0 0 22px;padding-left:20px;display:grid;gap:8px;font-size:14px;color:#3d5a4b}
+.cp-intro ol b{display:block;color:#173f2d}
+.cp-store-list{display:flex;flex-wrap:wrap;gap:7px}
+.cp-store-list span{font-size:12px;border:1px solid #d6e5da;border-radius:20px;padding:4px 11px;color:#3d5a4b}
+.cp-store-list span.priced{background:#e5f3e9;border-color:#b7dcc4;color:#14634a;font-weight:800}
+.cp-results-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.cp-results-head h2{font-size:22px;margin:6px 0 2px;letter-spacing:-.03em}
+.cp-results-head p{font-size:12px;color:#647d6b;margin:0}
+.cp-toggle{font-size:13px;font-weight:700;color:#2e5a45;display:flex;gap:6px;align-items:center}
+.cp-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.cp-summary>div{background:#f2f8f4;border:1px solid #d6e8dc;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;min-width:0}
+.cp-summary span{font-size:11px;font-weight:800;color:#55735f}
+.cp-summary strong{font:900 22px 'Noto Sans JP',sans-serif;color:#b8341b;overflow-wrap:anywhere}
+.cp-summary>div:nth-child(n+2) strong{font-size:16px;color:#1d4332}
+.cp-summary small{font-size:11px;color:#647d6b}
+.cp-offers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.cp-offer{display:grid;grid-template-columns:28px 64px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #dce8df;border-radius:13px;padding:10px 12px;background:#fff}
+.cp-offer.is-cheapest{border-color:#e1a493;box-shadow:0 0 0 2px #f7d9cf}
+.cp-rank{font:900 15px 'Noto Sans JP',sans-serif;color:#2b8c6b;text-align:center}
+.cp-offer img,.cp-noimg{width:64px;height:64px;object-fit:contain;border-radius:8px;background:#f5f8f6;display:grid;place-items:center;font-size:24px}
+.cp-offer-store{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:12px;color:#55735f}
+.cp-store{font-size:10px;font-weight:900;border-radius:5px;padding:2px 7px;color:#fff;background:#666}
+.cp-store-rakuten{background:#bf0000}.cp-store-yahoo{background:#ff0033}
+.cp-best{font-style:normal;font-size:10px;font-weight:900;color:#fff;background:#b8341b;border-radius:5px;padding:2px 7px}
+.cp-offer-title{margin:3px 0;font-size:13px;line-height:1.55;color:#1d3d2f;font-weight:600}
+.cp-offer-meta{margin:0;font-size:11px;color:#647d6b}
+.cp-offer-price{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}
+.cp-offer-price strong{font:900 19px 'Noto Sans JP',sans-serif;color:#b8341b}
+.cp-offer-price small{font-size:11px;color:#647d6b;white-space:nowrap}
+.cp-offer-price a{margin-top:4px;background:#14634a;color:#fff;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:850;white-space:nowrap}
+.cp-pr{font-style:normal;font-size:9px;font-weight:900;color:#8a5a00;background:#fff3d6;border:1px solid #f0d699;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:1px}
+.cp-similar{margin-top:14px}
+.cp-similar>button,.cp-ask{border:0;background:transparent;color:#1f6c4d;font-size:13px;font-weight:800;cursor:pointer;padding:6px 0;text-decoration:underline}
+.cp-ask{margin-top:10px}
+.cp-muted,.cp-note{font-size:13px;color:#5f7a69}
+.cp-note{background:#fff9ea;border:1px solid #f0e0b0;border-radius:10px;padding:9px 12px}
+.cp-error{color:#9a352a;font-size:13px}
+.cp-stores>p,.cp-disclosure p{font-size:13px;color:#566d60;margin:0 0 12px}
+.cp-store-group h3{font-size:13px;color:#2e5a45;margin:14px 0 8px}
+.cp-store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.cp-store-grid a{display:flex;align-items:center;gap:6px;border:1px solid #d6e5da;border-radius:11px;padding:11px 13px;color:#1d4332;background:#fff;font-size:13px}
+.cp-store-grid a:hover{border-color:#5fa883}
+.cp-store-grid a span{margin-left:auto;color:#3c8a66;font-weight:800}
+.cp-page button:focus-visible,.cp-page a:focus-visible,.cp-page input:focus-visible{outline:3px solid #74c6a1;outline-offset:2px}
+@media(max-width:700px){
+ .cp-hero{padding:40px 0 34px}.cp-search{flex-direction:column}.cp-search button{width:100%}
+ .cp-intro,.cp-results,.cp-stores,.cp-disclosure{padding:18px}
+ .cp-summary{grid-template-columns:1fr}
+ .cp-offer{grid-template-columns:22px 52px minmax(0,1fr);row-gap:8px}
+ .cp-offer img,.cp-noimg{width:52px;height:52px}
+ .cp-offer-price{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center}
+}
+
+.cp-next-step{padding:22px;margin:18px 0;border:1px solid #bdd8c5;border-radius:12px;background:#f0f8f2}.cp-next-step>strong{font-size:18px;color:#16452f}.cp-next-step>p{font-size:12px;line-height:1.8}.cp-next-step .vl-primary{display:inline-flex;gap:10px;align-items:center;padding:12px 18px;color:#fff;background:#155f48;border-radius:8px;font-weight:700;text-decoration:none;min-height:44px}.cp-next-step small{font-size:10px}
+
+/* Keep payment amount and reward-adjusted estimates visually distinguishable. */
+.cp-result-controls{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px 18px}
+.cp-sort-label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:750;color:#2e5a45}
+.cp-sort-label select{max-width:340px;min-height:44px;border:1px solid #b4cfc0;border-radius:8px;background:#fff;color:#153e2b;padding:8px 12px;font:700 13px 'Noto Sans JP',sans-serif}
+.cp-result-controls .cp-toggle{min-height:44px}
+.cp-result-controls :is(input,select):focus-visible{outline:3px solid #14664f;outline-offset:3px}
+.cp-criteria-note{font-size:12px;line-height:1.85;color:#50695d;background:#f2f7f4;padding:10px 13px;border-top:1px solid #b5d3c1;margin:0 0 15px}
+.cp-offer-price .cp-point-estimate{font-size:12px;font-weight:750;color:#155c45;white-space:normal}
+@media(max-width:650px){.cp-result-controls{width:100%}.cp-sort-label{width:100%}.cp-sort-label select{max-width:none;width:100%}.cp-offer-price{justify-content:flex-start;gap:8px 16px;text-align:left}}

@@ -1,4 +1,4 @@
-import TravelPage from './TravelPage.jsx';
 import { mount } from '../shared/mount.jsx';
+import TravelPage from './TravelPage.jsx';
 
 mount(<TravelPage />);

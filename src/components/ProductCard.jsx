@@ -1,7 +1,8 @@
+import { recordOutboundClick } from '../shared/outboundClient.js';
 import { useMemo } from 'react';
-import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl, cleanSearchKeyword } from '../api';
-import { trackOutbound } from '../shared/track';
+import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl } from '../api';
 import { getOptimizedAffiliateRoute } from '../optimizationEngine';
+import { deriveProductQuery } from '../shared/priceCompare.js';
 
 function StarRating({ score }) {
     const stars = Math.round((score || 0) * 2) / 2;
@@ -16,20 +17,20 @@ function StarRating({ score }) {
 }
 
 export default function ProductCard({ item, viewMode, isSelected, onToggleCompare, isCheapest }) {
-    // 販促文言（【送料無料】等）を除いた商品名の先頭数語を他モール検索のキーワードにする。
-    // 以前は先頭1語だけで「【送料無料】Apple」のような検索になり、送客しても商品が見つからなかった。
-    const keyword = cleanSearchKeyword(item.itemName);
+    // 広告文を除き、型番とブランドを他モールへ引き継ぐ。
+    const keyword = deriveProductQuery(item.itemName) || item.itemName;
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
     const yahooUrl = buildYahooAffiliateUrl(keyword);
 
     // --- 楽天ファーストのルーティング結果をキャッシュ ---
     const { bestUrl, winnerPlatform, rakutenTracked } = useMemo(
-        () => getOptimizedAffiliateRoute(item, keyword, item.itemPrice),
+        () => getOptimizedAffiliateRoute(item, keyword),
         [item, keyword]
     );
     const platformLabel = winnerPlatform === 'rakuten' ? '楽天市場'
         : winnerPlatform === 'amazon' ? 'Amazon' : 'Yahoo!ショッピング';
-    const track = (target, placement) => () => trackOutbound({ section: 'products', target, placement });
+
+    const recordMerchant = (placement, merchant = winnerPlatform) => recordOutboundClick({ section: 'products', merchant: merchant === 'yahoo' ? 'yahoo-shopping' : merchant, placement, sponsored: true });
 
     return (
         <div className={`product-card${viewMode === 'list' ? ' list-card' : ''}${isSelected ? ' selected' : ''}`}>
@@ -41,7 +42,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                         {item.isFreeShipping ? '実質最安' : '実質最安（送料別）'}
                     </div>
                 )}
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link" onClick={track(winnerPlatform, 'card-image')}>
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link" onClick={() => recordMerchant('product-image')}>
                     {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.itemName} className="product-image" loading="lazy" />
                     ) : (
@@ -52,7 +53,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
 
             <div className="product-info-col">
                 <h3 className="product-title">
-                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link" onClick={track(winnerPlatform, 'card-title')}>
+                    <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="product-title-link" onClick={() => recordMerchant('product-title')}>
                         {item.itemName}
                     </a>
                 </h3>
@@ -109,19 +110,23 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     比較に追加
                 </label>
 
-                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first" onClick={track(winnerPlatform, 'card-cta')}>
-                    {platformLabel}で購入する ▶<br />
+                <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-primary-cta rakuten-first" onClick={() => recordMerchant('product-primary')}>
+                    {platformLabel}で価格・在庫を確認 ▶<br />
                     <span className="dy-tooltip">
-                        {rakutenTracked ? '楽天市場の商品ページへ' : `楽天の在庫が確認できないため${platformLabel}へ`}
+                        {rakutenTracked ? '楽天市場の商品ページへ' : `別ショップの検索結果で条件を確認`}
                     </span>
                 </a>
 
+                <a className="btn-compare-all" href={`/compare/?q=${encodeURIComponent(deriveProductQuery(item.itemName))}&ref=${encodeURIComponent(item.itemName.slice(0, 160))}`}>
+                    主要ショップで価格比較 →
+                </a>
+
                 <div className="sub-actions">
-                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small" onClick={track('amazon', 'card-cross')}>
-                        Amazonで価格を見る
+                    <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small" onClick={() => recordMerchant('product-secondary', 'amazon')}>
+                        Amazonで探す
                     </a>
-                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small" onClick={track('yahoo', 'card-cross')}>
-                        Yahoo!で価格を見る
+                    <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small" onClick={() => recordMerchant('product-secondary', 'yahoo-shopping')}>
+                        Yahoo!で探す
                     </a>
                 </div>
             </div>

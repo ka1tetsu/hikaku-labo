@@ -5,9 +5,9 @@ import { SITE_SECTIONS, isActiveSection } from '../src/shared/siteDirectory.js';
 
 const text = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 
-test('all three public entrypoints have one shared route and original Tabler icons', () => {
-  assert.deepEqual(SITE_SECTIONS.map(item => item.href), ['/', '/tools/', '/travel/']);
-  assert.equal(new Set(SITE_SECTIONS.map(item => item.id)).size, 3);
+test('all public sections have one shared route and Tabler icons', () => {
+  assert.deepEqual(SITE_SECTIONS.map(item => item.href), ['/', '/tools/', '/life/', '/travel/', '/database']);
+  assert.equal(new Set(SITE_SECTIONS.map(item => item.id)).size, 5);
   for (const item of SITE_SECTIONS) {
     assert.equal(isActiveSection(item.id), true);
     assert.ok(existsSync(new URL('../public/icons/tabler/' + item.icon + '.svg', import.meta.url)));
@@ -19,7 +19,7 @@ test('shared navigation supports screen readers and route-specific current item'
   const header = text('src/shared/SiteHeader.jsx');
   assert.match(header, /aria-current=/);
   assert.match(header, /href="#main-content"/);
-  assert.match(header, /aria-label="比較ラボのサイト内ナビゲーション"/);
+  assert.match(header, /aria-label="Vivlicaのサイト内ナビゲーション"/);
   for (const page of ['src/App.jsx', 'src/tools/ToolsPage.jsx', 'src/travel/TravelPage.jsx']) {
     assert.match(text(page), /id="main-content"/);
   }

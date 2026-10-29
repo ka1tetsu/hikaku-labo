@@ -1,51 +1,51 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import SiteFooter from './shared/SiteFooter.jsx';
+import { recordOutboundClick } from './shared/outboundClient.js';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
+import SavingsPlanner from './services/SavingsPlanner.jsx';
 import SectionDirectory from './shared/SectionDirectory.jsx';
+import SiteConcierge from './shared/SiteConcierge.jsx';
+import { describeProductRequest, parseProductRequest } from './shared/productAdvisor.js';
+import { openConcierge } from './shared/conciergeActions.js';
 import './shared/home-refresh.css';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
+import ProductSearchLinks from './components/ProductSearchLinks.jsx';
 import CategoryNav from './components/CategoryNav';
 import RankingSection from './components/RankingSection';
 import ArticleSection from './components/ArticleSection';
 import ComparisonTable from './components/ComparisonTable';
-import MallSearchFallback from './components/MallSearchFallback';
-import CategoryGuide, { CategoryHero } from './components/CategoryGuide';
-import { searchRakutenItems, buildMallSearchLinks } from './api';
-import { trackOutbound } from './shared/track';
-import {
-  PRODUCT_CATEGORIES,
-  categoryPageTitle,
-  categoryPath,
-  resolveInitialView,
-} from './shared/productCategories.js';
+import { searchRakutenItems, buildAmazonAffiliateUrl, buildYahooAffiliateUrl, buildRakutenSearchAffiliateUrl } from './api';
 import './index.css';
 
-const DEFAULT_KEYWORD = 'おすすめ 人気';
-const HOME_TITLE = '比較ラボ - あらゆる商品・サービスの総合比較サイト';
-const MALL_BAR_KEYWORDS = ['ワイヤレスイヤホン', 'ノートパソコン', '4Kテレビ', 'ドラム式洗濯機'];
+const CATEGORIES = [
+  { label: 'スマートフォン', genreId: '101240', emoji: '📱' },
+  { label: 'パソコン', genreId: '501293', emoji: '💻' },
+  { label: 'カメラ', genreId: '201026', emoji: '📷' },
+  { label: 'テレビ', genreId: '213010', emoji: '📺' },
+  { label: 'イヤホン', genreId: '216131', emoji: '🎧' },
+  { label: '家電', genreId: '100804', emoji: '🏠' },
+  { label: 'ゲーム', genreId: '568453', emoji: '🎮' },
+  { label: 'ファッション', genreId: '100371', emoji: '👗' },
+];
 
-function currentLocation() {
-  if (typeof window === 'undefined') return { pathname: '/', search: '' };
-  return { pathname: window.location.pathname, search: window.location.search };
-}
-
-export default function App({ initialPath, initialSearch = '' }) {
-  const [initialView] = useState(() => {
-    const loc = initialPath ? { pathname: initialPath, search: initialSearch } : currentLocation();
-    return resolveInitialView(loc.pathname, loc.search);
-  });
-  const [query, setQuery] = useState(initialView.keyword);
-  const [inputValue, setInputValue] = useState(initialView.keyword);
+export default function App() {
+  const [query, setQuery] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [products, setProducts] = useState([]);
-  // 初回は必ず検索するので loading から始める（静的HTMLに「見つかりません」を出さないため）
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [activeCategory, setActiveCategory] = useState(initialView.category);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortMode, setSortMode] = useState('popular');
   const [compareList, setCompareList] = useState([]);
+  // Natural-language search ("母の日のプレゼント 3000円くらい") → keyword + filters.
+  const [smart, setSmart] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const searchController = useRef(null);
+  useEffect(() => () => searchController.current?.abort(), []);
 
   const MAX_COMPARE = 4;
 
@@ -78,87 +78,111 @@ export default function App({ initialPath, initialSearch = '' }) {
     return products.reduce((min, p) => (p.effectivePrice < min.effectivePrice ? p : min)).itemCode;
   }, [products]);
 
-  const doSearch = useCallback(async (kw, genre, pg = 1) => {
+  const doSearch = useCallback(async (kw, genre, pg = 1, options = {}) => {
     if (!kw && !genre) return;
+    searchController.current?.abort();
+    const controller = new AbortController();
+    searchController.current = controller;
+    setHasSearched(true);
     setLoading(true);
     setError(null);
+    document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     try {
-      const data = await searchRakutenItems(kw, genre, pg);
+      const data = await searchRakutenItems(kw, genre, pg, { ...options, signal: controller.signal });
+      if (controller.signal.aborted) return;
       setProducts(data.items);
       setTotalPages(Math.min(data.pageCount, 100));
       setPage(pg);
-      if (data.items.length > 0 && !data.affiliateActive) {
-        console.warn('[hikaku-labo] 楽天APIが affiliateUrl を返していません。affiliateId の設定を確認してください。');
-      }
     } catch (e) {
-      // モックで取り繕わず、実際の失敗を伝える（偽の商品で比較させないため）。
-      // 技術的な詳細は訪問者ではなく開発者向けにコンソールへ出す。
-      console.error('[hikaku-labo] 商品データの取得に失敗しました。/api/diag で原因を確認してください。', e);
+      if (controller.signal.aborted) return;
       setError(e.message || '商品データの取得に失敗しました。');
       setProducts([]);
     } finally {
-      setLoading(false);
+      if (searchController.current === controller && !controller.signal.aborted) setLoading(false);
     }
   }, []);
 
-  const runView = useCallback((view) => {
-    setActiveCategory(view.category);
-    setQuery(view.keyword);
-    setInputValue(view.keyword);
-    setCompareList([]);
-    if (view.category) doSearch(view.category.keyword, view.category.genreId, 1);
-    else doSearch(view.keyword || DEFAULT_KEYWORD, '', 1);
+  // 初回ロード。?keyword= / ?genreId= が付いていればそれを検索する
+  // （フッターのカテゴリリンクからの遷移に対応）
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const kw = params.get('keyword') || '';
+    const genre = params.get('genreId') || '';
+
+    if (kw || genre) {
+      setInputValue(kw);
+      setQuery(kw);
+      const matched = CATEGORIES.find(c => c.genreId === genre);
+      if (matched) setActiveCategory(matched);
+      doSearch(kw || matched?.label || '', genre, 1);
+    }
   }, [doSearch]);
 
-  // 初回ロード（URL由来の状態で検索）と、ブラウザの戻る/進む
+  // The concierge's "比較ページで一覧を見る" runs the search on this page.
   useEffect(() => {
-    runView(initialView);
-    const onPop = () => {
-      const loc = currentLocation();
-      runView(resolveInitialView(loc.pathname, loc.search));
+    const onAction = (event) => {
+      if (event.detail?.type !== 'products' || !event.detail.keyword) return;
+      event.preventDefault();
+      const kw = event.detail.keyword;
+      setInputValue(kw);
+      setQuery(kw);
+      setActiveCategory(null);
+      setSmart(null);
+      doSearch(kw, '', 1);
+      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
-  }, [initialView, runView]);
+    window.addEventListener('hikaku:concierge-action', onAction);
+    return () => window.removeEventListener('hikaku:concierge-action', onAction);
+  }, [doSearch]);
 
-  // タイトルを表示内容に合わせる（共有・ブックマーク・ブラウザ履歴で分かりやすくする）
-  useEffect(() => {
-    if (activeCategory) document.title = categoryPageTitle(activeCategory);
-    else if (query) document.title = `「${query}」の価格比較・最安値｜比較ラボ`;
-    else document.title = HOME_TITLE;
-  }, [activeCategory, query]);
-
-  const navigate = (url) => {
-    if (window.location.pathname + window.location.search !== url) window.history.pushState(null, '', url);
+  // Plain product names search as typed; wishes, budgets and preferences are interpreted.
+  const runSmartSearch = (text) => {
+    const request = parseProductRequest(text);
+    const interpreted = request.keyword && (request.need || request.maxPrice || request.minPrice || request.freeShipping || request.sort !== 'standard');
+    setActiveCategory(null);
+    if (!interpreted) {
+      setSmart(null);
+      setQuery(text);
+      doSearch(text, '', 1);
+      return;
+    }
+    const options = { minPrice: request.minPrice, maxPrice: request.maxPrice, sort: request.sort, freeShipping: request.freeShipping };
+    setSmart({ original: text, keyword: request.keyword, options, summary: describeProductRequest(request), alternatives: request.need ? request.need.keywords.filter(k => k !== request.keyword) : [] });
+    if (request.sort === '+itemPrice') setSortMode('effective-asc');
+    if (request.sort === '-reviewAverage') setSortMode('review');
+    setQuery(request.keyword);
+    doSearch(request.keyword, '', 1, options);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const kw = inputValue.trim();
-    if (!kw) return;
-    navigate(`/?keyword=${encodeURIComponent(kw)}`);
-    runView({ category: null, keyword: kw });
+    if (!inputValue.trim()) return;
+    runSmartSearch(inputValue.trim());
+  };
+
+  const searchAlternative = (keyword) => {
+    setSmart(current => current && { ...current, keyword, alternatives: [current.keyword, ...current.alternatives.filter(k => k !== keyword)] });
+    setQuery(keyword);
+    doSearch(keyword, '', 1, smart?.options || {});
   };
 
   const handleCategory = (cat) => {
-    navigate(categoryPath(cat));
-    runView({ category: cat, keyword: '' });
+    setSmart(null);
+    setActiveCategory(cat);
+    setQuery('');
+    setInputValue('');
+    doSearch(cat.label, cat.genreId, 1);
   };
 
   const handlePage = (newPage) => {
-    if (activeCategory) doSearch(activeCategory.keyword, activeCategory.genreId, newPage);
-    else doSearch(query || DEFAULT_KEYWORD, '', newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    doSearch(query, activeCategory?.genreId || '', newPage, smart?.options || {});
   };
 
   const searchTitle = activeCategory
     ? `「${activeCategory.label}」の人気商品・最安値`
     : query
       ? `「${query}」の検索結果`
-      : '注目の人気商品';
-
-  const fallbackKeyword = activeCategory ? activeCategory.keyword : (query || DEFAULT_KEYWORD);
-  const mallBarKeywords = activeCategory ? activeCategory.related : MALL_BAR_KEYWORDS;
+      : '商品名・型番から価格を調べる';
 
   return (
     <div className="app-wrapper">
@@ -169,33 +193,28 @@ export default function App({ initialPath, initialSearch = '' }) {
       />
 
       <CategoryNav
-        categories={PRODUCT_CATEGORIES}
+        categories={CATEGORIES}
         activeCategory={activeCategory}
         onSelect={handleCategory}
       />
 
       <main id="main-content" className="main-content container">
-        {activeCategory ? <CategoryHero category={activeCategory} /> : <SectionDirectory />}
+        <SectionDirectory />
+        <SavingsPlanner />
 
-        {/* 主要モールの検索結果への計測付きリンク */}
+        {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
           <div className="affiliate-bar-title">
             主要モールの検索結果を比較・確認
+            <a className="affiliate-compare-link" href="/compare/">型番で全ショップの価格を比較 →</a>
           </div>
           <div className="affiliate-bar-links">
-            {mallBarKeywords.map(kw => (
+            {['スマートフォン', 'ノートPC', '液晶テレビ', 'ドラム式洗濯機'].map(kw => (
               <div key={kw} className="affiliate-kw-group">
                 <span className="kw-label">{kw}：</span>
-                {buildMallSearchLinks(kw).map(link => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer sponsored"
-                    className={`kw-link ${link.id}`}
-                    onClick={() => trackOutbound({ section: 'products', target: link.id, placement: 'mall-bar' })}
-                  >{link.id === 'rakuten' ? '楽天' : link.id === 'yahoo' ? 'Yahoo' : link.label}</a>
-                ))}
+                <a href={buildRakutenSearchAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link rakuten" onClick={() => recordOutboundClick({ section: 'products', merchant: 'rakuten', placement: 'quick-search', sponsored: true })}>楽天</a>
+                <a href={buildAmazonAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link amazon" onClick={() => recordOutboundClick({ section: 'products', merchant: 'amazon', placement: 'quick-search', sponsored: true })}>Amazon</a>
+                <a href={buildYahooAffiliateUrl(kw)} target="_blank" rel="noopener noreferrer sponsored" className="kw-link yahoo" onClick={() => recordOutboundClick({ section: 'products', merchant: 'yahoo-shopping', placement: 'quick-search', sponsored: true })}>Yahoo</a>
               </div>
             ))}
           </div>
@@ -238,6 +257,17 @@ export default function App({ initialPath, initialSearch = '' }) {
           )}
         </div>
 
+        {hasSearched && <ProductSearchLinks keyword={query || activeCategory?.label || ''} />}
+
+        {smart && (
+          <div className="hl-smart-search" role="status">
+            <p><strong>「{smart.original}」</strong>を、<strong>{smart.keyword}</strong>{smart.summary.filter(item => !item.startsWith('検索:') && item !== smart.keyword).length > 0 && <>（{smart.summary.filter(item => !item.startsWith('検索:')).join('・')}）</>}で検索しました。</p>
+            {smart.alternatives.length > 0 && <div className="hl-smart-chips"><span>ほかの候補：</span>{smart.alternatives.map(k => <button type="button" key={k} onClick={() => searchAlternative(k)}>{k}</button>)}</div>}
+            <button type="button" className="hl-smart-ask" onClick={() => openConcierge(smart.original)}>✳ 入力条件から別の候補を探す</button>
+          </div>
+        )}
+
+        {!hasSearched && <div className="hl-search-intro"><h3>買いたい商品が決まっていますか？</h3><p>上の検索窓に商品名や型番を入力してください。価格取得に対応していないショップも、検索結果へのリンクから確認できます。</p><a className="vl-primary" href="/compare/">ショップを横断して価格を比較 →</a></div>}
         {loading && (
           <div className="loading-state">
             <div className="spinner"></div>
@@ -245,17 +275,18 @@ export default function App({ initialPath, initialSearch = '' }) {
           </div>
         )}
 
-        {!loading && error && (
-          <MallSearchFallback keyword={fallbackKeyword} related={mallBarKeywords} />
+        {error && (
+          <div className="error-box">
+            <strong>商品データを取得できませんでした。</strong>
+            <p>現在、商品情報を読み込めません。上のショップ検索から価格・在庫を直接確認できます。</p>
+            <button type="button" className="page-btn" onClick={() => doSearch(query || activeCategory?.label || 'おすすめ 人気', activeCategory?.genreId || '', page, smart?.options || {})}>もう一度読み込む</button>
+          </div>
         )}
 
-        {!loading && !error && products.length === 0 && (
-          <>
-            <div className="empty-state">
-              <p>🔍 当サイトの検索では商品が見つかりませんでした。各モールでも探せます。</p>
-            </div>
-            <MallSearchFallback keyword={fallbackKeyword} related={mallBarKeywords} placement="empty" />
-          </>
+        {!loading && !error && hasSearched && products.length === 0 && (
+          <div className="empty-state">
+            <p>🔍 商品が見つかりませんでした。別のキーワードをお試しください。</p>
+          </div>
         )}
 
         {compareList.length > 0 && (
@@ -310,16 +341,16 @@ export default function App({ initialPath, initialSearch = '' }) {
           </>
         )}
 
-        {activeCategory && <CategoryGuide category={activeCategory} />}
-
+        {/* SEO and Volume boosting section */}
         <ArticleSection />
 
+        {/* Ranking sidebar */}
         <RankingSection />
-
-        {activeCategory && <SectionDirectory headingLevel="h2" />}
       </main>
 
       <Footer />
+    <SiteFooter />
+      <SiteConcierge section="products" />
     </div>
   );
 }

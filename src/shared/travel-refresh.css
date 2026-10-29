@@ -1,7 +1,7 @@
 /* Consistent, readable decision support visuals on the trip budgeting page. */
 .tv-page{--ink:#19332b;--muted:#546d60;--brand:#14664f;--border:#dbe6df;background:#f5f7f5;color:#1a332b;font-size:15px;line-height:1.85}
 .tv-page .hl-chrome{position:relative;z-index:50}
-.tv-page .tv-hero{background:linear-gradient(120deg,#142f2a,#15533f 56%,#28725b)}
+.tv-page .tv-hero{background:#193e34}
 .tv-page .tv-hero h1{letter-spacing:-.045em}
 .tv-page .tv-hero-text>p{font-size:15px;color:#e0ebe5}
 .tv-page .tv-hero-minor{font-size:12px;color:#e1f1e5}
@@ -52,9 +52,14 @@
  .tv-page .tv-guide{padding-block:58px}
 }
 
-/* 楽天トラベル（楽天アフィリエイト）エリア別リンク */
-.tv-rakuten-links{display:flex;flex-direction:column;gap:8px;margin:14px 0;padding:14px;border:1px solid #e5d3d3;border-radius:12px;background:#fff}
-.tv-rakuten-links strong{font-size:14px;color:#1c3029}
-.tv-rakuten-grid{display:flex;flex-wrap:wrap;gap:8px}
-.tv-rakuten-grid a{display:inline-flex;align-items:center;padding:8px 12px;border-radius:9px;background:#bf0000;color:#fff!important;font-weight:800;font-size:13px;text-decoration:none!important}
-.tv-rakuten-grid a:hover{background:#9e0000}
+.tv-page .tv-editorial-link{margin-top:30px;padding:25px 29px;border:1px solid #d4e7d8;background:#e9f4ec;border-radius:14px;display:flex;justify-content:space-between;align-items:center;gap:23px}
+.tv-page .tv-editorial-link strong{font-size:16px;color:#204331}
+.tv-page .tv-editorial-link p{font-size:13px;margin:7px 0 0;color:#5b7965}
+.tv-page .tv-editorial-link a{background:#166449;color:#fff!important;border-radius:9px;padding:12px 17px;font-size:13px;font-weight:850;white-space:nowrap;text-decoration:none}
+@media(max-width:670px){.tv-page .tv-editorial-link{flex-direction:column;align-items:stretch;padding:20px}.tv-page .tv-editorial-link a{text-align:center;white-space:normal}}
+.tv-booking-shortcuts{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.tv-booking-shortcuts a{display:inline-flex;align-items:center;min-height:44px;border:1px solid #bad2c4;border-radius:8px;padding:10px 14px;color:#155f48;background:#fff;font-size:13px;font-weight:750;text-decoration:none}
+.tv-booking-date{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;margin:14px 0}
+.tv-booking-date input{box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:10px;border:1px solid #c4d9ca;border-radius:7px;background:#fff;color:#234c35;font:inherit}
+.tv-result-booking .tvw-links{margin:12px 0}
+.tv-result-booking .tvw-links a{min-width:0;overflow-wrap:anywhere}

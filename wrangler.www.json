@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vivlica-www-redirect",
+  "main": "cloudflare/redirect.js",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "www.vivlica.com", "custom_domain": true }]
+}

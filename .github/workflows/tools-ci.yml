@@ -20,5 +20,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:all
+      - run: npm run sync:database-routes -- --check
       - run: npm run lint
       - run: npm run build
+      - run: npm run verify:build
+      - run: npm run audit:affiliate
+      - name: Check Cloudflare app and redirect deployments without publishing
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: npm run check:cloudflare

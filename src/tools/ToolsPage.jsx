@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import DecisionEvidence from '../shared/DecisionEvidence.jsx';
+import SiteFooter from '../shared/SiteFooter.jsx';
+import { useEffect, useRef, useState } from 'react';
+import DecisionBar from '../shared/DecisionBar.jsx';
 import SiteHeader from '../shared/SiteHeader.jsx';
+import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { CATEGORIES, LAST_REVIEWED } from './catalog.js';
 import { rankServices } from './score.js';
 import { outboundLink, recordOutbound } from './affiliate.js';
@@ -21,7 +25,7 @@ const PRIORITIES = [
 ];
 const ICON = { website: '◧', shop: '▦', wordpress: '◉' };
 
-function OfficialLink({ service, compact = false }) {
+function OfficialLink({ service, compact = false, placement = 'service-card' }) {
   const destination = outboundLink(service);
   return (
     <a
@@ -29,7 +33,7 @@ function OfficialLink({ service, compact = false }) {
       href={destination.url}
       target="_blank"
       rel={destination.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'}
-      onClick={() => recordOutbound(service, destination.sponsored)}
+      onClick={() => recordOutbound(service, destination.sponsored, placement)}
     >
       {destination.sponsored ? '広告リンクで公式サイトへ' : '公式サイトで確認'}
       <span aria-hidden="true"> ↗</span>
@@ -77,7 +81,7 @@ function PlanCard({ service, index, selected, toggle }) {
       <div className="tl-card-actions">
         <OfficialLink service={service} />
         {typeof A8_AD_PLACEMENTS[service.id] === 'string' && A8_AD_PLACEMENTS[service.id].trim() && (
-          <div className="tl-a8-placement" aria-label="A8.netアフィリエイト広告">
+          <div className="tl-a8-placement" aria-label="A8.netアフィリエイト広告" onClick={event => { if (event.target.closest('a')) recordOutbound(service, true, 'a8-service-card'); }}>
             <span className="tl-a8-label">広告・PR（A8.net）</span>
             <div dangerouslySetInnerHTML={{ __html: A8_AD_PLACEMENTS[service.id] }} />
           </div>
@@ -94,16 +98,36 @@ function PlanCard({ service, index, selected, toggle }) {
   );
 }
 
+// ?category=&budget=&priority= (used by the concierge) preselects the selector.
+function initialChoice(key, options, fallback) {
+  const value = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get(key);
+  return options.some(option => option.id === value) ? value : fallback;
+}
+
 export default function ToolsPage() {
-  const [category, setCategory] = useState('website');
-  const [budget, setBudget] = useState('standard');
-  const [priority, setPriority] = useState('easy');
+  const [category, setCategory] = useState(() => initialChoice('category', CATEGORIES, 'website'));
+  const [budget, setBudget] = useState(() => initialChoice('budget', BUDGETS, 'standard'));
+  const [priority, setPriority] = useState(() => initialChoice('priority', PRIORITIES, 'easy'));
   const [selectedIds, setSelectedIds] = useState([]);
   const [onlySelection, setOnlySelection] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const recommendationRef = useRef(null);
   const ranking = rankServices({ category, budget, priority });
   const displayed = onlySelection ? ranking.filter(service => selectedIds.includes(service.id)) : ranking;
   const comparison = ranking.filter(service => selectedIds.includes(service.id));
+  useEffect(() => {
+    const onAction = event => {
+      if (event.detail?.type !== 'tools') return;
+      const params = new URL(event.detail.url, window.location.origin).searchParams;
+      event.preventDefault();
+      if (CATEGORIES.some(c => c.id === params.get('category'))) { setCategory(params.get('category')); setSelectedIds([]); setOnlySelection(false); }
+      if (BUDGETS.some(b => b.id === params.get('budget'))) setBudget(params.get('budget'));
+      if (PRIORITIES.some(p => p.id === params.get('priority'))) setPriority(params.get('priority'));
+      document.getElementById('selector')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('hikaku:concierge-action', onAction);
+    return () => window.removeEventListener('hikaku:concierge-action', onAction);
+  }, []);
   function changeCategory(next) {
     setCategory(next);
     setSelectedIds([]);
@@ -120,8 +144,8 @@ export default function ToolsPage() {
         <section className="tl-hero">
           <div className="tl-wrap tl-hero-grid">
             <div className="tl-hero-copy">
-              <span className="tl-eyebrow"><span className="tl-dot"/> THE SMART WAY TO CHOOSE TOOLS</span>
-              <h1>あなたの仕事に、<br/><em>ちょうどいい</em>ツールを。</h1>
+              <span className="tl-eyebrow"><span className="tl-dot"/> ITツールの比較</span>
+              <h1>用途と予算で、<br/><em>ITツールを選ぶ。</em></h1>
               <p>Webサイト、ネットショップ、WordPress。目的と予算を選ぶだけで、公式情報に基づいてサービスを整理。広告報酬の多さではなく、条件との一致度で比較します。</p>
               <div className="tl-hero-cta">
                 <a href="#selector" className="tl-hero-button">無料で診断を始める <span>↗</span></a>
@@ -129,17 +153,7 @@ export default function ToolsPage() {
               </div>
               <div className="tl-trust"><span>✓ 根拠は公式サイト</span><span>✓ 広告表示を明示</span><span>✓ 無料で比較</span></div>
             </div>
-            <div className="tl-hero-visual" aria-hidden="true">
-              <div className="tl-floating-label">YOUR TOOL MATCH</div>
-              <div className="tl-visual-card">
-                <div className="tl-visual-top"><span>サービス選定</span><span className="tl-live-mark">● ANALYSIS</span></div>
-                <div className="tl-visual-line"><span>01 / 目的</span><strong>Webサイト制作</strong><span>✓</span></div>
-                <div className="tl-visual-line"><span>02 / 予算</span><strong>月5,000円以内</strong><span>✓</span></div>
-                <div className="tl-visual-line"><span>03 / 重視</span><strong>使いやすさ</strong><span>✓</span></div>
-                <div className="tl-visual-result"><span>CONSIDER</span><b>サービスを比較</b><i>↗</i></div>
-              </div>
-              <span className="tl-visual-deco tl-deco-a">✳</span><span className="tl-visual-deco tl-deco-b">✳</span>
-            </div>
+            <DecisionEvidence section="tools"/>
           </div>
         </section>
 
@@ -151,7 +165,7 @@ export default function ToolsPage() {
 
         <section className="tl-work tl-wrap" id="selector">
           <div className="tl-section-head">
-            <div><span className="tl-overline">FREE TOOL SELECTOR</span><h2>あなたに合うサービスを診断</h2><p>入力結果に合わせて順位が変わります。気になる候補は最大3つまで横並びで比較できます。</p></div>
+            <div><span className="tl-overline">用途と予算で比較</span><h2>あなたに合うサービスを診断</h2><p>入力結果に合わせて順位が変わります。気になる候補は最大3つまで横並びで比較できます。</p></div>
             <span className="tl-counter">約1分で完了</span>
           </div>
           <div className="tl-work-grid">
@@ -190,6 +204,12 @@ export default function ToolsPage() {
                 <div><span className="tl-overline">YOUR RECOMMENDATIONS</span><h3>{CATEGORIES.find(x => x.id === category).title} — 比較結果</h3><p>公開された機能と参考価格から独自ルールで点数化。AI生成による根拠の捏造はしません。</p></div>
                 <span className="tl-result-count">{ranking.length}件を比較</span>
               </div>
+              <div ref={recommendationRef} className="vl-tool-pick">
+                <span>この条件での最初の候補</span><strong>{ranking[0].name}</strong><p>{ranking[0].reasons[0]}</p>
+                <small>{ranking[0].price.label} · {ranking[0].price.detail}</small>
+                <OfficialLink service={ranking[0]} placement="tool-top-pick" />
+                <small>予算内かどうか、年払い・手数料の条件を公式で確認してください。</small>
+              </div>
               <div className="tl-results-actions">
                 <span>並び順：条件適合スコア順</span>
                 <button type="button" disabled={selectedIds.length === 0} onClick={() => setOnlySelection(v => !v)}>{onlySelection ? 'すべて表示' : '選択した候補のみ表示'}（{selectedIds.length}/3）</button>
@@ -217,7 +237,8 @@ export default function ToolsPage() {
           </table></div>
         </section>}
 
-        <section className="tl-method tl-wrap">
+        <aside className="hl-inline-guide" aria-label="ITサービス選びのガイド"><div><strong>導入前に、料金と運用の落とし穴を確認</strong><p>月額以外の手数料や、データ移行の条件もチェックしましょう。</p></div><a href="/guides/website-tools/">サイト制作・ネットショップの選び方 ↗</a></aside>
+        <section className="tl-method tl-wrap" id="method">
           <div className="tl-method-heading"><span className="tl-overline">HOW WE COMPARE</span><h2>広告よりも、納得できる選び方を。</h2></div>
           <div className="tl-method-grid">
             <article><span>01 / VERIFIED</span><h3>情報源を明示</h3><p>公式の料金・機能ページを各サービスに添付。出典のない価格や架空のユーザー評価は掲載しません。</p></article>
@@ -231,7 +252,7 @@ export default function ToolsPage() {
 
       <footer className="tl-footer">
         <div className="tl-wrap tl-footer-top">
-          <div><div className="tl-footer-brand"><span>✳</span> 比較ラボ / tools</div><p>必要なものを、必要なだけ。<br/>納得できるサービス選びのために。</p></div>
+          <div><div className="tl-footer-brand"><span>✳</span> Vivlica / tools</div><p>必要なものを、必要なだけ。<br/>納得できるサービス選びのために。</p></div>
           <div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="#selector">無料診断</a><a href="#disclosure">広告の開示</a></div>
           <div><b>情報の注意事項</b><p>情報確認日：{LAST_REVIEWED}</p><p>料金と提供機能は予告なく変更されることがあります。</p></div>
         </div>
@@ -239,10 +260,13 @@ export default function ToolsPage() {
           <h3>広告・アフィリエイトに関する開示</h3>
           <p>当サイトは広告・アフィリエイトプログラムから報酬を受け取る場合があります。提携が承認された広告リンクには「広告リンク」と表示します。広告契約のないサービスも掲載し、ランキングには広告報酬額を使用しません。現時点でリンクの承認・報酬発生は保証されません。</p>
           <h3>プライバシー</h3>
-          <p>診断で選んだ条件はこのページ内で処理し、氏名・メールアドレスを収集しません。公式サイトへのクリック時にはサービスIDと広告リンクの有無だけを、運営上の集計目的で当サイトに送信します。外部サイトでのデータ取扱いはリンク先の規定をご確認ください。</p>
+          <p>診断で選んだ条件はこのページ内で処理し、氏名・メールアドレスを収集しません。ページ種別、外部リンクのサービスID・配置・広告リンクの有無を、運営上の集計目的で当サイトに送信します。外部サイトでのデータ取扱いはリンク先の規定をご確認ください。</p>
         </div>
-        <div className="tl-wrap tl-footer-bottom">© 2026 比較ラボ <a href="#selector">ページ上部へ ↑</a></div>
+        <div className="tl-wrap tl-footer-bottom">© 2026 Vivlica <a href="#selector">ページ上部へ ↑</a></div>
       </footer>
+      <DecisionBar anchorRef={recommendationRef} name={ranking[0].name} detail={ranking[0].price.label} section="tools" merchant={ranking[0].id} link={outboundLink(ranking[0])} placement="tools-decision-bar" caution="年払い・手数料などの条件を確認" />
+      <SiteConcierge section="tools" />
+    <SiteFooter />
     </div>
   );
 }

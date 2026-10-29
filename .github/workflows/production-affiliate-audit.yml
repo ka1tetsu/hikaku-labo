@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'  # daily, 12:00 JST
 
 permissions:
   contents: read
@@ -25,14 +27,15 @@ jobs:
           npm run test:all
           npm run lint
           npm run build
+          npm run verify:build
       - name: Check production site via real HTTP
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule'
         shell: bash
         env:
-          PUBLIC_SITE_URL: https://hikaku-labo.vercel.app
+          PUBLIC_SITE_URL: https://vivlica.com
         run: |
           set -euo pipefail
-          for path in "/" "/tools/" "/travel/"; do
+          for path in "/" "/compare/" "/life/" "/sim/" "/hikari/" "/card/" "/hoken/" "/tools/" "/travel/" "/guides/travel-budget/" "/guides/website-tools/" "/robots.txt" "/sitemap.xml"; do
             printf '\n=== Checking %s%s ===\n' "$PUBLIC_SITE_URL" "$path"
             status=$(curl -L -sS --max-time 30 --retry 2 -o /tmp/hikaku-check.html -w '%{http_code}' "$PUBLIC_SITE_URL$path")
             echo "HTTP status: $status"
@@ -44,8 +47,14 @@ jobs:
               exit 1
             fi
             if [ "$path" = "/travel/" ]; then
-              grep -q '旅行予算シミュレーター' /tmp/hikaku-check.html || {
+              grep -q 'Vivlica Travel' /tmp/hikaku-check.html || {
                 echo "::error::Travel page not served at /travel/."
+                exit 1
+              }
+            fi
+            if [ "$path" = "/sitemap.xml" ]; then
+              grep -Fq "$PUBLIC_SITE_URL/guides/travel-budget/" /tmp/hikaku-check.html || {
+                echo "::error::Sitemap missing travel guide."
                 exit 1
               }
             fi
@@ -56,9 +65,62 @@ jobs:
               }
             fi
           done
+          status=$(curl -sS --max-time 20 -X POST -H 'Content-Type: application/json' --data '{"event":"invalid"}' -o /tmp/vivlica-track-check.json -w '%{http_code}' "$PUBLIC_SITE_URL/api/track")
+          if [ "$status" != "400" ]; then
+            echo "::error::Production tracking function returned HTTP $status for an invalid event; expected 400."
+            exit 1
+          fi
+          python3 -c 'import json; assert json.load(open("/tmp/vivlica-track-check.json"))["error"] == "invalid_event"'
+      - name: Inspect requested Vivlica domain
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: python
+        run: |
+          import json, re, socket, subprocess, urllib.request, urllib.error
+          for host in ['vivlica.com', 'www.vivlica.com']:
+              result = {'host': host}
+              try:
+                  result['addresses'] = sorted({entry[4][0] for entry in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)})
+              except socket.gaierror:
+                  result['dns'] = 'not_resolved'
+              try:
+                  ns = subprocess.run(['dig', '+short', 'NS', host], capture_output=True, text=True, timeout=8)
+                  result['nameservers'] = ns.stdout.split()
+              except Exception:
+                  result['nameservers'] = []
+              try:
+                  req = urllib.request.Request('https://' + host, headers={'User-Agent': 'Vivlica-domain-readiness-check'})
+                  with urllib.request.urlopen(req, timeout=10) as response:
+                      result['http_status'] = response.status
+                      result['final_host'] = urllib.parse.urlparse(response.url).hostname
+                      html = response.read(16000).decode('utf-8', errors='replace')
+                      title = re.search(r'<title[^>]*>(.*?)</title>', html, re.I | re.S)
+                      result['title'] = re.sub(r'\s+', ' ', title.group(1)).strip()[:160] if title else ''
+              except urllib.error.HTTPError as error:
+                  result['http_status'] = error.code
+              except Exception as error:
+                  result['connection'] = type(error).__name__
+              message = json.dumps(result, ensure_ascii=True).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::notice title=Vivlica domain inspection::' + message)
+      - name: Audit live revenue readiness
+        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
+        run: npm run audit:live -- --origin https://vivlica.com --output /tmp/vivlica-live-revenue.json --summary "$GITHUB_STEP_SUMMARY" --require-monetization
+      - name: Save live revenue audit
+        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'))
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-revenue-readiness
+          path: /tmp/vivlica-live-revenue.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Audit production npm dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Publish prioritized monetization activation checklist
+        if: always()
+        env:
+          SITE_ORIGIN: https://vivlica.com
+        run: npm run audit:activation
       - name: Check advertising setup (not actual revenue)
         if: always()
+        env:
+          SITE_ORIGIN: https://vivlica.com
         run: node scripts/audit-affiliate.mjs
-      - name: Require approved ads before claiming monetization
-        if: always() && github.event_name == 'workflow_dispatch'
-        run: node scripts/audit-affiliate.mjs --require-placements

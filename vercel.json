@@ -1,5 +1,511 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "framework": "vite",
+  "buildCommand": "SITE_ORIGIN=https://vivlica.com npm run build",
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "hikaku-labo.vercel.app"
+        }
+      ],
+      "destination": "https://vivlica.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.vivlica.com"
+        }
+      ],
+      "destination": "https://vivlica.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "q"
+        }
+      ],
+      "destination": "/database",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "status"
+        }
+      ],
+      "destination": "/database",
+      "permanent": false
+    },
+    {
+      "source": "/owner",
+      "destination": "https://vivlica.vivlica.workers.dev/owner",
+      "permanent": false
+    },
+    {
+      "source": "/owner/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/owner/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/console",
+      "destination": "https://vivlica.vivlica.workers.dev/console",
+      "permanent": false
+    },
+    {
+      "source": "/console/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/console/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/billing",
+      "destination": "https://vivlica.vivlica.workers.dev/billing",
+      "permanent": false
+    },
+    {
+      "source": "/billing/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/billing/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/api/owner",
+      "destination": "https://vivlica.vivlica.workers.dev/api/owner",
+      "permanent": false
+    },
+    {
+      "source": "/api/owner/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/owner/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/api/console",
+      "destination": "https://vivlica.vivlica.workers.dev/api/console",
+      "permanent": false
+    },
+    {
+      "source": "/api/console/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/console/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/api/billing",
+      "destination": "https://vivlica.vivlica.workers.dev/api/billing",
+      "permanent": false
+    },
+    {
+      "source": "/api/billing/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/billing/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/api/membership",
+      "destination": "https://vivlica.vivlica.workers.dev/api/membership",
+      "permanent": false
+    },
+    {
+      "source": "/api/membership/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/membership/:path*",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/release.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/owner/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/console/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/billing/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/owner/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/console/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/billing/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/api/membership/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/database",
+      "destination": "https://vivlica.vivlica.workers.dev/?__vivlica_proxy=1"
+    },
+    {
+      "source": "/database/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/database/:path*"
+    },
+    {
+      "source": "/discover",
+      "destination": "https://vivlica.vivlica.workers.dev/discover"
+    },
+    {
+      "source": "/discover/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/discover/:path*"
+    },
+    {
+      "source": "/osint",
+      "destination": "https://vivlica.vivlica.workers.dev/osint"
+    },
+    {
+      "source": "/osint/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/osint/:path*"
+    },
+    {
+      "source": "/signals",
+      "destination": "https://vivlica.vivlica.workers.dev/signals"
+    },
+    {
+      "source": "/signals/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/signals/:path*"
+    },
+    {
+      "source": "/reports",
+      "destination": "https://vivlica.vivlica.workers.dev/reports"
+    },
+    {
+      "source": "/reports/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/reports/:path*"
+    },
+    {
+      "source": "/signals-ai",
+      "destination": "https://vivlica.vivlica.workers.dev/signals-ai"
+    },
+    {
+      "source": "/signals-ai/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/signals-ai/:path*"
+    },
+    {
+      "source": "/screener",
+      "destination": "https://vivlica.vivlica.workers.dev/screener"
+    },
+    {
+      "source": "/screener/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/screener/:path*"
+    },
+    {
+      "source": "/map",
+      "destination": "https://vivlica.vivlica.workers.dev/map"
+    },
+    {
+      "source": "/map/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/map/:path*"
+    },
+    {
+      "source": "/rankings",
+      "destination": "https://vivlica.vivlica.workers.dev/rankings"
+    },
+    {
+      "source": "/rankings/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/rankings/:path*"
+    },
+    {
+      "source": "/company",
+      "destination": "https://vivlica.vivlica.workers.dev/company"
+    },
+    {
+      "source": "/company/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/company/:path*"
+    },
+    {
+      "source": "/data",
+      "destination": "https://vivlica.vivlica.workers.dev/data"
+    },
+    {
+      "source": "/data/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/data/:path*"
+    },
+    {
+      "source": "/quant",
+      "destination": "https://vivlica.vivlica.workers.dev/quant"
+    },
+    {
+      "source": "/quant/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/quant/:path*"
+    },
+    {
+      "source": "/pricing",
+      "destination": "https://vivlica.vivlica.workers.dev/pricing"
+    },
+    {
+      "source": "/pricing/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/pricing/:path*"
+    },
+    {
+      "source": "/partners",
+      "destination": "https://vivlica.vivlica.workers.dev/partners"
+    },
+    {
+      "source": "/partners/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/partners/:path*"
+    },
+    {
+      "source": "/docs/api",
+      "destination": "https://vivlica.vivlica.workers.dev/docs/api"
+    },
+    {
+      "source": "/docs/api/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/docs/api/:path*"
+    },
+    {
+      "source": "/legal",
+      "destination": "https://vivlica.vivlica.workers.dev/legal"
+    },
+    {
+      "source": "/legal/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/legal/:path*"
+    },
+    {
+      "source": "/_next",
+      "destination": "https://vivlica.vivlica.workers.dev/_next"
+    },
+    {
+      "source": "/_next/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/_next/:path*"
+    },
+    {
+      "source": "/samples",
+      "destination": "https://vivlica.vivlica.workers.dev/samples"
+    },
+    {
+      "source": "/samples/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/samples/:path*"
+    },
+    {
+      "source": "/feed.xml",
+      "destination": "https://vivlica.vivlica.workers.dev/feed.xml"
+    },
+    {
+      "source": "/feed.xml/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/feed.xml/:path*"
+    },
+    {
+      "source": "/r",
+      "destination": "https://vivlica.vivlica.workers.dev/r"
+    },
+    {
+      "source": "/r/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/r/:path*"
+    },
+    {
+      "source": "/v1",
+      "destination": "https://vivlica.vivlica.workers.dev/v1"
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/v1/:path*"
+    },
+    {
+      "source": "/mcp",
+      "destination": "https://vivlica.vivlica.workers.dev/mcp"
+    },
+    {
+      "source": "/mcp/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/mcp/:path*"
+    },
+    {
+      "source": "/api/audit",
+      "destination": "https://vivlica.vivlica.workers.dev/api/audit"
+    },
+    {
+      "source": "/api/audit/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/audit/:path*"
+    },
+    {
+      "source": "/api/companies",
+      "destination": "https://vivlica.vivlica.workers.dev/api/companies"
+    },
+    {
+      "source": "/api/companies/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/companies/:path*"
+    },
+    {
+      "source": "/api/edinet",
+      "destination": "https://vivlica.vivlica.workers.dev/api/edinet"
+    },
+    {
+      "source": "/api/edinet/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/edinet/:path*"
+    },
+    {
+      "source": "/api/health",
+      "destination": "https://vivlica.vivlica.workers.dev/api/health"
+    },
+    {
+      "source": "/api/health/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/health/:path*"
+    },
+    {
+      "source": "/api/leads",
+      "destination": "https://vivlica.vivlica.workers.dev/api/leads"
+    },
+    {
+      "source": "/api/leads/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/leads/:path*"
+    },
+    {
+      "source": "/api/metrics",
+      "destination": "https://vivlica.vivlica.workers.dev/api/metrics"
+    },
+    {
+      "source": "/api/metrics/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/metrics/:path*"
+    },
+    {
+      "source": "/api/osint",
+      "destination": "https://vivlica.vivlica.workers.dev/api/osint"
+    },
+    {
+      "source": "/api/osint/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/osint/:path*"
+    },
+    {
+      "source": "/api/signals",
+      "destination": "https://vivlica.vivlica.workers.dev/api/signals"
+    },
+    {
+      "source": "/api/signals/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/signals/:path*"
+    },
+    {
+      "source": "/api/status",
+      "destination": "https://vivlica.vivlica.workers.dev/api/status"
+    },
+    {
+      "source": "/api/status/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/status/:path*"
+    },
+    {
+      "source": "/api/sync",
+      "destination": "https://vivlica.vivlica.workers.dev/api/sync"
+    },
+    {
+      "source": "/api/sync/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/sync/:path*"
+    },
+    {
+      "source": "/api/v1",
+      "destination": "https://vivlica.vivlica.workers.dev/api/v1"
+    },
+    {
+      "source": "/api/v1/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/v1/:path*"
+    },
+    {
+      "source": "/api/mcp",
+      "destination": "https://vivlica.vivlica.workers.dev/api/mcp"
+    },
+    {
+      "source": "/api/mcp/:path*",
+      "destination": "https://vivlica.vivlica.workers.dev/api/mcp/:path*"
+    }
+  ]
 }

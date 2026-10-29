@@ -15,7 +15,7 @@ test('travel calculator includes all costs with transparent assumptions', () => 
 
 test('travel budgets sanitize negative and impossible inputs', () => {
   const result = calculateTravelBudget({nights: -9, rooms: 0, travelers: -3, perRoomNight: -999, travelPerPerson: NaN});
-  assert.equal(result.nights, 1);
+  assert.equal(result.nights, 0);
   assert.equal(result.rooms, 1);
   assert.equal(result.travelers, 1);
   assert.equal(result.lodging, 0);
@@ -26,6 +26,9 @@ test('ad rendering is active after owner confirms site registration and can be d
   assert.equal(travelAffiliateEnabled({}), true);
   assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'false' }), true);
   assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_DISABLED: 'true' }), false);
+  assert.equal(travelAffiliateEnabled({ VITE_A8_TRAVEL_REGISTERED_ORIGIN: 'https://vivlica.com' }), true);
+  assert.equal(travelAffiliateEnabled({ VITE_SITE_ORIGIN: 'https://hikaku-labo.vercel.app' }), false);
+  assert.equal(travelAffiliateEnabled({ VITE_SITE_ORIGIN: 'https://hikaku-labo.vercel.app', VITE_A8_TRAVEL_REGISTERED_ORIGIN: 'https://hikaku-labo.vercel.app' }), true);
 });
 
 test('supplied A8 ad materials have matching tracking IDs and untouched view pixels', () => {

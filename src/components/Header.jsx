@@ -12,12 +12,12 @@ export default function Header({ inputValue, setInputValue, onSearch }) {
             type="search"
             value={inputValue}
             onChange={event => setInputValue(event.target.value)}
-            placeholder="例：ワイヤレスイヤホン、ノートPC、カメラ"
+            placeholder="例：ワイヤレスイヤホン、1万円以下のノートPC、母の日のプレゼント"
             autoComplete="off"
           />
           <button type="submit">商品を検索 <img src="/icons/tabler/arrow-right.svg" alt="" aria-hidden="true" width="17" height="17"/></button>
         </form>
-        <span className="hl-searchbar-help">楽天市場の商品データを確認</span>
+        <span className="hl-searchbar-help">「予算」「用途」もそのまま入力OK</span>
       </div>
     </div>
   </SiteHeader>;

@@ -1,5 +1,5 @@
 /* ===== Google Fonts & Variables ===== */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
   --primary: #bf0000;
@@ -297,7 +297,7 @@ a:hover {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary);
-  border-left: 4px solid var(--primary);
+  border-bottom: 1px solid var(--primary);
   padding-left: 10px;
 }
 
@@ -619,7 +619,7 @@ a:hover {
   font-size: 1.6rem;
   font-weight: 900;
   color: #cc0000;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
 .shop-count-label {
@@ -744,7 +744,7 @@ a:hover {
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--text);
-  border-left: 4px solid #FF9900;
+  border-bottom: 1px solid #d3a86e;
   padding-left: 8px;
 }
 
@@ -888,6 +888,7 @@ a:hover {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
+  /* impeccable-disable-next-line border-accent-on-rounded: functional loading spinner, not a rounded content card */
   border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -1576,3 +1577,8 @@ a:hover {
 .travel-home-link{white-space:nowrap;background:#16684d;border-radius:9px;padding:13px 18px;color:#fff!important;font-weight:900;font-size:12px}
 .header .travel-badge{background:#167659;border:1px solid #d6f8d8;color:#fff!important}
 @media(max-width:700px){.travel-home-banner{flex-direction:column;align-items:stretch;padding:20px;gap:15px}.travel-home-banner h2{font-size:17px}.travel-home-link{text-align:center}}
+
+/* Cross-store comparison entry on each product */
+.btn-compare-all{display:block;text-align:center;margin:8px 0 6px;padding:9px 10px;border:1px solid #b7dcc4;border-radius:9px;background:#eef7f1;color:#14634a!important;font-size:12px;font-weight:800;text-decoration:none}
+.btn-compare-all:hover{background:#e0f1e6}
+.affiliate-compare-link{font-size:12px;font-weight:800;color:#14634a;margin-left:10px}

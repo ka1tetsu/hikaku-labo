@@ -5,12 +5,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir .ssr-build && node scripts/prerender.mjs",
+    "sync:database-routes": "node scripts/sync-database-routes.mjs",
+    "build": "vite build && node scripts/prerender.mjs",
+    "build:cloudflare": "node scripts/build-cloudflare.mjs",
+    "check:cloudflare": "wrangler deploy --dry-run --outdir /tmp/vivlica-cloudflare-bundle && wrangler deploy --config wrangler.www.json --dry-run --outdir /tmp/vivlica-cloudflare-www-bundle",
+    "deploy:cloudflare": "wrangler deploy && wrangler deploy --config wrangler.www.json",
     "lint": "eslint .",
     "preview": "vite preview",
+    "generate:articles": "node scripts/generate-articles.mjs",
     "test:tools": "node --test tests/tools.test.mjs",
-    "test:travel": "node --test tests/travel.test.mjs",
-    "test:all": "node --test tests/*.test.mjs"
+    "test:travel": "node --test tests/travel.test.mjs tests/travel-discovery.test.mjs tests/travel-world.test.mjs",
+    "test:all": "node --test tests/*.test.mjs",
+    "audit:affiliate": "node scripts/audit-affiliate.mjs",
+    "report:revenue": "node scripts/revenue-report.mjs",
+    "verify:build": "node scripts/verify-build.mjs",
+    "audit:live": "node scripts/audit-live.mjs",
+    "ads:import": "node scripts/import-travel-ad.mjs",
+    "audit:activation": "node scripts/monetization-checklist.mjs",
+    "audit:design": "npx --yes impeccable@4.8.0 detect --json src/ guides/ index.html tools/index.html travel/index.html compare/index.html life/index.html sim/index.html hikari/index.html card/index.html hoken/index.html public/guides.css travel/hotels/index.html next-app/app/globals.css"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -26,6 +38,8 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
-    "vite": "^5.4.10"
+    "parse5": "8.0.0",
+    "vite": "^5.4.10",
+    "wrangler": "4.152.0"
   }
 }

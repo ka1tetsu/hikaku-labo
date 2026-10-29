@@ -1,22 +1,22 @@
 import { SITE_SECTIONS } from './siteDirectory.js';
 
-export default function SectionDirectory({ headingLevel = 'h1' }) {
-  const Heading = headingLevel;
+export default function SectionDirectory() {
   return <section className="hl-directory" aria-labelledby="hl-directory-title">
     <div className="hl-directory-head">
       <div>
-        <span className="hl-kicker"><span className="hl-kicker-dot"/> RESEARCH & COMPARISON</span>
-        <Heading id="hl-directory-title" className="hl-directory-title">選ぶ前に、<em>比べる軸</em>を。</Heading>
-        <p>価格だけでなく、条件・使いやすさ・総費用も。判断に必要な情報を整理できる、3つの無料比較ツール。</p>
+        <span className="hl-kicker"><span className="hl-kicker-dot"/> 比較の入口</span>
+        <h1 id="hl-directory-title">何にいくらかかる？<em>条件をそろえて比べる。</em></h1>
+        <p>スマホの基本料金、同じ型番の販売価格、宿泊の支払総額。値段の意味が違うものを混ぜず、条件・出典・見落としやすい費用を確認できる{SITE_SECTIONS.length}つの入口です。</p>
       </div>
-      <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>03</strong><span>比較カテゴリ</span><small>商品・IT・旅行</small></div>
+      <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較・調査カテゴリ</span><small>商品・IT・旅行・通信・企業データ</small></div>
     </div>
+    <div className="hl-directory-start"><a href="#savings">スマホ代の年間差額を診断 →</a><a href="/compare/">型番で商品価格を比較 →</a></div>
     <div className="hl-directory-grid">
       {SITE_SECTIONS.map(section => <a key={section.id}
         className={'hl-directory-card hl-directory-' + section.id}
         href={section.id === 'products' ? '#results' : section.href}>
         <div className="hl-directory-card-top"><span className="hl-directory-icon"><img src={'/icons/tabler/' + section.icon + '.svg'} alt="" aria-hidden="true" width="25" height="25"/></span><span className="hl-directory-metric">{section.metric}</span></div>
-        {headingLevel === 'h1' ? <h2>{section.heading}</h2> : <h3 className="hl-directory-card-title">{section.heading}</h3>}<p>{section.description}</p>
+        <h2>{section.heading}</h2><p>{section.description}</p>
         <span className="hl-directory-action">{section.action}<img src="/icons/tabler/arrow-up-right.svg" alt="" aria-hidden="true" width="17" height="17"/></span>
       </a>)}
     </div>

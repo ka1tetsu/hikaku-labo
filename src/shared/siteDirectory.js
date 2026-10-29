@@ -1,7 +1,9 @@
 // One verified route per publicly managed comparison experience.
 export const SITE_SECTIONS = Object.freeze([
-  { id: 'products', href: '/', icon: 'layout-grid', nav: '商品価格比較', heading: '商品を比較', description: '楽天市場の商品情報と、他モールへの確認リンクで購入条件を整理。', metric: '01 / SHOPPING', action: '価格と条件を見る' },
+  { id: 'products', href: '/', icon: 'layout-grid', nav: '商品価格比較', heading: '商品を比較', description: '楽天市場・Yahoo!ショッピングの実売価格を同じ商品で比較。Amazonや家電量販店も一括で確認。', metric: '01 / SHOPPING', action: '価格と条件を見る' },
   { id: 'tools', href: '/tools/', icon: 'device-desktop', nav: 'ITサービス診断', heading: 'ITツールを選ぶ', description: 'Web制作・EC・WordPress向けサービスを予算や重視条件から比較。', metric: '02 / SOFTWARE', action: '無料で診断する' },
-  { id: 'travel', href: '/travel/', icon: 'plane', nav: '旅行予算ガイド', heading: '旅行の予算を立てる', description: '宿泊費・交通費・食費をまとめて計算し、予約前の比較ポイントを確認。', metric: '03 / TRAVEL', action: '予算を計算する' },
+  { id: 'life', href: '/life/', icon: 'wallet', nav: '通信・お金', heading: 'スマホ・回線・カードを見直す', description: '格安SIM・光回線・クレジットカード・保険を、公式料金と条件で比較。毎月の固定費を見直せます。', metric: '03 / LIFE COSTS', action: '固定費を見直す' },
+  { id: 'travel', href: '/travel/', icon: 'plane', nav: 'Vivlica Travel', heading: '旅行先を比べてプランを探す', description: '国内外81都市・約200の国と地域から検索。航空券・ホテル・体験の予約先へ案内し、掲載データと入力条件からモデルコース・予算のたたき台を作れます。', metric: '04 / TRAVEL', action: 'おすすめの旅を探す' },
+  { id: 'database', href: '/database', icon: 'chart-bar', nav: '企業データ', heading: '企業・開示データを調べる', description: 'vividatabaseの企業調査、株式スクリーニング、官公需・EDINETの出典付きデータ。公開情報を無料で確認でき、有料API・会員機能は別契約です。', metric: '05 / DATABASE', action: '企業データを調べる' },
 ]);
 export function isActiveSection(id) { return SITE_SECTIONS.some(x => x.id === id); }
