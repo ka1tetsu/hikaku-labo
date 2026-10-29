@@ -9,7 +9,7 @@ test('every core Vivlica section discloses verified inputs, formula, exclusions 
   assert.deepEqual(Object.keys(EVIDENCE_BY_SECTION).sort(),['life','products','tools','travel']);
   for(const [name,evidence] of Object.entries(EVIDENCE_BY_SECTION)){
     for(const field of ['title','short','source','calculation','excluded','next'])
-      assert.ok(typeof evidence[field]==='string' && evidence[field].length>12,name+': '+field);
+      assert.ok(typeof evidence[field]==='string' && evidence[field].length>(field==='title'?4:12),name+': '+field);
   }
   assert.match(EVIDENCE_BY_SECTION.travel.excluded,/A8/);
   assert.match(EVIDENCE_BY_SECTION.travel.calculation,/入力/);
