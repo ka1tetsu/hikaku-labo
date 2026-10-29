@@ -144,8 +144,8 @@ export default function ToolsPage() {
         <section className="tl-hero">
           <div className="tl-wrap tl-hero-grid">
             <div className="tl-hero-copy">
-              <span className="tl-eyebrow"><span className="tl-dot"/> THE SMART WAY TO CHOOSE TOOLS</span>
-              <h1>あなたの仕事に、<br/><em>ちょうどいい</em>ツールを。</h1>
+              <span className="tl-eyebrow"><span className="tl-dot"/> ITツールの比較</span>
+              <h1>用途と予算で、<br/><em>ITツールを選ぶ。</em></h1>
               <p>Webサイト、ネットショップ、WordPress。目的と予算を選ぶだけで、公式情報に基づいてサービスを整理。広告報酬の多さではなく、条件との一致度で比較します。</p>
               <div className="tl-hero-cta">
                 <a href="#selector" className="tl-hero-button">無料で診断を始める <span>↗</span></a>

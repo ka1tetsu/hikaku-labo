@@ -143,3 +143,6 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
 .hl-directory-card p{line-height:1.85;max-width:46ch}
 .hl-directory-action{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:650px){.hl-directory-grid{grid-template-columns:minmax(0,1fr);gap:0}.hl-directory-card{min-height:0;padding:18px 0}.hl-directory-card:last-child{grid-column:auto}}
+
+/* Editorial hero proportions: prevent isolated trailing syllables on wide screens. */
+.hl-directory h1{font-size:clamp(30px,3.3vw,44px);line-height:1.35}
