@@ -1,5 +1,5 @@
 /* ===== Google Fonts & Variables ===== */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
   --primary: #bf0000;
@@ -619,7 +619,7 @@ a:hover {
   font-size: 1.6rem;
   font-weight: 900;
   color: #cc0000;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
 .shop-count-label {
