@@ -74,7 +74,8 @@ export default async function handler(req, res) {
     rakutenOffers(q || jan, budget).catch(() => ({ status: 'error', offers: [] })),
     yahooOffers(q, jan, budget),
   ]);
-  const offers = rankOffers([...rakuten.offers, ...yahoo.offers].filter(offer => withinCompareBudget(offer, budget)), ref || q, jan).slice(0, 40);
+  // Preserve both cash-cheapest and rewards-cheapest candidates for client-side criteria.
+  const offers = rankOffers([...rakuten.offers, ...yahoo.offers].filter(offer => withinCompareBudget(offer, budget)), ref || q, jan).slice(0, 80);
   res.setHeader('Cache-Control', [rakuten.status, yahoo.status].includes('ok') ? 's-maxage=300, stale-while-revalidate=300' : 'no-store');
   return res.status(200).json({
     query: q, reference: ref, jan,
