@@ -1,3 +1,4 @@
+import DecisionEvidence from '../shared/DecisionEvidence.jsx';
 import SiteFooter from '../shared/SiteFooter.jsx';
 import { useEffect, useRef, useState } from 'react';
 import DecisionBar from '../shared/DecisionBar.jsx';
@@ -143,8 +144,8 @@ export default function ToolsPage() {
         <section className="tl-hero">
           <div className="tl-wrap tl-hero-grid">
             <div className="tl-hero-copy">
-              <span className="tl-eyebrow"><span className="tl-dot"/> THE SMART WAY TO CHOOSE TOOLS</span>
-              <h1>あなたの仕事に、<br/><em>ちょうどいい</em>ツールを。</h1>
+              <span className="tl-eyebrow"><span className="tl-dot"/> ITツールの比較</span>
+              <h1>用途と予算で、<br/><em>ITツールを選ぶ。</em></h1>
               <p>Webサイト、ネットショップ、WordPress。目的と予算を選ぶだけで、公式情報に基づいてサービスを整理。広告報酬の多さではなく、条件との一致度で比較します。</p>
               <div className="tl-hero-cta">
                 <a href="#selector" className="tl-hero-button">無料で診断を始める <span>↗</span></a>
@@ -152,17 +153,7 @@ export default function ToolsPage() {
               </div>
               <div className="tl-trust"><span>✓ 根拠は公式サイト</span><span>✓ 広告表示を明示</span><span>✓ 無料で比較</span></div>
             </div>
-            <div className="tl-hero-visual" aria-hidden="true">
-              <div className="tl-floating-label">YOUR TOOL MATCH</div>
-              <div className="tl-visual-card">
-                <div className="tl-visual-top"><span>サービス選定</span><span className="tl-live-mark">● ANALYSIS</span></div>
-                <div className="tl-visual-line"><span>01 / 目的</span><strong>Webサイト制作</strong><span>✓</span></div>
-                <div className="tl-visual-line"><span>02 / 予算</span><strong>月5,000円以内</strong><span>✓</span></div>
-                <div className="tl-visual-line"><span>03 / 重視</span><strong>使いやすさ</strong><span>✓</span></div>
-                <div className="tl-visual-result"><span>CONSIDER</span><b>サービスを比較</b><i>↗</i></div>
-              </div>
-              <span className="tl-visual-deco tl-deco-a">✳</span><span className="tl-visual-deco tl-deco-b">✳</span>
-            </div>
+            <DecisionEvidence section="tools"/>
           </div>
         </section>
 
@@ -174,7 +165,7 @@ export default function ToolsPage() {
 
         <section className="tl-work tl-wrap" id="selector">
           <div className="tl-section-head">
-            <div><span className="tl-overline">FREE TOOL SELECTOR</span><h2>あなたに合うサービスを診断</h2><p>入力結果に合わせて順位が変わります。気になる候補は最大3つまで横並びで比較できます。</p></div>
+            <div><span className="tl-overline">用途と予算で比較</span><h2>あなたに合うサービスを診断</h2><p>入力結果に合わせて順位が変わります。気になる候補は最大3つまで横並びで比較できます。</p></div>
             <span className="tl-counter">約1分で完了</span>
           </div>
           <div className="tl-work-grid">
@@ -247,7 +238,7 @@ export default function ToolsPage() {
         </section>}
 
         <aside className="hl-inline-guide" aria-label="ITサービス選びのガイド"><div><strong>導入前に、料金と運用の落とし穴を確認</strong><p>月額以外の手数料や、データ移行の条件もチェックしましょう。</p></div><a href="/guides/website-tools/">サイト制作・ネットショップの選び方 ↗</a></aside>
-        <section className="tl-method tl-wrap">
+        <section className="tl-method tl-wrap" id="method">
           <div className="tl-method-heading"><span className="tl-overline">HOW WE COMPARE</span><h2>広告よりも、納得できる選び方を。</h2></div>
           <div className="tl-method-grid">
             <article><span>01 / VERIFIED</span><h3>情報源を明示</h3><p>公式の料金・機能ページを各サービスに添付。出典のない価格や架空のユーザー評価は掲載しません。</p></article>

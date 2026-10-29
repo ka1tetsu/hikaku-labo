@@ -7,8 +7,8 @@ import { resolve } from 'node:path';
 
 const base=process.env.IMPECCABLE_BASE_DIR;
 if(!base){console.error('IMPECCABLE_BASE_DIR is required');process.exit(1);}
-const version='4.7.0';
-const targets=['src/','guides/','index.html','tools/index.html','travel/index.html','compare/index.html','life/index.html','sim/index.html','hikari/index.html','card/index.html','hoken/index.html','public/guides.css'];
+const version='4.8.0';
+const targets=['src/','guides/','index.html','tools/index.html','travel/index.html','compare/index.html','life/index.html','sim/index.html','hikari/index.html','card/index.html','hoken/index.html','travel/hotels/index.html','public/guides.css','next-app/app/globals.css'];
 const command=['--yes','impeccable@'+version,'detect','--json',...targets];
 const reportDir=resolve(process.env.IMPECCABLE_REPORT_DIR||'impeccable-reports');
 mkdirSync(reportDir,{recursive:true});
@@ -20,7 +20,10 @@ function scan(cwd,name){
   let parsed;try{parsed=JSON.parse(result.stdout)}catch{throw new Error(name+': unexpected detector JSON');}
   const entries=Array.isArray(parsed)?parsed:Array.isArray(parsed.findings)?parsed.findings:Array.isArray(parsed.results)?parsed.results:null;
   if(!entries)throw new Error(name+': unsupported detector JSON schema');
-  return entries.filter(item=>item&&typeof item==='object'&&item.advisory!==true&&item.severity!=='advisory');
+  return entries.filter(item=>item&&typeof item==='object'&&item.advisory!==true&&item.isAdvisory!==true&&item.severity!=='advisory').map(item=>{
+    if(!(item.antipattern||item.ruleId||item.rule_id||item.rule||item.id||item.code))throw new Error(name+': detector finding has no rule identifier');
+    return item;
+  });
 }
 function normalizeFile(item){
   let p=String(item.file||item.path||item.filename||item.location?.file||item.source?.file||'unknown').replaceAll('\\','/');
@@ -28,7 +31,7 @@ function normalizeFile(item){
   if(m)p=p.slice(p.length-m[0].length+(m[0].startsWith('/')?1:0));
   return p;
 }
-function key(item){return String(item.ruleId||item.rule_id||item.rule||item.id||item.code||'unknown-rule')+'|'+normalizeFile(item);}
+function key(item){return String(item.antipattern||item.ruleId||item.rule_id||item.rule||item.id||item.code||'unknown-rule')+'|'+normalizeFile(item);}
 function counts(items){const count=new Map();for(const item of items){const k=key(item);count.set(k,(count.get(k)||0)+1);}return count;}
 try{
   const before=scan(resolve(base),'base'),after=scan(process.cwd(),'head');

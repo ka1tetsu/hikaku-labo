@@ -1,0 +1,49 @@
+name: Vivlica real-browser design QA
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-design-and-functionality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Install pinned browser test tooling
+        run: |
+          npm install --no-save --no-package-lock playwright@1.64.1
+          npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Start preview and check readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/vivlica-vite-preview.log 2>&1 &
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/vivlica-vite-preview.log
+          exit 1
+      - name: Audit 16 routes at 375, 768, 1440px and interactive journeys
+        run: node scripts/browser-qa.mjs
+      - name: Upload screenshots and complete report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vivlica-browser-qa
+          path: artifacts/browser-qa/
+          if-no-files-found: warn
