@@ -86,6 +86,19 @@ try{
    await page.locator('.tvx-shortcuts button').filter({hasText:'京都'}).first().click();
    if(!page.url().includes('destination=kyoto'))throw Error('Choosing Kyoto did not update URL');
  });
+ await interaction('compact-mobile-concierge',{width:375,height:812},async page=>{
+   await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
+   const trigger=page.locator('.hcl-launcher');
+   await trigger.waitFor({timeout:6000});
+   const rect=await trigger.boundingBox();
+   if(!rect || rect.width>56 || rect.height>56)throw Error('Floating assistant blocks mobile comparison screen');
+   if((await trigger.getAttribute('aria-label'))!=='条件を相談')throw Error('Assistant has no mobile accessible name');
+   await trigger.click();
+   const dialog=page.getByRole('dialog',{name:'Vivlica 条件検索アシスタント'});
+   await dialog.waitFor({timeout:6000});
+   await page.keyboard.press('Escape');
+   if(await dialog.isVisible())throw Error('Escape failed to close assistant');
+ });
  await interaction('cash-vs-points-shopping-order',{width:375,height:812},async page=>{
    const makeOffer=(title,price,point,url)=>({
      store:'rakuten',storeName:'楽天市場',shopName:'検証用の架空店',title,price,point,
