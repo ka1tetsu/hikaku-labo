@@ -58,3 +58,42 @@ test('revenue activation report does not count code as real earnings or infer A8
   assert.equal(registered.a8RenderedWithCurrentSettings, true);
   assert.equal(registered.blockers.some(x => x.code === 'a8_domain_unverified'), false);
 });
+
+test('existing Rakuten account quick wins come first and disappear once configured', async () => {
+  const { RAKUTEN_GROUP_QUICK_WINS } = await import('../scripts/monetization-checklist.mjs');
+  const empty = monetizationChecklist({}, 'https://vivlica.com');
+  assert.equal(empty.blockers[0].code, 'rakuten_group_quick_wins');
+  assert.match(empty.blockers[0].action, /VITE_AFF_URL_RAKUTEN_MOBILE/);
+  assert.match(empty.blockers[0].action, /VITE_AFF_URL_RAKUTEN_CARD/);
+  for (const item of RAKUTEN_GROUP_QUICK_WINS) {
+    assert.match(item.sourceUrl, /^https:\/\/affiliate\.rakuten\.co\.jp\//);
+    assert.ok(item.reward > 0 && item.checkedAt);
+  }
+  const configured = monetizationChecklist({
+    VITE_AFF_URL_RAKUTEN_MOBILE: 'https://hb.afl.rakuten.co.jp/hsc/x/?link_type=text',
+    VITE_AFF_URL_RAKUTEN_CARD: 'https://hb.afl.rakuten.co.jp/hsc/y/?link_type=text',
+  }, 'https://vivlica.com');
+  assert.equal(configured.blockers.some(x => x.code === 'rakuten_group_quick_wins'), false);
+  assert.equal(configured.blockers.some(x => x.code === 'affiliate_url_rejected'), false);
+});
+
+test('a configured but invalid affiliate URL is reported instead of silently earning nothing', () => {
+  const report = monetizationChecklist({
+    VITE_AFF_URL_RAKUTEN_CARD: 'http://hb.afl.rakuten.co.jp/hsc/y/',
+    VITE_AFF_URL_IIJMIO: 'https://example.com/track',
+  }, 'https://vivlica.com');
+  const rejected = report.blockers.find(x => x.code === 'affiliate_url_rejected');
+  assert.ok(rejected);
+  assert.match(rejected.message, /VITE_AFF_URL_RAKUTEN_CARD/);
+  assert.match(rejected.message, /VITE_AFF_URL_IIJMIO/);
+  assert.equal(report.blockers[0].priority, 0);
+});
+
+test('hosting commercial-use reminder cites Vercel terms and can be acknowledged', () => {
+  const report = monetizationChecklist({}, 'https://vivlica.com');
+  const hosting = report.blockers.find(x => x.code === 'hosting_commercial_terms');
+  assert.match(hosting.message, /vercel\.com\/docs\/limits\/fair-use-guidelines/);
+  assert.match(hosting.action, /CLOUDFLARE-ONE-TIME/);
+  const ok = monetizationChecklist({ VIVLICA_HOSTING_COMMERCIAL_OK: 'true' }, 'https://vivlica.com');
+  assert.equal(ok.blockers.some(x => x.code === 'hosting_commercial_terms'), false);
+});
