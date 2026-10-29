@@ -13,7 +13,7 @@ function readScan(file, status, root) {
   const data=Array.isArray(obj)?obj:(Array.isArray(obj.findings)?obj.findings:obj.results);
   if (!Array.isArray(data)) throw new Error('Unknown detector JSON shape: '+file);
   return data.filter(x=>x.advisory!==true && x.isAdvisory!==true && x.severity!=='advisory').map(x=>{
-    const rule=x.ruleId??x.rule_id??x.rule??x.id??x.code;
+    const rule=x.antipattern??x.ruleId??x.rule_id??x.rule??x.id??x.code;
     const name=typeof rule==='string'?rule:(rule?.id??rule?.name);
     if (!name) throw new Error('Missing rule identifier in '+file+': '+JSON.stringify(x).slice(0,200));
     const value=String(x.file??x.filename??x.path??x.source?.file??x.location?.file??'<unknown>').replaceAll('\\','/');
