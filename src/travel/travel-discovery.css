@@ -34,7 +34,7 @@
 .tvx-trust-strip span{font-size:12px;font-weight:850;color:#466353}
 .tvx-discover{padding-top:74px;padding-bottom:82px}
 .tvx-section-header{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:28px}
-.tvx-kicker{font:800 11px 'Noto Sans JP','Noto Sans JP',sans-serif;letter-spacing:.14em;color:#23775c}
+.tvx-kicker{font:800 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:#23775c}
 .tvx-section-header h2{font-size:clamp(26px,3.2vw,38px);letter-spacing:-.04em;line-height:1.4;margin:10px 0 8px;color:#1b392b}
 .tvx-section-header p{font-size:13px;color:#5a7363;line-height:1.9}
 .tvx-count,.tvx-result-badge{border-radius:30px;background:#e5f4e9;color:#256b4b;font-size:12px;font-weight:850;padding:8px 15px;white-space:nowrap}
