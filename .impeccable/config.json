@@ -1,0 +1,15 @@
+{
+  "telemetry": false,
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [],
+    "designSystem": {
+      "enabled": false
+    }
+  },
+  "hook": {
+    "enabled": true,
+    "quiet": true
+  }
+}

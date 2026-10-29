@@ -131,6 +131,6 @@ test('page discloses PR links and the API-free concierge', () => {
   const concierge = readFileSync(new URL('../src/shared/ConciergeChat.jsx', import.meta.url), 'utf8');
   const links = readFileSync(new URL('../src/travel/BookingLinks.jsx', import.meta.url), 'utf8');
   assert.match(page, /「PR」/);
-  assert.match(concierge, /外部のAI APIは使わず/);
+  assert.match(concierge, /回答は生成AIではなく/);
   assert.match(links, /rel=\{link\.sponsored \? 'sponsored noopener'/);
 });

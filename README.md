@@ -40,3 +40,13 @@ npm run audit:affiliate
 追加の[短期利益改善と実行内容](docs/IMMEDIATE-PROFIT-PLAN.md)、[vivlica.comへの無料統合手順](docs/VIVLICA-FREE-DOMAIN.md)も参照してください。無料統合はホスティングの利用条件とAPI移植の有無を分けて判断します。
 
 Cloudflare向けのビルド・API互換処理・DNS/TLS自動設定・www転送を用意しました。[最初のGitHub接続と公開](docs/CLOUDFLARE-ONE-TIME.md)後は自動更新できます。`npm run check:cloudflare`で公開せず検証できます。
+
+## AI生成文章とUIの品質
+
+全ページ共通の出典・比較条件・欠落データの表示と、Impeccableを使ったUIデザインの機械検査を導入しました。
+
+```sh
+npm run audit:design
+```
+
+PRではCIがサイト全体のUIソースを検査し、既存ベースラインと比べて増えた検出数をブロックします。監査JSONはGitHub Actionsから入手できます。文章の方針、限界、エージェント導入は [全サイトのImpeccable監査](docs/IMPECCABLE-SITEWIDE.md)、[PRODUCT.md](PRODUCT.md)、[DESIGN.md](DESIGN.md) を参照してください。未検証のAI記事を大量公開することはせず、草案が必要なら `npm run generate:articles -- --drafts-only` として公開対象外に出力します。

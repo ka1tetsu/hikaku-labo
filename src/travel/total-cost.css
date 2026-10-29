@@ -23,7 +23,7 @@
 .gx-cost-result{background:#fff;border:1px solid #d8e8db;border-radius:16px;padding:24px 27px}
 .gx-cost-result h3{font-size:20px;color:#1b5037;margin:0 0 12px}
 .gx-cost-result>p{font-size:13px;color:#365846;line-height:1.9}
-.gx-cost-highlight{border-left:4px solid #298461;background:#e9f6ed;border-radius:7px;padding:14px}
+.gx-cost-highlight{border:1px solid #add9bd;background:#e9f6ed;border-radius:7px;padding:14px}
 .gx-cost-highlight b{color:#176246}
 .gx-cost-result ol{list-style:none;padding:0;margin:14px 0}
 .gx-cost-result li{display:flex;align-items:center;justify-content:space-between;gap:11px;flex-wrap:wrap;border-top:1px solid #e5eee6;padding:12px 0;color:#315944;font-size:13px}

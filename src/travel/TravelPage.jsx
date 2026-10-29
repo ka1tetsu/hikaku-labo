@@ -157,12 +157,12 @@ export default function TravelPage() {
         <details><summary>ポイント即時利用・クーポンは計算されますか？</summary><p>自動反映されません。利用資格、支払方法、対象プラン等で条件が異なるため、予約確認画面の金額をご確認ください。</p></details>
         <details><summary>Vivlicaで直接予約できますか？</summary><p>できません。Vivlicaは旅行予算の計画を支援するサイトです。予約・支払・キャンセル手続きは旅行予約サイトでお願いします。</p></details>
         <details><summary>航空券・ホテルのリンクの「PR」とは何ですか？</summary><p>アフィリエイト広告であることを示す表示です。リンク経由で予約が成立すると、当サイトが予約サイトから紹介料を受け取る場合があります。料金はお客様の負担にならず、並び順は報酬額ではなく固定です。PR表示のないリンクは通常のリンクです。</p></details>
-        <details><summary>AIコンシェルジュはどんな仕組みですか？</summary><p>外部のAI APIを使わず、ブラウザ内で動くルールエンジンが文章から時期・日数・人数・予算・テーマなどを読み取り、編集部が整理した旅行データから提案します。入力内容はサーバーに送信・保存されません。移動時間・ベストシーズン・予算との相性は目安で、運賃・空室・入国条件は公式情報と予約サイトでご確認ください。</p></details>
+        <details><summary>旅行の条件検索はどんな仕組みですか？</summary><p>外部のAI APIを使わず、ブラウザ内で動くルールエンジンが文章から時期・日数・人数・予算・テーマなどを読み取り、編集部が整理した旅行データから提案します。入力内容はサーバーに送信・保存されません。移動時間・ベストシーズン・予算との相性は目安で、運賃・空室・入国条件は公式情報と予約サイトでご確認ください。</p></details>
         <details><summary>掲載されていない国や都市は探せますか？</summary><p>検索窓に入力すると、{DESTINATION_CATALOG.length}都市のモデルコースに加えて約200の国と地域を検索できます。掲載外の場所でも、宿・航空券・地図を各サイトで直接検索するリンクを表示します。</p></details>
       </section>
     </main>
     <SiteConcierge section="travel" />
     <SiteFooter />
-    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ Vivlica Travel</strong><p>世界の旅の計画を、もっとわかりやすく。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#concierge">AIコンシェルジュ</a><a href="#booking">航空券・ホテル比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク（「PR」表示）経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.net・楽天アフィリエイト等の提携に基づき掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 Vivlica <a href="#planner">ページ上部へ ↑</a></div></footer>
+    <footer className="tv-footer"><div className="tv-wrap tv-footer-columns"><div><strong>✳ Vivlica Travel</strong><p>国内外の旅先と予算を、条件ごとに比べる。</p></div><div><b>サイト内リンク</b><a href="/">商品価格比較</a><a href="/tools/">ITツール比較</a><a href="#concierge">AIコンシェルジュ</a><a href="#booking">航空券・ホテル比較</a><a href="#planner">予算シミュレーション</a></div><div><b>PR・アフィリエイトについて</b><p>当サイトでは広告が掲載される場合があります。広告リンク（「PR」表示）経由で予約等が成立した場合、当サイトが紹介報酬を受け取ることがあります。A8.net・楽天アフィリエイト等の提携に基づき掲載しています。広告掲載条件が変更された場合は掲載を停止します。</p></div></div><div className="tv-wrap tv-footer-bottom">© 2026 Vivlica <a href="#planner">ページ上部へ ↑</a></div></footer>
   </div>;
 }

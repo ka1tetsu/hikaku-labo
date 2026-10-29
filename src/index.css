@@ -1,5 +1,5 @@
 /* ===== Google Fonts & Variables ===== */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
   --primary: #bf0000;
@@ -297,7 +297,7 @@ a:hover {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary);
-  border-left: 4px solid var(--primary);
+  border-bottom: 1px solid var(--primary);
   padding-left: 10px;
 }
 
@@ -619,7 +619,7 @@ a:hover {
   font-size: 1.6rem;
   font-weight: 900;
   color: #cc0000;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
 .shop-count-label {
@@ -744,7 +744,7 @@ a:hover {
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--text);
-  border-left: 4px solid #FF9900;
+  border-bottom: 1px solid #d3a86e;
   padding-left: 8px;
 }
 
@@ -888,6 +888,7 @@ a:hover {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
+  /* impeccable-disable-next-line border-accent-on-rounded: functional loading spinner, not a rounded content card */
   border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
