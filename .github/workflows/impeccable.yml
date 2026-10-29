@@ -1,0 +1,50 @@
+name: Impeccable sitewide design gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  impeccable:
+    name: Sitewide design audit and regression gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DO_NOT_TRACK: "1"
+      IMPECCABLE_NO_TELEMETRY: "1"
+      IMPECCABLE_BASE_DIR: "../impeccable-base"
+      IMPECCABLE_REPORT_DIR: "impeccable-reports"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Prepare independent baseline checkout
+        shell: bash
+        env:
+          PR_BASE: "${{ github.event.pull_request.base.sha }}"
+        run: |
+          set -euo pipefail
+          if [ -n "$PR_BASE" ]; then BASE="$PR_BASE"; else BASE="$(git rev-parse HEAD^1)"; fi
+          git worktree add --detach ../impeccable-base "$BASE"
+          mkdir -p ../impeccable-base/.impeccable
+          cp .impeccable/config.json ../impeccable-base/.impeccable/config.json
+          cp DESIGN.md PRODUCT.md ../impeccable-base/
+      - name: Check design anti-patterns across the entire site
+        run: node scripts/impeccable-gate.mjs
+      - name: Publish Impeccable evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: impeccable-audit-${{ github.run_id }}
+          path: impeccable-reports/
+          if-no-files-found: warn
+          retention-days: 21
