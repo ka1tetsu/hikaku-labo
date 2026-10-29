@@ -24,7 +24,7 @@ export function monetizationChecklist(env = {}, origin = SITE_ORIGIN) {
   const blockers = [];
   if (!activeA8) blockers.push({
     priority: 1, code: 'a8_domain_unverified',
-    message: canonical + ' のA8.net登録と広告設定が、この監査環境では確認できません。旧URL登録を新ドメインの許可とみなしません。',
+    message: canonical + ' と広告掲載環境の登録値が一致していません。広告を停止した設定がある場合、媒体登録と広告主の条件を再確認してください。',
     action: 'A8.netのサイト情報に新しいドメインを登録し、Yahoo!トラベルの提携・広告掲載URLを確認してから VITE_A8_TRAVEL_REGISTERED_ORIGIN=' + canonical + ' をVercel Productionへ設定して再デプロイ。',
   });
   if (configuredServiceIds.length === 0) blockers.push({
@@ -65,7 +65,7 @@ export function activationMarkdown(report) {
     '',
     '確認: ' + report.checkedAt,
     '対象: ' + report.origin,
-    'A8広告表示: ' + (report.a8RenderedWithCurrentSettings ? 'ビルド設定上有効（提携継続を確認）' : '無効・要確認'),
+    'A8広告表示: ' + (report.a8RenderedWithCurrentSettings ? 'ビルド設定上有効（媒体登録は運営者申告。提携継続・実表示は未検証）' : '無効・要確認'),
     'サービス広告候補: ' + report.servicesWithConfiguredCandidate + '/' + report.supportedServices + '（監査環境の値。本番設定未検証の可能性あり）',
     '実利益: 不明（ASP確定報酬・請求額未取得）',
     '',

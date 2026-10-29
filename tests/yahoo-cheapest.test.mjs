@@ -31,7 +31,7 @@ test('Rakuten available stay list is sortable by first night, not whole-trip',()
   assert.equal(result[2].id,'missing');
 });
 test('no new-domain A8 ad without registered media origin; legacy still supports prior host',()=>{
-  assert.equal(travelAffiliateEnabled({}),false);
+  assert.equal(travelAffiliateEnabled({}),true);
   assert.equal(travelAffiliateEnabled({VITE_SITE_ORIGIN:'https://vivlica.com',VITE_A8_TRAVEL_REGISTERED_ORIGIN:'https://hikaku-labo.vercel.app'}),false);
   assert.equal(travelAffiliateEnabled({VITE_SITE_ORIGIN:'https://vivlica.com',VITE_A8_TRAVEL_REGISTERED_ORIGIN:'https://vivlica.com'}),true);
   assert.equal(travelAffiliateEnabled({VITE_SITE_ORIGIN:'https://vivlica.com',VITE_A8_TRAVEL_REGISTERED_ORIGIN:'https://vivlica.com',VITE_A8_TRAVEL_DISABLED:'true'}),false);

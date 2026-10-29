@@ -32,4 +32,8 @@ for (const value of urls) {
     try { await access(target); } catch { throw new Error(`Broken local reference ${href} in ${fileURLToPath(file)}`); }
   }
 }
+const hotelShell = await readFile(new URL('travel/hotels/index.html', dist), 'utf8');
+if (!hotelShell.includes('<meta name="robots" content="noindex,follow"')) throw new Error('Unverified hotel template should not be indexed');
+if (!hotelShell.includes('Vivlica') || !hotelShell.includes('<main')) throw new Error('Hotel detail server shell missing');
+if (urls.some(value => value.includes('/travel/hotels/'))) throw new Error('Hotel template is not verified hotel-specific SEO content');
 console.log(`Verified ${urls.length} rendered pages: canonical origin, sitemap, structured data, and local assets/links.`);

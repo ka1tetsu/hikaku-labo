@@ -13,6 +13,7 @@ export default defineConfig({
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
         tools: fileURLToPath(new URL('./tools/index.html', import.meta.url)),
         travel: fileURLToPath(new URL('./travel/index.html', import.meta.url)),
+        'hotel-details': fileURLToPath(new URL('./travel/hotels/index.html', import.meta.url)),
         compare: fileURLToPath(new URL('./compare/index.html', import.meta.url)),
         life: fileURLToPath(new URL('./life/index.html', import.meta.url)),
         sim: fileURLToPath(new URL('./sim/index.html', import.meta.url)),
