@@ -34,7 +34,7 @@ aside{align-self:start;position:sticky;top:28px;display:grid;gap:16px}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{padding:13px;border:1px solid var(--line);text-align:left;vertical-align:top}
 th{background:#eaf3ec}
-.note{background:#f2f7f3;border-left:4px solid #298368;padding:15px 17px;font-size:14px}
+.note{background:#f2f7f3;border:1px solid #c1ddcc;padding:15px 17px;font-size:14px}
 .endcta{padding:25px;background:#e6f1e8;border-radius:15px;margin-top:30px}
 footer{background:#18372c;color:#e0efe3;padding:28px 0;font-size:12px}
 footer a{color:#e0efe3}
