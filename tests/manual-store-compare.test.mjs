@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { manualOfferCost, compareManualOffers, MANUAL_STORES } from '../src/compare/manualCompare.js';
 import { validFunnelEvent } from '../src/shared/outboundSchema.js';
 import { storeLinks } from '../src/shared/merchants.js';
+import { revenueReport } from '../scripts/revenue-report.mjs';
 
 const a = { storeId: 'rakuten', price: '39800', shipping: '0', discount: '1000', points: '3000' };
 const b = { storeId: 'amazon', price: '38000', shipping: '850', discount: '0', points: '0' };
@@ -56,4 +57,25 @@ test('browser-only calculator uses registered approved/ordinary store search lin
   assert.ok(refs.find(x=>x.id==='amazon').url.startsWith('https://'));
   assert.equal(validFunnelEvent({event:'funnel',page:'compare',action:'product_manual_ready'}),true);
   assert.equal(validFunnelEvent({event:'funnel',page:'travel',action:'product_manual_ready'}),false);
+});
+
+test('report counts comparison and outbound funnel events separately from any verified purchase',()=>{
+  const timestamp='2026-10-29T14:00:00Z';
+  const events=[
+    {type:'hikaku_view',timestamp,page:'compare'},
+    {type:'hikaku_funnel',timestamp,page:'compare',action:'product_manual_ready'},
+    {type:'hikaku_outbound',timestamp,page:'compare',section:'products',merchant:'rakuten',placement:'manual-research',sponsored:true},
+    {type:'hikaku_outbound',timestamp,page:'compare',section:'products',merchant:'amazon',placement:'manual-result',sponsored:true},
+    {type:'hikaku_outbound',timestamp,page:'travel',section:'travel',merchant:'booking',placement:'stay-quick',sponsored:false},
+  ];
+  const report=revenueReport(events);
+  const compare=report.pages.find(row=>row.page==='compare');
+  assert.equal(compare.productManualReady,1);
+  assert.equal(compare.productManualResearchClicks,1);
+  assert.equal(compare.productManualResultClicks,1);
+  assert.equal(report.pages.find(row=>row.page==='travel').travelDirectSearchClicks,1);
+  assert.equal(report.financials,null);
+  assert.equal(report.nextActions.some(action=>action.action==='review_product_manual_cta'),false);
+  const noConversion=revenueReport(events.filter(event=>event.placement!=='manual-result'));
+  assert.equal(noConversion.nextActions.some(action=>action.action==='review_product_manual_cta'),true);
 });
