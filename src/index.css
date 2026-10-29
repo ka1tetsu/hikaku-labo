@@ -1,18 +1,18 @@
 /* ===== Google Fonts & Variables ===== */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
-  --primary: #bf0000;
+  --primary: #145f4b;
   /* kakaku.com red */
-  --primary-dark: #8b0000;
+  --primary-dark: #104734;
   --rakuten-red: #BF0000;
   --amazon-orange: #FF9900;
   --amazon-dark: #232F3E;
   --surface: #ffffff;
-  --bg: #f4f4f4;
+  --bg: #f6f8f5;
   --border: #dddddd;
-  --text: #222222;
-  --text-sub: #555555;
+  --text: #20372d;
+  --text-sub: #50665a;
   --text-muted: #888888;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.16);
@@ -29,8 +29,8 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.75;
 }
 
 a {
@@ -619,7 +619,7 @@ a:hover {
   font-size: 1.6rem;
   font-weight: 900;
   color: #cc0000;
-  font-family: 'Inter', sans-serif;
+  font-family: ''Noto Sans JP'', sans-serif;
 }
 
 .shop-count-label {

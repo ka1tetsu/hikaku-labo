@@ -1,19 +1,19 @@
 /* Consistent, readable decision support visuals on the trip budgeting page. */
 .tv-page{--ink:#19332b;--muted:#546d60;--brand:#14664f;--border:#dbe6df;background:#f5f7f5;color:#1a332b;font-size:15px;line-height:1.85}
 .tv-page .hl-chrome{position:relative;z-index:50}
-.tv-page .tv-hero{background:linear-gradient(120deg,#142f2a,#15533f 56%,#28725b)}
+.tv-page .tv-hero{background:#173f34}
 .tv-page .tv-hero h1{letter-spacing:-.045em}
 .tv-page .tv-hero-text>p{font-size:15px;color:#e0ebe5}
 .tv-page .tv-hero-minor{font-size:12px;color:#e1f1e5}
 .tv-page .tv-primary-button{background:#e4edb7;color:#21492f!important;min-height:47px}
 .tv-page .tv-secondary-button{min-height:47px;background:#ffffff12}
-.tv-page .tv-process{background:#fff;border:1px solid #e2ebe3;border-radius:14px;padding-inline:21px;margin-top:20px;box-shadow:0 7px 18px #1435250c}
+.tv-page .tv-process{background:#fff;border:1px solid #e2ebe3;border-radius:14px;padding-inline:21px;margin-top:20px;box-shadow:none}
 .tv-page .tv-process>div{font-size:13px}
 .tv-page .tv-section-heading h2,.tv-page .tv-guide h2,.tv-page .tv-booking-cta h2{color:#182f27;letter-spacing:-.035em}
 .tv-page .tv-eyebrow{color:#16694e;font-size:11px;letter-spacing:.12em}
 .tv-page .tv-hero .tv-eyebrow{color:#b7e1c5}
 .tv-page .tv-section-heading p{color:#576d60;font-size:14px}
-.tv-page .tv-form,.tv-page .tv-result{background:#fff;border:1px solid #dce7df;border-radius:16px;box-shadow:0 9px 26px #183b250c;padding:30px}
+.tv-page .tv-form,.tv-page .tv-result{background:#fff;border:1px solid #dce7df;border-radius:16px;box-shadow:none;padding:30px}
 .tv-page .tv-form-heading strong{font-size:19px}
 .tv-page .tv-form-heading small{font-size:12px;color:#627869}
 .tv-page .tv-destination-label,.tv-page .tv-number-field>span{font-size:13px;color:#294c3c}
@@ -32,7 +32,7 @@
 .tv-page .tv-ad-placeholder a{font-size:13px;min-height:47px;display:inline-flex;align-items:center}
 .tv-page .tv-affiliate-ad{background:#f5faf6;border:1px solid #d8e9dc}
 .tv-page .tv-guide{background:#e9f0e9}
-.tv-page .tv-guide-cards article{border:1px solid #dfe9e0;border-radius:14px;box-shadow:0 4px 14px #102c230b}
+.tv-page .tv-guide-cards article{border:1px solid #dfe9e0;border-radius:14px;box-shadow:none}
 .tv-page .tv-guide-cards h3{font-size:19px;color:#1f3a2c}
 .tv-page .tv-guide-cards p{font-size:13px;color:#506e5c;line-height:2}
 .tv-page .tv-booking-cta>div>p{font-size:14px;line-height:2}
@@ -63,3 +63,6 @@
 .tv-booking-date input{box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:10px;border:1px solid #c4d9ca;border-radius:7px;background:#fff;color:#234c35;font:inherit}
 .tv-result-booking .tvw-links{margin:12px 0}
 .tv-result-booking .tvw-links a{min-width:0;overflow-wrap:anywhere}
+
+.tv-page .tv-guide-cards article{border:0;border-top:2px solid #c8d8cc;border-radius:0;box-shadow:none;background:transparent}
+.tv-page :is(a,button,input,select,summary):focus-visible{outline:3px solid #126d54;outline-offset:3px}
