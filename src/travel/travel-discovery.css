@@ -1,13 +1,13 @@
 /* Hikaku Labo Travel 2.0 — responsive destination explorer and editorial planner */
 .tv-page{background:#f8faf8;color:#21372e;overflow-x:clip}
-.tvx-hero{background:linear-gradient(122deg,#123d33 0%,#155a49 65%,#277960 100%);color:#fff;overflow:hidden}
+.tvx-hero{background:#183f34;color:#fff;overflow:hidden}
 .tvx-hero-grid{min-height:480px;display:grid;grid-template-columns:minmax(0,1.16fr) minmax(0,.84fr);gap:65px;align-items:center;padding-top:65px;padding-bottom:65px}
-.tvx-eyebrow{display:flex;align-items:center;gap:9px;font:800 11px/1.4 Inter,sans-serif;letter-spacing:.19em;color:#bfe8d4}
+.tvx-eyebrow{display:flex;align-items:center;gap:9px;font:800 11px/1.4 sans-serif;letter-spacing:.19em;color:#bfe8d4}
 .tvx-sparkle{font-size:23px;color:#f3e9a2}
 .tvx-hero h1{font-size:clamp(37px,4.7vw,60px);font-weight:900;letter-spacing:-.05em;line-height:1.43;margin:20px 0 18px}
 .tvx-hero h1 em{font-style:normal;color:#e1eead}
 .tvx-hero-lead{font-size:14px;color:#dfefe5;line-height:2.1;max-width:620px}
-.tvx-search{position:relative;background:#fff;padding:12px 13px 13px;border-radius:14px;margin-top:30px;box-shadow:0 20px 55px #091f1938;color:#213d2d;max-width:685px}
+.tvx-search{position:relative;background:#fff;padding:12px 13px 13px;border-radius:14px;margin-top:30px;box-shadow:0 2px 8px #091f1912;color:#213d2d;max-width:685px}
 .tvx-search>label{font-size:12px;font-weight:900;display:block;margin:0 0 9px 6px;color:#254a39}
 .tvx-search-control{display:flex;align-items:center;gap:8px;min-height:51px}
 .tvx-search-control>span{font-size:27px;line-height:1;color:#49816a;padding:0 8px}
@@ -30,20 +30,20 @@
 .tvx-hero-art{position:relative;min-height:370px;width:100%;border-radius:22px;background:radial-gradient(ellipse at 50% 36%,#72bfab 0%,#367f67 43%,#1b5948 85%);border:1px solid #b9e4c140;overflow:hidden;box-shadow:0 30px 60px #032c232c}
 .tvx-art-orbit{position:absolute;left:50%;top:48%;border:1px solid #edffc462;border-radius:50%;transform:translate(-50%,-50%) rotate(-22deg)}
 .tvx-art-orbit-one{width:360px;height:220px}.tvx-art-orbit-two{width:470px;height:290px;transform:translate(-50%,-50%) rotate(29deg)}
-.tvx-art-title{position:absolute;top:117px;left:19%;font:800 41px/1.07 Inter,Arial,sans-serif;letter-spacing:-.06em;color:#eaf6d3;text-shadow:0 9px 29px #1748349a}
+.tvx-art-title{position:absolute;top:117px;left:19%;font:800 41px/1.07 Arial,sans-serif;letter-spacing:-.06em;color:#eaf6d3;text-shadow:0 9px 29px #1748349a}
 .tvx-art-title span{color:#f6dea6;position:absolute;right:-22px;top:-24px;font-size:27px}
 .tvx-art-spot{position:absolute;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;width:88px;height:88px;border-radius:18px;border:1px solid #ffffff79;background:#ffffffef;box-shadow:0 13px 26px #1b563d56;font-size:32px;transform:rotate(-8deg)}
-.tvx-art-spot small{font:800 9px Inter,Arial,sans-serif;letter-spacing:.09em;color:#4a7257}
+.tvx-art-spot small{font:800 9px Arial,sans-serif;letter-spacing:.09em;color:#4a7257}
 .tvx-art-spot-a{left:3%;top:13%;transform:rotate(-11deg)}.tvx-art-spot-b{right:4%;top:10%;transform:rotate(10deg)}.tvx-art-spot-c{right:11%;bottom:8%;transform:rotate(-7deg)}
 .tvx-art-compass{position:absolute;left:9%;bottom:15%;color:#fcf0bd;font-size:52px}
 .tvx-trust-strip{display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:22px 0;gap:0;border-bottom:1px solid #dce7de}
 .tvx-trust-strip>div{display:flex;align-items:center;gap:13px;padding:6px 18px;border-right:1px solid #dce7de}
 .tvx-trust-strip>div:first-child{padding-left:0}.tvx-trust-strip>div:last-child{border:0}
-.tvx-trust-strip b{font:900 22px Inter,sans-serif;color:#2b8c6b}
+.tvx-trust-strip b{font:900 22px sans-serif;color:#2b8c6b}
 .tvx-trust-strip span{font-size:12px;font-weight:850;color:#466353}
 .tvx-discover{padding-top:74px;padding-bottom:82px}
 .tvx-section-header{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:28px}
-.tvx-kicker{font:800 11px Inter,'Noto Sans JP',sans-serif;letter-spacing:.14em;color:#23775c}
+.tvx-kicker{font:800 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:#23775c}
 .tvx-section-header h2{font-size:clamp(26px,3.2vw,38px);letter-spacing:-.04em;line-height:1.4;margin:10px 0 8px;color:#1b392b}
 .tvx-section-header p{font-size:13px;color:#5a7363;line-height:1.9}
 .tvx-count,.tvx-result-badge{border-radius:30px;background:#e5f4e9;color:#256b4b;font-size:12px;font-weight:850;padding:8px 15px;white-space:nowrap}
@@ -72,7 +72,7 @@
 .tvx-destination-emblem{position:absolute;right:36px;top:31px;font-size:71px;filter:drop-shadow(0 12px 15px #182c2845);transform:rotate(10deg);z-index:1}
 .tvx-destination-cover-bottom{position:relative;z-index:1;display:flex;align-items:baseline;gap:12px}
 .tvx-destination-cover-bottom strong{font-size:28px;line-height:1.1;letter-spacing:-.05em}
-.tvx-destination-cover-bottom span{font:800 10px Inter,Arial,sans-serif;letter-spacing:.16em;color:#f2f7e8e0}
+.tvx-destination-cover-bottom span{font:800 10px Arial,sans-serif;letter-spacing:.16em;color:#f2f7e8e0}
 .tvx-destination-content{padding:19px}
 .tvx-destination-content p{min-height:29px;font-size:13px;line-height:1.8;color:#3e5a49}
 .tvx-destination-tags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 17px}
@@ -120,12 +120,12 @@
 .tvx-itinerary-days{padding-top:7px}
 .tvx-day{display:grid;grid-template-columns:100px 1fr;gap:24px;padding:24px 0;border-bottom:1px dashed #d4e4d8}
 .tvx-day:last-child{border:0}
-.tvx-day-index{font:800 12px Inter,sans-serif;letter-spacing:.08em;color:#498366;padding-top:6px}
+.tvx-day-index{font:800 12px sans-serif;letter-spacing:.08em;color:#498366;padding-top:6px}
 .tvx-day-index strong{font-size:27px;color:#1b6a4b;margin-left:4px}
 .tvx-day-contents h4{font-size:14px;font-weight:850;color:#365d45;margin:0 0 10px}
 .tvx-day-contents ol{margin:0;padding:0;display:flex;gap:9px;flex-wrap:wrap;list-style:none}
 .tvx-day-contents li{display:flex;gap:8px;align-items:center;background:#f3f8f4;border:1px solid #e2eee5;border-radius:9px;padding:10px 13px;font-size:13px;color:#264b35}
-.tvx-day-contents li span{background:#dae9de;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font:800 11px Inter,sans-serif;color:#24583c}
+.tvx-day-contents li span{background:#dae9de;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font:800 11px sans-serif;color:#24583c}
 .tvx-itinerary-source{border-top:1px solid #e5eee5;padding-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:#657d6c}
 .tvx-itinerary-source a{color:#177150!important;text-decoration:underline}
 .tvx-plan-bottom{margin-top:21px;display:flex;align-items:center;flex-wrap:wrap;gap:12px 23px;border:1px solid #d5e6db;border-radius:13px;background:#fff;padding:21px 24px}
@@ -165,3 +165,7 @@
 .tvx-domestic-quick button{border:0;border-radius:8px;background:#166248;color:#fff;font-weight:800;font-size:12px;padding:10px 15px;white-space:nowrap;cursor:pointer}
 .tvx-domestic-quick>p{width:100%;color:#92362e;font-size:12px}
 @media(max-width:570px){.tvx-domestic-quick{align-items:stretch;flex-direction:column;gap:9px}.tvx-domestic-quick>div{min-width:0;flex-direction:column}}
+
+.tv-page .tvx-hero{background:#183f34}
+.tv-page .tvx-search{border:1px solid #d0e3d5;border-radius:7px}
+.tv-page .tvx-search :is(input,button,select):focus-visible{outline:3px solid #0c7355;outline-offset:3px}

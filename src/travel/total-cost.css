@@ -3,13 +3,13 @@
 .gx-cost-section .gx-heading strong{color:#1b674d}
 .gx-cost-head{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-bottom:17px;background:#eaf4ed;border:1px solid #d9e8dc;padding:15px 18px;border-radius:12px}
 .gx-cost-head label{font-size:13px;font-weight:800;color:#24543d}
-.gx-cost-head select{background:#fff;border:1px solid #c6d9cd;border-radius:9px;min-height:43px;padding:10px 15px;font-size:13px;color:#254b36}
+.gx-cost-head select{background:#fff;border:1px solid #c6d9cd;border-radius:9px;min-height:44px;padding:10px 15px;font-size:13px;color:#254b36}
 .gx-cost-head span{font-size:12px;color:#678071;margin-left:auto}
 .gx-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .gx-cost-card{min-width:0;border:1px solid #dae7dd;border-radius:15px;padding:22px;background:#fff;display:flex;flex-direction:column;gap:15px}
 .gx-cost-card legend{font-size:12px;font-weight:900;color:#286c4d;padding:0 9px}
 .gx-cost-card label{display:flex;flex-direction:column;gap:7px;color:#315341;font-size:12px;font-weight:800}
-.gx-cost-card input[type=number],.gx-cost-card select{border:1px solid #cfdfd2;border-radius:8px;background:#fff;min-height:43px;width:100%;font:600 13px 'Noto Sans JP',sans-serif;color:#254734;padding:10px 12px}
+.gx-cost-card input[type=number],.gx-cost-card select{border:1px solid #cfdfd2;border-radius:8px;background:#fff;min-height:44px;width:100%;font:600 13px 'Noto Sans JP',sans-serif;color:#254734;padding:10px 12px}
 .gx-cost-card input:focus-visible,.gx-cost-card select:focus-visible{outline:3px solid #95c9ab}
 .gx-cost-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .gx-cost-card .gx-cost-confirm{display:flex;flex-direction:row;align-items:start;gap:10px;font-weight:700;line-height:1.75;background:#f3f8f3;padding:12px;border-radius:9px}

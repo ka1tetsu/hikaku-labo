@@ -1,10 +1,10 @@
 /* Floating "AIに相談" launcher, shown on every page */
 .hcl-root{position:fixed;right:20px;bottom:20px;z-index:1000;font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}
-.hcl-launcher{display:flex;align-items:center;gap:8px;border:0;border-radius:40px;background:#14634a;color:#fff;font-size:14px;font-weight:850;padding:13px 20px;min-height:52px;cursor:pointer;box-shadow:0 12px 30px #0b2d2140;font-family:inherit}
+.hcl-launcher{display:flex;align-items:center;gap:8px;border:0;border-radius:40px;background:#14634a;color:#fff;font-size:14px;font-weight:850;padding:13px 20px;min-height:52px;cursor:pointer;box-shadow:0 2px 10px #0b2d211d;font-family:inherit}
 .hcl-launcher span{font-size:20px;color:#f3e9a2;line-height:1}
 .hcl-launcher:hover{background:#0f513c}
 .hcl-launcher:focus-visible{outline:3px solid #a8d5bc;outline-offset:3px}
-.hcl-panel{position:absolute;right:0;bottom:66px;width:min(420px,calc(100vw - 32px));height:min(680px,calc(100vh - 110px));background:#fff;border:1px solid #d7e6dc;border-radius:20px;box-shadow:0 24px 60px #0b2d2140;display:flex;flex-direction:column;overflow:hidden}
+.hcl-panel{position:absolute;right:0;bottom:66px;width:min(420px,calc(100vw - 32px));height:min(680px,calc(100vh - 110px));background:#fff;border:1px solid #d7e6dc;border-radius:20px;box-shadow:0 8px 28px #0b2d2125;display:flex;flex-direction:column;overflow:hidden}
 .hcl-panel[hidden]{display:none}
 .hcl-panel-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#14634a;color:#fff}
 .hcl-panel-head>div{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.4}
