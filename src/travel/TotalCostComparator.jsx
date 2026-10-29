@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import { compareEnteredQuotes } from './totalCost.js';
-import { TRAVEL_PROVIDERS, providerTarget } from './providers.js';
+import { TRAVEL_PROVIDERS } from './providers.js';
+import { globalProviderTarget } from './searchLinkAdapter.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import './total-cost.css';
 
 const blank=(id,type)=>({id,type,providerId:'',base:'',taxes:'0',extras:'0',discount:'0',points:'0',sameConditions:false});
 const yen=n=>n.toLocaleString('ja-JP')+'円';
 
-export default function TotalCostComparator(){
+export default function TotalCostComparator({ searchCriteria = {} }){
   const [kind,setKind]=useState('flight');
   const [offers,setOffers]=useState(()=>[blank(1,'flight'),blank(2,'flight')]);
   const [nextId,setNextId]=useState(3);
@@ -20,7 +21,7 @@ export default function TotalCostComparator(){
   const displayProvider=id=>TRAVEL_PROVIDERS.find(p=>p.id===id)?.name||id;
   const visit=id=>{
     const provider=TRAVEL_PROVIDERS.find(p=>p.id===id);
-    return provider?providerTarget(provider):null;
+    return provider?globalProviderTarget(provider,searchCriteria):null;
   };
   const handleClick=(id,sponsored)=>recordOutboundClick({section:'travel',merchant:id,placement:'user-quote',sponsored});
   const copy=async()=>{
