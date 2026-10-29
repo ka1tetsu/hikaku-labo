@@ -1,4 +1,4 @@
-> 段階公開: このリリースは新機能を既存の `hikaku-labo.vercel.app` で公開する設定です。Vercelのビルド時だけ `SITE_ORIGIN` を既存URLにし、APIのReferer既定値も既存URLを維持します。vivlica.comのDNS・Vercel接続確認後、`vercel.json` のbuildCommandを `npm run build` に戻し、APIの `SITE_URL` をvivlica.comに設定し、旧URLからの恒久転送と本番監査URLの切替を行ってください。現在、旧URLから未確認の新ドメインへ転送する設定は無効です。
+> 更新（2026-10-29）：この文書の初期『段階公開』は旧リリースの履歴です。現在のリポジトリ設定は正規URL `https://vivlica.com`、旧 `hikaku-labo.vercel.app` からのリダイレクト指定です。ただし、この環境から独自ドメインの実HTTPやVercelチーム管理画面は確認できていません。新ドメイン登録と提携確認は [MONETIZATION-ACTION-20261029.md](MONETIZATION-ACTION-20261029.md) を優先してください。
 
 # Vivlica.comへの統合・収益運用
 
