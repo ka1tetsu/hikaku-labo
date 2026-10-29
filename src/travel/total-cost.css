@@ -32,3 +32,23 @@
 .gx-cost-copy{background:#19654c;border:0;border-radius:9px;padding:11px 16px;cursor:pointer;color:#fff;font-size:12px;font-weight:850;min-height:44px}
 .gx-cost-result .gx-cost-caveat{font-size:11px;line-height:1.9;color:#708174}
 @media(max-width:620px){.gx-cost-section{padding:45px 0}.gx-cost-grid{grid-template-columns:1fr}.gx-cost-card{padding:17px}.gx-cost-head span{margin-left:0}.gx-cost-result{padding:17px}.gx-cost-details{gap:10px}}
+
+/* Lowest eligible manually entered checkout total, without claiming a market-wide fare. */
+.gx-cost-winner{background:#e9f5ed;border:1px solid #b9dfc7;border-radius:14px;padding:22px;margin:15px 0 23px;display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+.gx-cost-winner>span{font-size:12px;font-weight:850;color:#266344}
+.gx-cost-winner>strong{font-size:23px;font-weight:900;color:#194a35}
+.gx-cost-winner>b{font-size:clamp(31px,4vw,41px);line-height:1.35;color:#115f44;font-variant-numeric:tabular-nums}
+.gx-cost-winner>p{font-size:13px;font-weight:700;color:#39644a;margin:0}
+.gx-cost-winner>small{font-size:11px;color:#53715e;line-height:1.8}
+.gx-cost-winner .gx-cost-winning-cta{background:#155f46;color:#fff!important;min-height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;padding:12px 20px;font-size:13px;font-weight:850;text-decoration:none}
+.gx-cost-yahoo{margin-top:22px;border-top:1px solid #dce9df;padding-top:18px}
+.gx-cost-yahoo h4{font-size:16px;margin:0 0 7px;color:#204a34}
+.gx-cost-yahoo>p{font-size:12px;color:#526e5d}
+.yt-ad-placement{background:#f7faf7;border:1px solid #d6e7dc;border-radius:11px;padding:17px;margin-top:12px;min-width:0}
+.yt-ad-placement .yt-ad-label{font-size:12px;font-weight:900;color:#216e4c;margin:0 0 7px}
+.yt-ad-placement>p:not(.yt-ad-label){font-size:12px;color:#57715e;line-height:1.9;margin:7px 0}
+.yt-ad-placement>a{display:inline-flex;align-items:center;min-height:44px;background:#e5f1e8;color:#175f40!important;text-decoration:none;border:1px solid #cde0d2;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:850}
+.yt-ad-creative{max-width:100%;overflow-wrap:anywhere}
+.yt-ad-creative>a{display:inline-flex;max-width:100%}
+.yt-ad-creative>a img{max-width:100%;height:auto;object-fit:contain}
+@media(max-width:560px){.gx-cost-winner{padding:17px}.gx-cost-winner .gx-cost-winning-cta{width:100%;text-align:center}}
