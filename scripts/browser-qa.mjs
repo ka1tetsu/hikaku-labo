@@ -112,7 +112,7 @@ try{
    if(!(await rows.first().innerText()).includes('ポイント優先の例'))throw Error('Points criterion did not reorder results');
    if(!(await rows.first().innerText()).includes('参考額'))throw Error('Reward-adjusted value was not marked as an estimate');
    if(!(await page.locator('.cp-criteria-note').innerText()).includes('購入時の支払額ではありません'))throw Error('Missing points disclaimer');
-   await page.screenshot({path:path.join(out,'interaction-cash-vs-points.png'),animations:'disabled'});
+   await page.locator('.cp-results').screenshot({path:path.join(out,'interaction-cash-vs-points.png'),animations:'disabled'});
  });
  await interaction('price-search',{width:1440,height:900},async page=>{
    await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
