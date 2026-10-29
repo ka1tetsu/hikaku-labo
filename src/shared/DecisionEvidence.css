@@ -1,0 +1,21 @@
+/* Editorial evidence panel: one consistent decision aide, not a fake dashboard. */
+.vl-decision-evidence{
+  width:100%;max-width:480px;min-width:0;justify-self:end;align-self:center;
+  border-block:2px solid #b6cdbd;padding:26px 0 24px;color:#f5f8f5;
+  font-family:'Noto Sans JP',system-ui,sans-serif;
+}
+.vl-decision-evidence__eyebrow{font-size:13px;letter-spacing:.035em;font-weight:800;color:#cbe3ce;margin:0 0 13px}
+.vl-decision-evidence h2{font-size:clamp(23px,2.5vw,32px);line-height:1.48;letter-spacing:-.03em;color:#fff;margin:0 0 19px;font-weight:850}
+.vl-decision-evidence dl{margin:0;padding:0}
+.vl-decision-evidence dl>div{display:grid;grid-template-columns:100px minmax(0,1fr);align-items:start;gap:16px;
+  padding:13px 0;border-top:1px solid #ffffff47}
+.vl-decision-evidence dt{color:#e8f2de;font-size:13px;line-height:1.75;font-weight:850}
+.vl-decision-evidence dd{margin:0;color:#eff7f0;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.vl-decision-evidence__note{font-size:12px;line-height:1.9;color:#d4e5d9;margin:18px 0 10px}
+.vl-decision-evidence a{display:inline-flex;min-height:44px;align-items:center;gap:8px;
+  font-size:13px;font-weight:800;color:#f2f8df!important;text-decoration:underline!important;text-underline-offset:4px}
+.vl-decision-evidence a:hover{color:#fff!important}
+.vl-decision-evidence a:focus-visible{outline:3px solid #f4f8d4;outline-offset:4px}
+@media(max-width:780px){.vl-decision-evidence{justify-self:start;max-width:650px}}
+@media(max-width:420px){.vl-decision-evidence{padding-block:19px}.vl-decision-evidence dl>div{grid-template-columns:90px minmax(0,1fr);gap:10px}}
+@media(prefers-reduced-motion:reduce){.vl-decision-evidence *{transition:none!important}}
