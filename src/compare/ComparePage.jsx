@@ -8,6 +8,7 @@ import { MERCHANTS, MERCHANT_KINDS, storeLinks } from '../shared/merchants.js';
 import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/compareBudget.js';
 import { PRICE_SORTS, displayValue, displayRange, sortDisplayedOffers } from '../shared/offerDisplay.js';
 import { openConcierge } from '../shared/conciergeActions.js';
+import ManualStoreCompare from './ManualStoreCompare.jsx';
 import './compare.css';
 
 const yen = n => '¥' + Math.round(n).toLocaleString('ja-JP');
@@ -95,7 +96,7 @@ export default function ComparePage() {
         <div className="cp-wrap">
           <span className="cp-kicker">価格・送料・販売条件を比べる</span>
           <h1>買う前に、<em>主要ショップ</em>の価格を比較。</h1>
-          <p>楽天市場・Yahoo!ショッピングから取得した商品価格を標準の並び順で比較。ポイントは現金値引きと区別します。ほかのショップへは同じキーワードで検索できるリンクを用意しています。</p>
+          <p>楽天市場・Yahoo!ショッピングの価格取得に対応。取得できないときも、楽天・Amazon・Yahoo!で確認した金額を入力して送料込みで比較できます。ポイントは現金値引きと区別します。</p>
           <form className="cp-search" role="search" onSubmit={submit}>
             <label htmlFor="cp-q" className="cp-visually-hidden">商品名・型番・JANコード</label>
             <input id="cp-q" type="search" value={input} onChange={e => setInput(e.target.value)} placeholder="商品名・型番・JANコード（例：WH-1000XM5）" autoComplete="off" />
@@ -133,7 +134,7 @@ export default function ComparePage() {
           {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
           <p className="cp-criteria-note">商品価格はポイント差引前・送料別の表示です。「送料無料」は取得元の送料区分で判定します。ポイント考慮後は参考値であり、購入時の支払額ではありません。</p>
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
-          {state.error && <p className="cp-error">{state.error}</p>}
+          {state.error && <p className="cp-error">{state.error} <a href="#cp-manual">3ショップの価格を手入力して比較する →</a></p>}
           {cheapest && <div className="cp-summary">
             <div><span>{priceSort === "cash" ? (same.length ? "一致候補の最も低い商品価格" : "近い商品の最も低い商品価格") : "ポイント考慮後の最も低い参考額"}</span><strong>{yen(displayValue(cheapest, priceSort))}</strong><small>{priceSort === "points" ? "現金支払額ではありません · " : ""}{cheapest.storeName}・{cheapest.shopName}</small></div>
             <div><span>{priceSort === "cash" ? "商品価格の幅" : "ポイント考慮後の参考額の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
@@ -149,6 +150,8 @@ export default function ComparePage() {
           </div>}
           <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 条件を変えて候補を探す</button>
         </section>}
+
+        {(query.q || query.jan) && <ManualStoreCompare keyword={searchTerm} stores={stores} />}
 
         {searchTerm && <section className="cp-stores">
           <h2>ほかのショップでも探す</h2>

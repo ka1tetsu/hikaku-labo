@@ -64,3 +64,9 @@
 @media(max-width:650px){.hs-heading,.hs-results-header{flex-direction:column;align-items:stretch}.hs-to-compare{align-self:stretch}.hs-controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:13px}.hs-controls label:nth-child(4){grid-column:1/-1}.hs-controls .hs-control-check{grid-column:1/-1}.hs-controls>button{grid-column:1/-1}.hs-card-grid,.hs-selected-grid{grid-template-columns:1fr}.hs-hotel-card{flex-direction:row;align-items:stretch}.hs-hotel-card>img,.hs-photo-empty{height:auto;width:34%;object-fit:cover}.hs-card-body{width:66%;padding:13px}.hs-card-body h4{font-size:14px}.hs-card-body>small{min-height:0}.hs-card-label{font-size:10px}.hs-price-row strong{font-size:19px}.hs-selected-grid article{padding:12px}}
 @media(max-width:420px){.hs-hotel-card{flex-direction:column}.hs-hotel-card>img,.hs-photo-empty{height:160px;width:100%}.hs-card-body{width:100%}}
 @media(prefers-reduced-motion:reduce){.hs-hotel-card{transition:none}}
+
+/* Direct merchant search is available without waiting for a potentially unavailable API. */
+.hs-direct-search{border-top:2px solid #c9dccd;border-bottom:1px solid #d7e3d8;padding:18px 0;margin:17px 0 21px}
+.hs-direct-search h3{font-size:17px;font-weight:850;color:#204b34;margin:0 0 6px}
+.hs-direct-search p{max-width:850px;margin:0 0 12px;color:#516f5b;line-height:1.8;font-size:12px}
+.hs-direct-search .tvw-links{margin:12px 0 0}

@@ -69,6 +69,8 @@ export default function StaySearch(){
   const toggleSelected=id=>setSelected(prev=>prev.includes(id)?prev.filter(item=>item!==id):prev.length<3?[...prev,id]:prev);
   const nights=search?(Date.parse(search.checkout)-Date.parse(search.checkin))/86400000:0;
   const links=search?buildStayLinks({destination:{name:search.place,area:'domestic'},query:search.place,checkin:search.checkin,checkout:search.checkout,nights,adults:search.adults,rooms:1,config:LINK_CONFIG}):[];
+  const quickSearch=useMemo(()=>parseStaySearch({...form,page:1},today),[form,today]);
+  const quickLinks=useMemo(()=>quickSearch?buildStayLinks({query:quickSearch.place,checkin:quickSearch.checkin,checkout:quickSearch.checkout,nights:(Date.parse(quickSearch.checkout)-Date.parse(quickSearch.checkin))/86400000,adults:quickSearch.adults,rooms:1,config:LINK_CONFIG}).filter(link=>['rakuten','booking','expedia'].includes(link.provider)):[],[quickSearch]);
   const morePages=state.data?.pageCount>1;
   const booking=(offer,placement)=>recordOutboundClick({section:'travel',merchant:'rakuten-travel',placement,sponsored:offer.sponsored});
   return <section className="tv-wrap tv-stay-search" id="stay-search" aria-labelledby="stay-search-title">
@@ -85,6 +87,7 @@ export default function StaySearch(){
       <label className="tv-stay-check"><input type="checkbox" checked={form.onsen==='true'} onChange={edit('onsen')}/>温泉あり希望</label>
       <button className="vl-primary" disabled={state.loading} type="submit">{state.loading?'空室を確認中…':'空室のある宿を探す ↗'}</button>
     </form>
+    {quickLinks.length>0&&<div className="hs-direct-search" aria-label="予約サイトで検索する"><div><h3>検索結果を待たずに、予約サイトでも探す</h3><p>行き先・日程・大人{quickSearch.adults}名・1室で各社の検索画面へ。予約可否や最新価格、食事・返金条件は各社で確認してください。楽天は行き先のみ引き継ぎます。</p></div><BookingLinkList links={quickLinks} placement="stay-quick" /></div>}
     <p className="tv-stay-note">国内・大人のみ・1室の検索です。複数室・お子様の人数は予約先で指定してください。すべての宿泊施設の網羅は保証しません。</p>
     <div aria-live="polite" aria-busy={state.loading}>
       {state.error&&<p className="hs-error" role="alert">{state.error}</p>}
