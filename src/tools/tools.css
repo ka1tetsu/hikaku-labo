@@ -93,7 +93,7 @@ body { margin: 0; }
 .tl-first { border: 1.5px solid #3d9475; }
 .tl-card-top { display: flex; flex-direction: column; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid #eef1ec; }
 .tl-company { display: flex; align-items: center; gap: 11px; }
-.tl-monogram { border-radius: 10px; color: #fff; width: 43px; height: 43px; flex-shrink: 0; display: grid; place-items: center; font-weight: 900; font-size: 23px; font-family: Arial,sans-serif; }
+.tl-monogram { border-radius: 10px; color: #fff; width: 43px; height: 43px; flex-shrink: 0; display: grid; place-items: center; font-weight: 900; font-size: 23px; font-family:'Noto Sans JP',sans-serif; }
 .tl-company-name { font-size: 17px; font-weight: 900; letter-spacing: -.02em; line-height: 1.4; }.tl-company p { font-size: 10px; color: #7e8981; }
 .tl-rank { font-size: 10px; width: max-content; padding: 4px 10px; border-radius: 20px; background: #e6f4e8; color: #237050; font-weight: 750; }
 .tl-card:not(.tl-first) .tl-rank { background: #f2f4f1; color: #78877e; }
