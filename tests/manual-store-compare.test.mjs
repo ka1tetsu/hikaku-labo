@@ -11,8 +11,8 @@ test('manual same-product comparison chooses cash cost and keeps later points se
   const result = compareManualOffers([a,b],{sort:'cash'});
   assert.equal(result.comparisonPossible,true);
   assert.deepEqual(MANUAL_STORES,['rakuten','amazon','yahoo-shopping']);
-  assert.equal(result.cheapest.row.storeId,'amazon');
-  assert.equal(result.cheapest.cost.cashPayable,38850);
+  assert.equal(result.cheapest.row.storeId,'rakuten');
+  assert.equal(result.cheapest.cost.cashPayable,38800);
   assert.equal(manualOfferCost(a).cashPayable,38800);
   assert.equal(manualOfferCost(a).pointsAdjustedIllustration,35800);
 });
