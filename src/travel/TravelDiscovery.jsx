@@ -94,7 +94,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
         <div>
           <div className="tvx-eyebrow"><span className="tvx-sparkle">✳</span> VIVLICA TRAVEL — WORLDWIDE</div>
           <h1 id="tvx-title">世界中から、<br/><em>ぴったりの旅</em>を見つけよう。</h1>
-          <p className="tvx-hero-lead">国内も海外も、都市名・国名・名所・「やりたいこと」で検索。AIコンシェルジュに相談すれば、モデルコースから航空券・ホテルの比較、旅の予算までひとつの画面で。</p>
+          <p className="tvx-hero-lead">国内も海外も、都市名・国名・名所・「やりたいこと」で検索。条件検索アシスタントを使えば、モデルコースから航空券・ホテルの比較、旅の予算までひとつの画面で。</p>
           <TravelSearchBox onDestination={goToDestination} onScope={applyScope} onExternal={setExternal}/>
           <nav className="tv-booking-shortcuts" aria-label="旅行先が決まっている方へ"><a className="tv-cheapest-shortcut" href="#travel-total-cost">Yahoo!トラベルなどの最安候補を比較 →</a><a href="#stay-search">日程・人数から空室を探す →</a><a href="#booking">宿・航空券を探す →</a><a href="#planner">旅行予算を計算する →</a></nav>
           {external&&<div className="tvw-external" role="region" aria-label="掲載外の場所の検索">

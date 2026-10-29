@@ -88,7 +88,7 @@ export default function ComparePage() {
     <main id="main-content">
       <section className="cp-hero">
         <div className="cp-wrap">
-          <span className="cp-kicker">✳ PRICE COMPARISON — ALL STORES</span>
+          <span className="cp-kicker">価格・送料・販売条件を比べる</span>
           <h1>買う前に、<em>主要ショップ</em>の価格を比較。</h1>
           <p>楽天市場・Yahoo!ショッピングの実際の販売価格を、ポイント還元後の「実質価格」で並べます。Amazon・家電量販店・フリマも同じキーワードでまとめて確認できます。</p>
           <form className="cp-search" role="search" onSubmit={submit}>
