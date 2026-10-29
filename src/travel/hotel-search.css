@@ -6,7 +6,7 @@
 .hs-to-compare{border:1px solid #cae0d0;background:#e8f3eb;color:#1e6244!important;text-decoration:none!important;border-radius:9px;padding:12px 16px;min-height:47px;display:inline-flex;align-items:center;justify-content:center;font-weight:850;font-size:12px;white-space:nowrap}
 .hs-search-form{border-radius:16px!important;box-shadow:0 9px 26px #0f38270c}
 .hs-loading,.hs-empty{background:#fff;border:1px solid #dce9df;border-radius:12px;padding:35px;color:#4c6c58;font-size:13px;text-align:center;margin:20px 0}
-.hs-error{border-left:3px solid #b94439;background:#fff0ee;color:#923c33;border-radius:6px;padding:14px;font-size:12px;line-height:1.9}
+.hs-error{border:1px solid #d9a39d;background:#fff0ee;color:#923c33;border-radius:6px;padding:14px;font-size:12px;line-height:1.9}
 .hs-results-header{display:flex;justify-content:space-between;gap:18px;align-items:end;margin:28px 0 15px}
 .hs-results-header h3{font-size:23px;color:#214b34;margin:7px 0}
 .hs-results-header p{color:#617868;font-size:12px;margin:0}
