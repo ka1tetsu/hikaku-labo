@@ -27,7 +27,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
   const pages = new Map(), placements = new Map(), merchants = new Map();
   let unattributedClicks = 0, ignoredRecords = 0, includedRecords = 0;
   const rowFor = page => {
-    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0 });
+    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0, travelQuotesReady: 0, travelQuoteBookingClicks: 0 });
     return pages.get(page);
   };
   for (const record of events) {
@@ -46,12 +46,13 @@ export function revenueReport(events, { from, to, finance } = {}) {
       const row = rowFor(fields.page);
       row.outboundClicks++; row.sponsoredClicks += Number(fields.sponsored);
       if (fields.placement === 'savings-result') row.savingsDirectClicks++;
+      if (fields.page === 'travel' && fields.section === 'travel' && fields.placement === 'user-quote') row.travelQuoteBookingClicks++;
       const key = [fields.page, fields.merchant, fields.placement, fields.sponsored].join(':');
       if (!placements.has(key)) placements.set(key, { page: fields.page, merchant: fields.merchant, placement: fields.placement, sponsored: fields.sponsored, clicks: 0 });
       placements.get(key).clicks++;
     } else if (type === 'hikaku_funnel' && validFunnelEvent({ event: 'funnel', ...fields })) {
       const row = rowFor(fields.page);
-      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons' }[fields.action];
+      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons', travel_quote_ready: 'travelQuotesReady' }[fields.action];
       row[counter]++;
     } else { ignoredRecords++; continue; }
     includedRecords++;
@@ -70,6 +71,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
     nextActions.push({ action: 'review_referral_setup', merchant: merchant.merchant, officialClicks: merchant.officialClicks, variable: affiliateEnvKey(merchant.merchant), message: '通常リンクへの送客が記録されています。提携の可否と承認済み素材の設定を確認してください。報酬の取り逃し額を示すものではありません。' });
   }
   for (const row of pages.values()) if (row.savingsCompleted > 0 && row.savingsComparisons === 0 && row.savingsDirectClicks === 0) nextActions.push({ action: 'review_savings_next_step', page: row.page, completedInteractions: row.savingsCompleted, message: '診断完了はありますが、結果からの移動が記録されていません。表示と計測を確認してください。利用者単位の離脱率ではありません。' });
+  for (const row of pages.values()) if (row.page === 'travel' && row.travelQuotesReady > 0 && row.travelQuoteBookingClicks === 0) nextActions.push({ action: 'review_travel_quote_cta', page: row.page, comparisonInteractions: row.travelQuotesReady, message: '旅行総額比較の完成イベントはありますが、結果からの予約先クリックが観測されていません。CTAの表示・掲載案件・計測を確認してください。利用者単位の離脱率ではありません。' });
   for (const row of pages.values()) if (row.page.startsWith('guide-') && row.views > 0 && row.guideComparisons === 0 && row.outboundClicks === 0) nextActions.push({ action: 'review_guide_next_step', page: row.page, views: row.views, message: '記事の閲覧はありますが比較・予約先への移動が記録されていません。記事の目的と次の手順、計測の欠損を確認してください。' });
   return {
     interval: { from: from || null, to: to || null, endExclusive: true }, includedRecords, ignoredRecords, unattributedClicks,
@@ -78,7 +80,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
     merchants: [...merchants.values()].sort((a, b) => b.clicks - a.clicks),
     nextActions,
     financials,
-    notes: ['Clicks are interactions, not people or confirmed sales; clicks per 100 views may exceed 100.', 'Incomplete hosting logs, bots and repeated clicks affect these counts. Compare the same interval.', 'Legacy clicks without page attribution are kept separately. Missing views produce null, not a zero rate.', 'Without owner-supplied settlement and cost totals, profit is unknown.'],
+    notes: ['Clicks are interactions, not people or confirmed sales; clicks per 100 views may exceed 100.', 'Incomplete hosting logs, bots and repeated clicks affect these counts. Compare the same interval.', 'Travel quote events count page interactions, not distinct customers, bookings or conversion rates.', 'Legacy clicks without page attribution are kept separately. Missing views produce null, not a zero rate.', 'Without owner-supplied settlement and cost totals, profit is unknown.'],
   };
 }
 

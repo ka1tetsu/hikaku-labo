@@ -45,7 +45,7 @@ export function pageId(path) {
 export function validPageId(page) {
   return VALID_PAGE_IDS.has(page);
 }
-export const FUNNEL_ACTIONS = Object.freeze(['savings_complete', 'savings_compare', 'selector_change', 'guide_compare']);
+export const FUNNEL_ACTIONS = Object.freeze(['savings_complete', 'savings_compare', 'selector_change', 'guide_compare', 'travel_quote_ready']);
 export function validFunnelEvent(body) {
-  return Boolean(body && typeof body === 'object' && !Array.isArray(body) && body.event === 'funnel' && validPageId(body.page) && FUNNEL_ACTIONS.includes(body.action) && Object.keys(body).every(key => ['event', 'page', 'action'].includes(key)));
+  return Boolean(body && typeof body === 'object' && !Array.isArray(body) && body.event === 'funnel' && validPageId(body.page) && FUNNEL_ACTIONS.includes(body.action) && (body.action !== 'travel_quote_ready' || body.page === 'travel') && Object.keys(body).every(key => ['event', 'page', 'action'].includes(key)));
 }

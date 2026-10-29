@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { compareEnteredQuotes } from './totalCost.js';
 import { TRAVEL_PROVIDERS } from './providers.js';
 import { globalProviderTarget } from './searchLinkAdapter.js';
-import { recordOutboundClick } from '../shared/outboundClient.js';
+import { recordFunnelEvent, recordOutboundClick } from '../shared/outboundClient.js';
 import './total-cost.css';
 
 const blank=(id,type)=>({id,type,providerId:'',base:'',taxes:'0',extras:'0',discount:'0',points:'0',sameConditions:false});
@@ -13,8 +13,15 @@ export default function TotalCostComparator({ searchCriteria = {} }){
   const [offers,setOffers]=useState(()=>[blank(1,'flight'),blank(2,'flight')]);
   const [nextId,setNextId]=useState(3);
   const [notice,setNotice]=useState('');
+  const recordedReady=useRef(false);
   const providers=TRAVEL_PROVIDERS.filter(x=>x.type===kind);
   const result=useMemo(()=>compareEnteredQuotes(offers,{type:kind}),[offers,kind]);
+  useEffect(()=>{
+    if(result.comparisonPossible && !recordedReady.current){
+      recordedReady.current=true;
+      recordFunnelEvent('travel_quote_ready');
+    }
+  },[result.comparisonPossible]);
   const edit=(id,key,value)=>setOffers(rows=>rows.map(row=>row.id===id?{...row,[key]:value}:row));
   const setCategory=value=>{setKind(value);setOffers([blank(1,value),blank(2,value)]);setNextId(3);setNotice('');};
   const addOffer=()=>{if(offers.length<4){setOffers(rows=>[...rows,blank(nextId,kind)]);setNextId(x=>x+1);}};
