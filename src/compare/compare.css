@@ -81,6 +81,6 @@ body{margin:0}
 .cp-sort-label select{max-width:340px;min-height:44px;border:1px solid #b4cfc0;border-radius:8px;background:#fff;color:#153e2b;padding:8px 12px;font:700 13px 'Noto Sans JP',sans-serif}
 .cp-result-controls .cp-toggle{min-height:44px}
 .cp-result-controls :is(input,select):focus-visible{outline:3px solid #14664f;outline-offset:3px}
-.cp-criteria-note{font-size:12px;line-height:1.85;color:#50695d;background:#f2f7f4;padding:10px 13px;border-left:3px solid #8ab69f;margin:0 0 15px}
+.cp-criteria-note{font-size:12px;line-height:1.85;color:#50695d;background:#f2f7f4;padding:10px 13px;border-top:1px solid #b5d3c1;margin:0 0 15px}
 .cp-offer-price .cp-point-estimate{font-size:12px;font-weight:750;color:#155c45;white-space:normal}
 @media(max-width:650px){.cp-result-controls{width:100%}.cp-sort-label{width:100%}.cp-sort-label select{max-width:none;width:100%}.cp-offer-price{justify-content:flex-start;gap:8px 16px;text-align:left}}
