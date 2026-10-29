@@ -33,10 +33,10 @@ export default function SiteConcierge({ section = 'site' }) {
   }, []);
 
   return <div className="hcl-root">
-    {(open || loaded) && <div className={'hcl-panel' + (open ? ' is-open' : '')} role="dialog" aria-modal="false" aria-label="Vivlica AIコンシェルジュ" hidden={!open}>
+    {(open || loaded) && <div className={'hcl-panel' + (open ? ' is-open' : '')} role="dialog" aria-modal="false" aria-label="Vivlica 条件検索アシスタント" hidden={!open}>
       <div className="hcl-panel-head">
         <span className="hcl-panel-mark" aria-hidden="true">✳</span>
-        <div><strong>AIコンシェルジュ</strong><small>旅行・お買い物・Webサービス、なんでも相談</small></div>
+        <div><strong>条件検索アシスタント</strong><small>旅行・商品・ITツールを掲載条件から探します</small></div>
         <button type="button" className="hcl-close" onClick={() => setOpen(false)} aria-label="閉じる">×</button>
       </div>
       <Suspense fallback={<p className="hcl-loading">読み込み中…</p>}>
@@ -45,7 +45,7 @@ export default function SiteConcierge({ section = 'site' }) {
     </div>}
     <button type="button" className={'hcl-launcher' + (open ? ' is-open' : '')} aria-expanded={open} aria-haspopup="dialog"
       onClick={() => { setOpen(value => !value); setLoaded(true); }}>
-      <span aria-hidden="true">{open ? '×' : '✳'}</span>{open ? '閉じる' : 'AIに相談'}
+      <span aria-hidden="true">{open ? '×' : '✳'}</span>{open ? '閉じる' : '条件を相談'}
     </button>
   </div>;
 }
