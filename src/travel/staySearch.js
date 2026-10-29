@@ -6,12 +6,14 @@ const validDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.te
 export function parseStaySearch(query = {}, today = japanToday()) {
   const { place, checkin, checkout } = query;
   const adults = Number(query.adults);
+  const page = query.page === undefined ? 1 : Number(query.page);
+  if (!Number.isInteger(page) || page < 1 || page > 100 || (query.page !== undefined && !/^\d{1,3}$/.test(String(query.page)))) return null;
   if (!['string', 'number'].includes(typeof query.adults)) return null;
   if (typeof place !== 'string' || place.trim().length < 2 || place.length > 80 || /\p{Cc}/u.test(place)) return null;
   if (!validDate(checkin) || !validDate(checkout) || checkin < today || checkout <= checkin || (Date.parse(checkout) - Date.parse(checkin)) / 86400000 > 30) return null;
   if (!/^\d{1,2}$/.test(String(query.adults)) || !Number.isInteger(adults) || adults < 1 || adults > 10) return null;
   if (![query.breakfast, query.onsen].every(value => value === undefined || value === '' || value === 'true' || value === 'false')) return null;
-  return { place: place.trim(), checkin, checkout, adults, breakfast: query.breakfast === 'true', onsen: query.onsen === 'true' };
+  return { place: place.trim(), checkin, checkout, adults, breakfast: query.breakfast === 'true', onsen: query.onsen === 'true', page };
 }
 export function sortStays(offers, order = 'rating') {
   const price = offer => offer.firstNightTotal ?? Infinity;
