@@ -10,6 +10,15 @@ function travelUrl(raw) {
     return url.protocol === 'https:' && !url.username && !url.password && !url.port && (url.hostname === 'hb.afl.rakuten.co.jp' || url.hostname === 'travel.rakuten.co.jp' || url.hostname.endsWith('.travel.rakuten.co.jp')) ? url.href : null;
   } catch { return null; }
 }
+function rakutenImage(raw){
+  if (typeof raw !== 'string') return null;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== 'https:' || url.username || url.password || url.port) return null;
+    if (url.hostname.endsWith('.rakuten.co.jp') || url.hostname === 'rakuten.co.jp' || url.hostname.endsWith('.r10s.jp') || url.hostname === 'r10s.jp') return url.href;
+  } catch { /* reject untrusted image hosts */ }
+  return null;
+}
 function hotelParts(group) { return Array.isArray(group?.hotel) ? group.hotel : []; }
 export function candidateHotelIds(body) {
   return [...new Set((body?.hotels || []).flatMap(group => hotelParts(group).map(part => String(part.hotelBasicInfo?.hotelNo || ''))).filter(id => /^\d{1,10}$/.test(id)))].slice(0, 30);
@@ -30,6 +39,7 @@ export function normalizeStays(body, search) {
       offers.push({
         id: `${basic.hotelNo}-${room.planId || ''}-${room.roomClass || ''}`,
         hotelNo: String(basic.hotelNo), name: String(basic.hotelName || ''), address: String(basic.address1 || '') + String(basic.address2 || ''),
+        image: rakutenImage(basic.hotelThumbnailUrl) || rakutenImage(basic.hotelImageUrl),
         roomName: String(room.roomName || ''), planName: String(room.planName || ''),
         rating: rating > 0 && rating <= 5 ? rating : null,
         reviewCount: Math.max(0, Math.floor(Number(basic.reviewCount) || 0)),
