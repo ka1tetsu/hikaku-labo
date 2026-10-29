@@ -33,13 +33,13 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
 .app-wrapper .main-content{gap:22px;padding-top:30px;padding-bottom:48px}
 .hl-directory{grid-column:1/-1;min-width:0}
 .hl-directory-head{display:flex;gap:24px;align-items:end;justify-content:space-between;padding:27px 0 26px}
-.hl-kicker{display:inline-flex;align-items:center;gap:9px;font:800 11px/1.5 Inter,'Noto Sans JP',sans-serif;letter-spacing:.14em;color:#23775b}
+.hl-kicker{display:inline-flex;align-items:center;gap:9px;font:800 11px/1.5 'Noto Sans JP','Noto Sans JP',sans-serif;letter-spacing:.14em;color:#23775b}
 .hl-kicker-dot{display:inline-block;width:8px;height:8px;background:#1a845f;border-radius:50%}
 .hl-directory h1{font-size:clamp(30px,3.7vw,49px);font-weight:900;letter-spacing:-.045em;line-height:1.4;margin:10px 0 14px}
 .hl-directory h1 em{font-style:normal;color:#1c7b59}
 .hl-directory-head p{font-size:15px;line-height:1.95;color:#556c5f;max-width:720px}
 .hl-directory-aside{border-left:1px solid #ccd9d2;padding:4px 8px 4px 28px;display:flex;flex-direction:column;white-space:nowrap}
-.hl-directory-aside strong{font:800 48px/.95 Inter,Arial,sans-serif;color:#1d6650}
+.hl-directory-aside strong{font:800 48px/.95 'Noto Sans JP',Arial,sans-serif;color:#1d6650}
 .hl-directory-aside span{font-size:13px;font-weight:800;margin-top:11px}
 .hl-directory-aside small{font-size:11px;color:#718b7c;margin-top:2px}
 .hl-directory-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -48,7 +48,7 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
 .hl-directory-card-top{width:100%;display:flex;align-items:center;justify-content:space-between}
 .hl-directory-icon{width:47px;height:47px;display:grid;place-items:center;border-radius:12px;background:#eaf2eb}
 .hl-directory-icon img{width:26px;height:26px;filter:invert(29%) sepia(20%) saturate(1023%) hue-rotate(112deg)}
-.hl-directory-metric{font:800 10px Inter,Arial,sans-serif;letter-spacing:.12em;color:#88a093}
+.hl-directory-metric{font:800 10px 'Noto Sans JP',Arial,sans-serif;letter-spacing:.12em;color:#88a093}
 .hl-directory-card h2{font-size:20px;line-height:1.4;font-weight:900;margin:22px 0 9px;letter-spacing:-.03em}
 .hl-directory-card p{font-size:13px;color:#597164;line-height:1.8;margin-bottom:19px}
 .hl-directory-action{display:inline-flex;align-items:center;gap:5px;margin-top:auto;font-size:12px;font-weight:900;color:#0d6b4b}
