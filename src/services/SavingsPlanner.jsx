@@ -25,7 +25,7 @@ export default function SavingsPlanner() {
   }
   function edit(setter) { return event => { setter(event.target.value); setResult(null); setError(''); }; }
   return <section className="vl-savings" id="savings" aria-labelledby="vl-savings-title">
-    <div className="vl-savings-copy"><span className="hl-kicker">MAKE ROOM FOR WHAT MATTERS</span>
+    <div className="vl-savings-copy"><span className="hl-kicker">固定費の見直し</span>
       <h2 id="vl-savings-title">スマホ代を見直すと、<br/>1年でいくら変わる？</h2>
       <p>いまの料金と使い方から、掲載プランとの差額を計算。家族分の回線も、乗り換え費用も含めて考えられます。</p>
       <span className="vl-savings-badge">無料・登録不要・入力金額は送信しません</span>

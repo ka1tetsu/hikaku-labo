@@ -221,7 +221,7 @@ export default function App() {
         </div>
 
         <div className="results-header" id="results">
-          <div className="hl-results-heading"><span className="hl-kicker"><span className="hl-kicker-dot"/> PRODUCT RESEARCH</span><h2 className="results-title">{searchTitle}</h2><p className="hl-results-caption">商品情報は楽天市場の取得時点のものです。最新の価格や送料、ポイント条件は販売ページでご確認ください。</p></div>
+          <div className="hl-results-heading"><span className="hl-kicker"><span className="hl-kicker-dot"/> 商品価格の比較</span><h2 className="results-title">{searchTitle}</h2><p className="hl-results-caption">商品情報は楽天市場の取得時点のものです。最新の価格や送料、ポイント条件は販売ページでご確認ください。</p></div>
           {products.length > 0 && (
             <div className="results-controls">
               <select

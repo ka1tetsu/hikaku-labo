@@ -91,7 +91,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
     <section className="tvx-hero" aria-labelledby="tvx-title">
       <div className="tv-wrap tvx-hero-grid">
         <div>
-          <div className="tvx-eyebrow"><span className="tvx-sparkle">✳</span> VIVLICA TRAVEL — WORLDWIDE</div>
+          <div className="tvx-eyebrow"><span className="tvx-sparkle">✳</span> 旅行先・宿・交通の比較</div>
           <h1 id="tvx-title">世界中から、<br/><em>ぴったりの旅</em>を見つけよう。</h1>
           <p className="tvx-hero-lead">国内も海外も、都市名・国名・名所・「やりたいこと」で検索。AIコンシェルジュに相談すれば、モデルコースから航空券・ホテルの比較、旅の予算までひとつの画面で。</p>
           <TravelSearchBox onDestination={goToDestination} onScope={applyScope} onExternal={setExternal}/>
@@ -105,14 +105,17 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           <div className="tvx-shortcuts"><span>人気の目的地</span>{['kyoto','naha','seoul','taipei','bangkok','honolulu','paris'].map(id=>{const d=getCity(id);return <button key={id} type="button" onClick={()=>goToDestination(d)}>{d.emoji} {d.name}</button>;})}</div>
           <p className="tvx-hero-note">登録不要 · 国内{DOMESTIC_COUNT}都市＋海外{OVERSEAS_COUNT}都市のモデルコース · {COUNTRY_INDEX.length}の国と地域から検索（宿・交通の予約は各予約サイトで）</p>
         </div>
-        <div className="tvx-hero-art" aria-hidden="true">
-          <div className="tvx-art-orbit tvx-art-orbit-one"/><div className="tvx-art-orbit tvx-art-orbit-two"/>
-          <span className="tvx-art-title">FIND YOUR<br/>NEXT ESCAPE<span>✦</span></span>
-          <span className="tvx-art-spot tvx-art-spot-a">⛩️<small>KYOTO</small></span>
-          <span className="tvx-art-spot tvx-art-spot-b">🗼<small>PARIS</small></span>
-          <span className="tvx-art-spot tvx-art-spot-c">🌺<small>HAWAII</small></span>
-          <span className="tvx-art-compass">↗</span>
-        </div>
+        <aside className="tvx-hero-checklist" aria-label="旅行費用を比べるときの確認項目">
+          <p className="tvx-checklist-label">予約前の比較メモ</p>
+          <h2>表示価格より、<br/>最後に支払う総額。</h2>
+          <ol>
+            <li><span>01</span><div><strong>宿泊費</strong><p>税・サービス料・現地払いの費用まで</p></div></li>
+            <li><span>02</span><div><strong>交通費</strong><p>空港・駅からの移動、荷物などの追加料金</p></div></li>
+            <li><span>03</span><div><strong>キャンセル条件</strong><p>無料期限・返金可否・予約変更の扱い</p></div></li>
+            <li><span>04</span><div><strong>実際の空室</strong><p>最終的な在庫と料金は予約サイトで確認</p></div></li>
+          </ol>
+          <a href="/guides/travel-total-cost/">旅行の支払総額を比べる方法 <span aria-hidden="true">↗</span></a>
+        </aside>
       </div>
     </section>
     <div className="tv-wrap tvx-trust-strip" aria-label="このサイトでできること">
@@ -124,7 +127,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
     {concierge}
 
     <section className="tv-wrap tvx-discover" id="destinations" aria-labelledby="tvx-discover-title" ref={listRef}>
-      <div className="tvx-section-header"><div><span className="tvx-kicker">EXPLORE DESTINATIONS</span><h2 id="tvx-discover-title">次の旅先を見つける。</h2><p>エリア・行きたい月・移動時間・旅費感で絞り込み。好きなテーマを選ぶと相性の良い順に並びます。</p></div><span className="tvx-count">国内 {DOMESTIC_COUNT} ＋ 海外 {OVERSEAS_COUNT} 都市</span></div>
+      <div className="tvx-section-header"><div><span className="tvx-kicker">旅先を探す</span><h2 id="tvx-discover-title">次の旅先を見つける。</h2><p>エリア・行きたい月・移動時間・旅費感で絞り込み。好きなテーマを選ぶと相性の良い順に並びます。</p></div><span className="tvx-count">国内 {DOMESTIC_COUNT} ＋ 海外 {OVERSEAS_COUNT} 都市</span></div>
       <div className="tvx-filter-panel">
         <div className="tvw-area-tabs" role="group" aria-label="国内・海外">
           {[['all','すべて'],['domestic','🗾 国内'],['overseas','🌏 海外']].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} className={area===id?'active':''}

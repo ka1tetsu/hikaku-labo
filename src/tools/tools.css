@@ -22,8 +22,8 @@ body { margin: 0; }
 .tl-back { color: #627771 !important; }
 .tl-nav-action { background: #0f6049; color: white !important; border-radius: 10px; padding: 11px 20px; }
 .tl-nav-action span { margin-left: 8px; }
-.tl-hero { position: relative; overflow: hidden; background: radial-gradient(ellipse at 88% 10%, #24735c 0%, transparent 38%), #11362d; color: white; }
-.tl-hero:after { content: ''; display: block; width: 440px; height: 440px; border: 1px solid rgba(255,255,255,.1); border-radius: 50%; position: absolute; right: -180px; top: -260px; pointer-events: none; }
+.tl-hero { position:relative;overflow:hidden;background:#173b30;color:#fff; }
+
 .tl-hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 5%; align-items: center; min-height: 500px; padding-block: 78px; }
 .tl-eyebrow { font-size: 11px; letter-spacing: .18em; font-weight: 800; color: #bbebce; }
 .tl-dot { display: inline-block; height: 8px; width: 8px; border-radius: 100%; margin-right: 8px; background: #9ee5ae; }
@@ -32,24 +32,17 @@ body { margin: 0; }
 .tl-hero-copy > p { font-size: 14px; line-height: 2.1; max-width: 620px; color: #e0ebe3; }
 .tl-hero-cta { display: flex; align-items: center; gap: 21px; margin-top: 33px; flex-wrap: wrap; }
 .tl-hero-button { border-radius: 12px; font-weight: 900; display: inline-flex; align-items: center; gap: 36px; padding: 17px 23px; background: #d8f0b7; color: #193b31 !important; transition: transform .15s; }
-.tl-hero-button:hover { transform: translateY(-2px); }
+.tl-hero-button:hover { background:#e5f4cc; }
 .tl-hero-cta > span { font-size: 12px; color: #cbddd2; }
 .tl-trust { display: flex; gap: 23px; margin-top: 35px; font-size: 11px; font-weight: 700; color: #a8d3c0; flex-wrap: wrap; }
-.tl-hero-visual { position: relative; width: 100%; max-width: 470px; justify-self: end; min-height: 320px; display: flex; align-items: center; }
-.tl-floating-label { position: absolute; top: 4px; left: 0; transform: rotate(-7deg); font-size: 11px; font-weight: 900; letter-spacing: .2em; color: #a3e4c3; }
-.tl-visual-card { position: relative; z-index: 1; width: 100%; background: #fff; color: #163b2d; border-radius: 18px; padding: 25px 27px 22px; box-shadow: 25px 28px 0 rgba(255,255,255,.07),0 20px 70px rgba(0,0,0,.18); transform: rotate(2deg); }
-.tl-visual-top { border-bottom: 1px solid #e5ece7; display: flex; justify-content: space-between; font-weight: 850; align-items: center; padding-bottom: 16px; }
-.tl-live-mark { font-size: 10px; color: #0a7656; letter-spacing: .08em; }
-.tl-visual-line { display: grid; grid-template-columns: 1fr 1.4fr 20px; align-items: center; padding: 19px 0; gap: 8px; border-bottom: 1px solid #f1f3f0; font-size: 12px; }
-.tl-visual-line > span:first-child { color: #667670; }
-.tl-visual-line > strong { font-size: 13px; }
-.tl-visual-line > span:last-child { color: #219c6e; font-size: 20px; }
-.tl-visual-result { margin-top: 18px; background: #e7f5e4; padding: 14px 16px; border-radius: 10px; display: flex; align-items: center; gap: 12px; }
-.tl-visual-result span { font-size: 10px; letter-spacing: .14em; font-weight: 900; color: #50936d; }
-.tl-visual-result b { flex: 1; }
-.tl-visual-result i { font-size: 25px; font-style: normal; }
-.tl-visual-deco { position: absolute; font-size: 78px; color: #8bc5a5; opacity: .5; }
-.tl-deco-a { right: -34px; top: -35px; }.tl-deco-b { left: -37px; bottom: -45px; font-size: 45px; }
+.tl-hero-evidence{align-self:center;border-top:2px solid #a4c3ae;border-bottom:1px solid #7fa68e;padding:28px 0 23px;color:#eff7ec;max-width:450px;justify-self:end}
+.tl-evidence-label{margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.06em;color:#c6dfc7}
+.tl-hero-evidence h2{font-size:clamp(22px,2.5vw,31px);line-height:1.5;letter-spacing:-.025em;font-weight:850;margin:0 0 20px;color:#fff}
+.tl-hero-evidence dl{margin:0;padding:0}
+.tl-hero-evidence dl>div{display:grid;grid-template-columns:88px minmax(0,1fr);gap:18px;padding:12px 0;border-top:1px solid #ffffff36}
+.tl-hero-evidence dt{font-weight:850;color:#d6eac8;font-size:13px}
+.tl-hero-evidence dd{margin:0;color:#e3eee7;font-size:13px;line-height:1.75}
+.tl-evidence-note{font-size:12px;line-height:1.85;color:#bcd9c8;margin:20px 0 0}
 .tl-steps { display: grid; grid-template-columns: repeat(3,1fr); margin-top: -1px; padding-block: 36px; }
 .tl-steps > div { display: grid; grid-template-columns: 43px 1fr; align-items: start; padding-inline: 6%; border-right: 1px solid #dce5de; column-gap: 12px; }
 .tl-steps > div:first-child { padding-left: 0; }.tl-steps > div:last-child { border: 0; }

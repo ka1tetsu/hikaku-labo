@@ -143,7 +143,7 @@ export default function ToolsPage() {
         <section className="tl-hero">
           <div className="tl-wrap tl-hero-grid">
             <div className="tl-hero-copy">
-              <span className="tl-eyebrow"><span className="tl-dot"/> THE SMART WAY TO CHOOSE TOOLS</span>
+              <span className="tl-eyebrow"><span className="tl-dot"/> ITツールの比較</span>
               <h1>あなたの仕事に、<br/><em>ちょうどいい</em>ツールを。</h1>
               <p>Webサイト、ネットショップ、WordPress。目的と予算を選ぶだけで、公式情報に基づいてサービスを整理。広告報酬の多さではなく、条件との一致度で比較します。</p>
               <div className="tl-hero-cta">
@@ -152,17 +152,16 @@ export default function ToolsPage() {
               </div>
               <div className="tl-trust"><span>✓ 根拠は公式サイト</span><span>✓ 広告表示を明示</span><span>✓ 無料で比較</span></div>
             </div>
-            <div className="tl-hero-visual" aria-hidden="true">
-              <div className="tl-floating-label">YOUR TOOL MATCH</div>
-              <div className="tl-visual-card">
-                <div className="tl-visual-top"><span>サービス選定</span><span className="tl-live-mark">● ANALYSIS</span></div>
-                <div className="tl-visual-line"><span>01 / 目的</span><strong>Webサイト制作</strong><span>✓</span></div>
-                <div className="tl-visual-line"><span>02 / 予算</span><strong>月5,000円以内</strong><span>✓</span></div>
-                <div className="tl-visual-line"><span>03 / 重視</span><strong>使いやすさ</strong><span>✓</span></div>
-                <div className="tl-visual-result"><span>CONSIDER</span><b>サービスを比較</b><i>↗</i></div>
-              </div>
-              <span className="tl-visual-deco tl-deco-a">✳</span><span className="tl-visual-deco tl-deco-b">✳</span>
-            </div>
+            <aside className="tl-hero-evidence" aria-label="この比較で大切にしていること">
+              <p className="tl-evidence-label">比較の考え方</p>
+              <h2>合う理由と、<br/>合わない理由を並べる。</h2>
+              <dl>
+                <div><dt>利用目的</dt><dd>作りたいものに必要な機能があるか</dd></div>
+                <div><dt>月額費用</dt><dd>無料枠や有料プランの条件に無理がないか</dd></div>
+                <div><dt>運用負担</dt><dd>使い続けるための知識や手間はどれくらいか</dd></div>
+              </dl>
+              <p className="tl-evidence-note">比較後は必ず公式の最新料金と利用条件を確認してください。</p>
+            </aside>
           </div>
         </section>
 
@@ -174,7 +173,7 @@ export default function ToolsPage() {
 
         <section className="tl-work tl-wrap" id="selector">
           <div className="tl-section-head">
-            <div><span className="tl-overline">FREE TOOL SELECTOR</span><h2>あなたに合うサービスを診断</h2><p>入力結果に合わせて順位が変わります。気になる候補は最大3つまで横並びで比較できます。</p></div>
+            <div><span className="tl-overline">用途・予算から選ぶ</span><h2>あなたに合うサービスを診断</h2><p>入力結果に合わせて順位が変わります。気になる候補は最大3つまで横並びで比較できます。</p></div>
             <span className="tl-counter">約1分で完了</span>
           </div>
           <div className="tl-work-grid">

@@ -4,7 +4,7 @@ export default function SectionDirectory() {
   return <section className="hl-directory" aria-labelledby="hl-directory-title">
     <div className="hl-directory-head">
       <div>
-        <span className="hl-kicker"><span className="hl-kicker-dot"/> RESEARCH & COMPARISON</span>
+        <span className="hl-kicker"><span className="hl-kicker-dot"/> 暮らしと支出の比較</span>
         <h1 id="hl-directory-title">毎日の支出に、<em>納得できる選択</em>を。</h1>
         <p>スマホ代を見直す、買い物を比べる、旅行を計画する、企業を調べる。目的に合わせて選べる、{SITE_SECTIONS.length}つの比較・調査サービス。</p>
       </div>
