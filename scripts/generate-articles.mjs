@@ -1,5 +1,5 @@
 // scripts/generate-articles.mjs
-// 価格.comクローン用の比較記事を大量生成して Markdown ファイルとして保存するスクリプト
+// Explicit draft-only workflow: generated text is not independently verified evidence and must not publish automatically.
 // 前提: /api/article がデプロイ済み（例: https://vivlica.com/api/article）
 
 import { mkdir, writeFile } from "node:fs/promises";
@@ -12,7 +12,7 @@ const __dirname = dirname(__filename);
 // ===== 設定ここから =====
 
 // 記事を保存するディレクトリ（リポジトリ内）
-const OUTPUT_DIR = join(__dirname, "..", "content", "articles");
+const OUTPUT_DIR = join(__dirname, "..", "content", "drafts", "editor-review-required");
 
 // 記事生成APIのベースURL（必要に応じて変更）
 const ARTICLE_API_BASE =
@@ -76,7 +76,10 @@ async function fetchArticle(categoryId, title) {
 }
 
 async function main() {
-  console.log("▶ 記事大量生成を開始します...");
+  if (!process.argv.includes('--drafts-only')) {
+    throw new Error('AI生成の量産記事は公開しません。草案を作る場合だけ --drafts-only を指定し、出典と計算条件を人が検証してください。');
+  }
+  console.log("▶ 未検証のAI記事下書きを作成します（公開しません）...");
   console.log(`  API: ${ARTICLE_API_BASE}`);
   console.log(`  出力先: ${OUTPUT_DIR}`);
 
@@ -86,7 +89,7 @@ async function main() {
 
   for (const [categoryId, topics] of Object.entries(CATEGORY_TOPICS)) {
     for (const topic of topics) {
-      const customTitle = `【徹底比較】${topic} ${categoryId} おすすめベストバイガイド`;
+      const customTitle = `【未検証ドラフト】${topic} ${categoryId} 比較で検証する項目`;
       console.log(`  - 生成中: category=${categoryId}, topic=${topic}`);
 
       try {
@@ -102,13 +105,16 @@ async function main() {
           `source: "${article.source || "unknown"}"`,
           `model: "${article.model || ""}"`,
           `generatedAt: "${new Date().toISOString()}"`,
+          "reviewRequired: true",
+          "publicationApproved: false",
+          "evidenceStatus: unverified",
           "---",
           ""
         ].join("\n");
 
         const body = typeof article.body === "string" ? article.body : String(article.body || "");
 
-        await writeFile(filePath, frontMatter + body, "utf8");
+        await writeFile(filePath, frontMatter + "## 編集者が公開前に検証すること\n\n- 一次資料のURL・取得日・引用箇所を確認\n- 製品仕様・送料・料金・比較条件を照合\n- 実際に使用していない場合は体験談として書かない\n- 誰に何が向き、なぜ他候補を選ばなかったか判断を加える\n- 事実未確認の文章を削除し、根拠と例外を追記\n\n## 未検証本文\n\n" + body, "utf8");
         console.log(`    -> 保存完了: ${filename}`);
         count += 1;
       } catch (err) {
