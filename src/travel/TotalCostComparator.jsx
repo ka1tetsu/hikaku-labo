@@ -35,6 +35,7 @@ export default function TotalCostComparator(){
     <div className="gx-heading"><span className="gx-kicker">ALL-IN PRICE CHECK</span>
       <h2 id="gx-cost-heading">「表示価格」ではなく、支払総額を比較。</h2>
       <p>各予約サイトで見つけた航空券・ホテルの候補を入力。税、荷物代、追加料金、即時割引をまとめて計算します。価格を自動取得するものではなく、入力内容はブラウザ内だけで計算します。</p>
+      <p><a href="/guides/travel-total-cost/">航空券・宿の追加費用を見落とさない比較ガイド →</a></p>
     </div>
     <div className="gx-cost-head"><label htmlFor="gx-cost-kind">比較する旅行サービス</label>
       <select id="gx-cost-kind" value={kind} onChange={e=>setCategory(e.target.value)}>
