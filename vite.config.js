@@ -20,6 +20,7 @@ export default defineConfig({
         card: fileURLToPath(new URL('./card/index.html', import.meta.url)),
         hoken: fileURLToPath(new URL('./hoken/index.html', import.meta.url)),
         'guide-travel-budget': fileURLToPath(new URL('./guides/travel-budget/index.html', import.meta.url)),
+        'guide-travel-total-cost': fileURLToPath(new URL('./guides/travel-total-cost/index.html', import.meta.url)),
         'guide-website-tools': fileURLToPath(new URL('./guides/website-tools/index.html', import.meta.url)),
         'guide-hotel-cancellation': fileURLToPath(new URL('./guides/hotel-cancellation/index.html', import.meta.url)),
         'guide-lodging-tax': fileURLToPath(new URL('./guides/lodging-tax/index.html', import.meta.url)),

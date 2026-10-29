@@ -27,7 +27,7 @@ export function validOutboundEvent(body) {
 export const PAGE_IDS = Object.freeze({
   '/about/': 'about', '/editorial-policy/': 'editorial-policy', '/privacy/': 'privacy',
   '/': 'home', '/compare/': 'compare', '/tools/': 'tools', '/life/': 'life', '/sim/': 'sim', '/hikari/': 'hikari',
-  '/card/': 'card', '/hoken/': 'hoken', '/travel/': 'travel', '/guides/travel-budget/': 'guide-travel-budget', '/guides/website-tools/': 'guide-website-tools',
+  '/card/': 'card', '/hoken/': 'hoken', '/travel/': 'travel', '/guides/travel-budget/': 'guide-travel-budget', '/guides/travel-total-cost/': 'guide-travel-total-cost', '/guides/website-tools/': 'guide-website-tools',
   '/guides/hotel-cancellation/': 'guide-hotel-cancellation', '/guides/lodging-tax/': 'guide-lodging-tax', '/guides/long-weekends/': 'guide-long-weekends',
   ...Object.fromEntries(SIM_PAIRS.map(pair => [pair.path, 'sim-vs-' + pair.slug])),
   ...Object.fromEntries(AREA_PAGES.map(page => [page.path, 'hikari-area-' + page.area])),
