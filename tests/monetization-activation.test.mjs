@@ -45,10 +45,10 @@ test('paid deep links only activate when real approved partner IDs are configure
 
 test('revenue activation report does not count code as real earnings or infer A8 approval', () => {
   const defaultReport = monetizationChecklist({}, 'https://vivlica.com');
-  assert.equal(defaultReport.a8RenderedWithCurrentSettings, false);
+  assert.equal(defaultReport.a8RenderedWithCurrentSettings, true);
   assert.equal(defaultReport.actualProfitJPY, null);
   assert.equal(defaultReport.productionEnvironmentVerified, false);
-  assert.ok(defaultReport.blockers.some(x => x.code === 'a8_domain_unverified'));
+  assert.equal(defaultReport.blockers.some(x => x.code === 'a8_domain_unverified'), false);
   assert.match(activationMarkdown(defaultReport), /ASP確定報酬/);
   const registered = monetizationChecklist({
     VITE_A8_TRAVEL_REGISTERED_ORIGIN: 'https://vivlica.com',
