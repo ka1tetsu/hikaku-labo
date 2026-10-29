@@ -20,7 +20,7 @@
 .hcx-card-head,.hcx-tool-head{display:flex;gap:9px;align-items:center}
 .hcx-card-head strong,.hcx-tool-head strong{display:block;font-size:16px;color:#173f2d}
 .hcx-card-head small,.hcx-tool-head small{display:block;font-size:11px;color:#628070;line-height:1.5}
-.hcx-rank{font:900 12px Inter,sans-serif;color:#fff;background:#2b8c6b;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;flex:none}
+.hcx-rank{font:900 12px 'Noto Sans JP',sans-serif;color:#fff;background:#2b8c6b;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;flex:none}
 .hcx-card-emoji{font-size:26px}
 .hcx-card ul,.hcx-tool ul{margin:0;padding-left:17px;font-size:12px;line-height:1.75;color:#34584a}
 .hcx-card-meta,.hcx-card-fit,.hcx-tool-price{font-size:11px!important;color:#5f7a69;line-height:1.7!important;margin:0!important}
@@ -33,7 +33,7 @@
 .hcx-plan ol{list-style:none;margin:0 0 10px;padding:0}
 .hcx-plan li{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:7px 0;border-bottom:1px dashed #dbe8df;font-size:13px;line-height:1.7}
 .hcx-plan li:last-child{border:0}
-.hcx-plan li b{font:800 11px Inter,sans-serif;color:#2b7a5a;padding-top:2px}
+.hcx-plan li b{font:800 11px 'Noto Sans JP',sans-serif;color:#2b7a5a;padding-top:2px}
 .hcx-plan>button{width:100%}
 .hcx-links h4{font-size:12px;color:#2e5a45;margin:12px 0 7px}
 .hcx-links .tvw-links{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
@@ -51,7 +51,7 @@
 .hcx-product-body{display:flex;flex-direction:column;gap:3px;min-width:0}
 .hcx-product-body strong{font-size:12px;line-height:1.55;font-weight:700}
 .hcx-product-body small{font-size:11px;color:#5f7a69;line-height:1.5}
-.hcx-product-price{font:800 16px Inter,'Noto Sans JP',sans-serif;color:#b8341b}
+.hcx-product-price{font:800 16px 'Noto Sans JP','Noto Sans JP',sans-serif;color:#b8341b}
 .hcx-product-price small{font-size:11px;color:#2b7a5a;margin-left:8px}
 .hcx-product .hcx-pr{position:absolute;right:10px;top:10px;margin:0}
 .hcx-malls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:#4d6a5a}
