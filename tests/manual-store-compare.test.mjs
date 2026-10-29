@@ -44,7 +44,7 @@ test('browser-only calculator uses registered approved/ordinary store search lin
   const parent=readFileSync(new URL('../src/compare/ComparePage.jsx',import.meta.url),'utf8');
   const travel=readFileSync(new URL('../src/travel/StaySearch.jsx',import.meta.url),'utf8');
   assert.match(parent,/ManualStoreCompare/);
-  assert.match(parent,/id="cp-manual"/); // link to the manual comparison on API failure
+  assert.match(parent,/href="#cp-manual"/); // link to the manual comparison on API failure
   assert.match(ui,/store\.sponsored/);
   assert.match(ui,/recordFunnelEvent\('product_manual_ready'\)/);
   assert.match(ui,/recordOutboundClick/);
