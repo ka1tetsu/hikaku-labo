@@ -90,7 +90,7 @@ export default function ManualStoreCompare({ keyword, stores }) {
         <ol>{comparison.ranked.map((entry, index) => {
           const link = target(entry.row.storeId);
           return <li key={entry.row.storeId}>
-            <div><span>{index + 1}位　{LABELS[entry.row.storeId]}</span>
+            <div><span>{index + 1}位 {LABELS[entry.row.storeId]}</span>
               <strong>{money(entry.cost.cashPayable)}</strong>
               <small>現金支払額（税込商品価格＋確認済み送料−即時値引き）</small>
               <small>後日ポイント {money(entry.cost.points)} ／ ポイント考慮後の参考額 {money(entry.cost.pointsAdjustedIllustration)}</small>
