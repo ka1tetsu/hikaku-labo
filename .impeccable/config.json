@@ -1,0 +1,10 @@
+{
+  "telemetry": false,
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "designSystem": {
+      "enabled": true
+    }
+  }
+}
