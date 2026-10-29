@@ -20,3 +20,11 @@
  .hcl-launcher.is-open{display:none}
 }
 @media print{.hcl-root{display:none}}
+
+/* Compact launcher on phones: avoid overlaying comparison cards and booking actions. */
+@media(max-width:530px){
+ .hcl-root{right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+ .hcl-launcher{width:48px;height:48px;min-height:48px;min-width:48px;padding:0;display:grid;place-items:center;border-radius:50%;box-shadow:0 3px 12px #0b2d2133}
+ .hcl-launcher>span:first-child{font-size:23px}
+ .hcl-launcher-label{display:none}
+}
