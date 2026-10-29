@@ -21,7 +21,8 @@
     "verify:build": "node scripts/verify-build.mjs",
     "audit:live": "node scripts/audit-live.mjs",
     "ads:import": "node scripts/import-travel-ad.mjs",
-    "audit:activation": "node scripts/monetization-checklist.mjs"
+    "audit:activation": "node scripts/monetization-checklist.mjs",
+    "audit:design": "npx --yes impeccable@4.7.0 detect --json src/ guides/ index.html tools/index.html travel/index.html compare/index.html life/index.html sim/index.html hikari/index.html card/index.html hoken/index.html public/guides.css"
   },
   "dependencies": {
     "react": "^18.3.1",
