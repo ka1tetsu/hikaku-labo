@@ -7,7 +7,7 @@
 .ht-topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:20px;color:#27765a;font:800 11px 'Noto Sans JP',Arial,sans-serif;letter-spacing:.12em}
 .ht-topbar a{color:#205740;text-decoration:none;font:700 12px 'Noto Sans JP',sans-serif;letter-spacing:0}
 .ht-headline{display:flex;justify-content:space-between;gap:30px;margin-bottom:27px}
-.ht-kicker{font:900 11px 'Noto Sans JP','Noto Sans JP',sans-serif;letter-spacing:.08em;color:#288566}
+.ht-kicker{font:900 11px 'Noto Sans JP',sans-serif;letter-spacing:.08em;color:#288566}
 .ht-headline h1{font-size:clamp(25px,3.5vw,40px);line-height:1.5;letter-spacing:-.04em;color:#1c3c2c;margin:8px 0}
 .ht-headline p{color:#65786c;font-size:13px;line-height:1.8}
 .ht-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}

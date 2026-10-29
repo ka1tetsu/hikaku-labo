@@ -51,7 +51,7 @@
 .hcx-product-body{display:flex;flex-direction:column;gap:3px;min-width:0}
 .hcx-product-body strong{font-size:12px;line-height:1.55;font-weight:700}
 .hcx-product-body small{font-size:11px;color:#5f7a69;line-height:1.5}
-.hcx-product-price{font:800 16px 'Noto Sans JP','Noto Sans JP',sans-serif;color:#b8341b}
+.hcx-product-price{font:800 16px 'Noto Sans JP',sans-serif;color:#b8341b}
 .hcx-product-price small{font-size:11px;color:#2b7a5a;margin-left:8px}
 .hcx-product .hcx-pr{position:absolute;right:10px;top:10px;margin:0}
 .hcx-malls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:#4d6a5a}

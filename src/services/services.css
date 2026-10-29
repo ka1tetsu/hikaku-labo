@@ -8,7 +8,7 @@ body{margin:0}
 .sv-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:26px}
 .sv-tabs a{color:#dbeaf3;border:1px solid #ffffff40;border-radius:30px;padding:6px 14px;font-size:13px;font-weight:700}
 .sv-tabs a[aria-current=page]{background:#fff;color:#1d4f6b;border-color:#fff}
-.sv-kicker{font:800 11px 'Noto Sans JP','Noto Sans JP',sans-serif;letter-spacing:.14em;color:#bfe2f0}
+.sv-kicker{font:800 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em;color:#bfe2f0}
 .sv-hero h1{font-size:clamp(30px,4.4vw,50px);font-weight:900;letter-spacing:-.04em;line-height:1.35;margin:12px 0}
 .sv-hero h1 em{font-style:normal;color:#ffe9a8}
 .sv-hero p{font-size:14px;color:#dcebf3;max-width:760px;margin:0}
@@ -17,7 +17,7 @@ body{margin:0}
 .sv-top-pick{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;background:#fffaf0;border:1px solid #f0d699;border-radius:16px;padding:14px 18px;margin:-60px 0 22px;position:relative;box-shadow:none}
 .sv-top-pick>span{font-size:11px;font-weight:900;color:#8a5a00;background:#fff3d6;border-radius:20px;padding:3px 10px}
 .sv-top-pick strong{font-size:20px;color:#15344a}
-.sv-top-pick b{font:900 17px 'Noto Sans JP','Noto Sans JP',sans-serif;color:#b8341b}
+.sv-top-pick b{font:900 17px 'Noto Sans JP',sans-serif;color:#b8341b}
 .sv-top-pick small{flex-basis:100%;font-size:12px;color:#55707f}
 .sv-top-pick .sv-cta{margin-top:0}
 .sv-top-more{font-size:12px;font-weight:800;color:#1d6b8a!important;text-decoration:underline!important}
@@ -49,7 +49,7 @@ body{margin:0}
 .sv-rank{font:900 18px 'Noto Sans JP',sans-serif;color:#fff;background:#2a7088;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
 .sv-item.is-top .sv-rank{background:#c98a14}
 .sv-price{text-align:right;display:flex;flex-direction:column}
-.sv-price b{font:900 17px 'Noto Sans JP','Noto Sans JP',sans-serif;color:#b8341b;white-space:nowrap}
+.sv-price b{font:900 17px 'Noto Sans JP',sans-serif;color:#b8341b;white-space:nowrap}
 .sv-price span{font-size:11px;color:#2a7088;font-weight:800}
 .sv-summary{font-size:13px;color:#3d5868;margin:8px 0}
 .sv-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}

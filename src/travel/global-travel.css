@@ -3,7 +3,7 @@
 .gx-wrap *{box-sizing:border-box}
 .gx-hero{color:#fff;background:linear-gradient(118deg,#102e2e,#114c43 68%,#2b8271);overflow:hidden}
 .gx-hero-grid{min-height:530px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:40px;align-items:center;padding-block:65px}
-.gx-overline{display:flex;align-items:center;gap:10px;color:#cbe4b9;font:800 11px Inter,'Noto Sans JP',sans-serif;letter-spacing:.14em}
+.gx-overline{display:flex;align-items:center;gap:10px;color:#cbe4b9;font:800 11px 'Noto Sans JP',sans-serif;letter-spacing:.14em}
 .gx-overline span{font-size:24px}
 .gx-hero h1{font-size:clamp(36px,4.25vw,58px);font-weight:900;line-height:1.5;letter-spacing:-.058em;margin:15px 0}
 .gx-hero h1 em{font-style:normal;color:#d6ebae}
@@ -22,16 +22,16 @@
 .gx-globe{position:absolute;left:22%;top:5%;font:100 250px/1 Arial,sans-serif;color:#c3f0bd6e;transform:rotate(-20deg)}
 .gx-globe-lines{position:absolute;border:1px solid #d9efcc81;left:17px;top:25px;width:225px;height:225px;border-radius:50%;box-shadow:0 0 0 28px #ffffff08,0 0 0 57px #ffffff09}
 .gx-floating{position:absolute;background:#fff;color:#204e3c;border-radius:15px;padding:13px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:33px;font-weight:800;box-shadow:0 13px 19px #16412d58}
-.gx-floating small{font:800 9px Inter,Arial,sans-serif;letter-spacing:.13em}
+.gx-floating small{font:800 9px 'Noto Sans JP',Arial,sans-serif;letter-spacing:.13em}
 .gx-fl-a{left:8%;top:15%;transform:rotate(-9deg)}
 .gx-fl-b{right:4%;top:16%;transform:rotate(12deg)}
 .gx-fl-c{left:29%;bottom:14%;transform:rotate(-5deg)}
-.gx-visual-note{position:absolute;right:8%;bottom:9%;color:#e2f2bf;font:900 11px/1.55 Inter,sans-serif;letter-spacing:.14em}
+.gx-visual-note{position:absolute;right:8%;bottom:9%;color:#e2f2bf;font:900 11px/1.55 'Noto Sans JP',sans-serif;letter-spacing:.14em}
 .gx-trust{display:flex;justify-content:space-between;gap:10px 20px;flex-wrap:wrap;border-bottom:1px solid #dce6dd;padding-block:21px}
 .gx-trust span{font-size:12px;font-weight:700;color:#406a52}
 .gx-workspace{padding-top:71px;padding-bottom:85px}
 .gx-heading{max-width:770px;margin-bottom:27px}
-.gx-kicker{font:800 11px Inter,Arial,sans-serif;letter-spacing:.15em;color:#26785c}
+.gx-kicker{font:800 11px 'Noto Sans JP',Arial,sans-serif;letter-spacing:.15em;color:#26785c}
 .gx-heading h2{font-size:clamp(26px,3.3vw,39px);line-height:1.5;letter-spacing:-.055em;color:#1e4030;margin:9px 0 11px}
 .gx-heading p{font-size:14px;line-height:1.9;color:#5a7463}
 .gx-status{background:#e3f3e8;border:1px solid #a4d2b6;color:#28573a;border-radius:6px;padding:11px 16px;font-size:13px;margin-bottom:16px}
