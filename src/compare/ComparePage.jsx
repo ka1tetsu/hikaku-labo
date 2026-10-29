@@ -134,7 +134,7 @@ export default function ComparePage() {
             <button type="button" onClick={() => setShowSimilar(v => !v)} aria-expanded={showSimilar}>{showSimilar ? '▲' : '▼'} 型番が異なる・近い商品（{rest.length}件）</button>
             {showSimilar && <ol className="cp-offers">{rest.slice(0, 15).map((offer, index) => <OfferRow key={offer.store + offer.url} offer={offer} rank={index + 1} cheapest={false} />)}</ol>}
           </div>}
-          <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 迷ったらAIコンシェルジュに相談</button>
+          <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 条件を変えて候補を探す</button>
         </section>}
 
         {searchTerm && <section className="cp-stores">
