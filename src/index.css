@@ -3,7 +3,7 @@
 
 :root {
   --primary: #145f4b;
-  /* kakaku.com red */
+  /* Vivlica forest green */
   --primary-dark: #104734;
   --rakuten-red: #BF0000;
   --amazon-orange: #FF9900;
@@ -297,8 +297,8 @@ a:hover {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary);
-  border-left: 4px solid var(--primary);
-  padding-left: 10px;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 8px;
 }
 
 .results-controls {
@@ -744,8 +744,8 @@ a:hover {
   font-weight: 700;
   margin-bottom: 10px;
   color: var(--text);
-  border-left: 4px solid #FF9900;
-  padding-left: 8px;
+  border-bottom: 2px solid #c17b14;
+  padding-bottom: 8px;
 }
 
 .ranking-tabs {
@@ -887,8 +887,8 @@ a:hover {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--primary);
+  border: 2px solid #e7eee8;
+  border-top: 2px solid var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 16px;

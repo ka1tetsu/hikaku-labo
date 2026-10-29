@@ -34,7 +34,7 @@
 .gx-kicker{font:800 11px sans-serif;letter-spacing:.15em;color:#26785c}
 .gx-heading h2{font-size:clamp(26px,3.3vw,39px);line-height:1.5;letter-spacing:-.055em;color:#1e4030;margin:9px 0 11px}
 .gx-heading p{font-size:14px;line-height:1.9;color:#5a7463}
-.gx-status{background:#e3f3e8;border-left:4px solid #187756;color:#28573a;border-radius:6px;padding:11px 16px;font-size:13px;margin-bottom:16px}
+.gx-status{background:#e3f3e8;border-top:2px solid #187756;color:#28573a;border-radius:6px;padding:11px 16px;font-size:13px;margin-bottom:16px}
 .gx-parsed{background:#fff;border:1px solid #b9d9c5;border-radius:13px;padding:15px 18px;margin-bottom:17px}
 .gx-parsed>b{display:block;color:#276346;font-size:13px;margin-bottom:12px}
 .gx-parsed>div{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
