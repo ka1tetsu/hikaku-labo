@@ -263,7 +263,7 @@ export default function App() {
           <div className="hl-smart-search" role="status">
             <p><strong>「{smart.original}」</strong>を、<strong>{smart.keyword}</strong>{smart.summary.filter(item => !item.startsWith('検索:') && item !== smart.keyword).length > 0 && <>（{smart.summary.filter(item => !item.startsWith('検索:')).join('・')}）</>}で検索しました。</p>
             {smart.alternatives.length > 0 && <div className="hl-smart-chips"><span>ほかの候補：</span>{smart.alternatives.map(k => <button type="button" key={k} onClick={() => searchAlternative(k)}>{k}</button>)}</div>}
-            <button type="button" className="hl-smart-ask" onClick={() => openConcierge(smart.original)}>✳ AIコンシェルジュに詳しく相談する</button>
+            <button type="button" className="hl-smart-ask" onClick={() => openConcierge(smart.original)}>✳ 入力条件から別の候補を探す</button>
           </div>
         )}
 
