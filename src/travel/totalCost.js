@@ -1,3 +1,4 @@
+import { TRAVEL_PROVIDERS } from './providers.js';
 // Privacy-first calculator for user-entered quotes; NOT a live booking price feed.
 // Do not compare offers whose trip terms are not confirmed equivalent.
 const safeYen = value => {
@@ -11,7 +12,7 @@ export const QUOTE_CATEGORIES=Object.freeze([
   {id:'flight',label:'航空券'},{id:'hotel',label:'ホテル・宿泊'},
 ]);
 export function quoteCost(quote){
-  if(!quote || !['flight','hotel'].includes(quote.type) || typeof quote.providerId !== 'string')return null;
+  if(!quote || !['flight','hotel'].includes(quote.type) || !TRAVEL_PROVIDERS.some(p=>p.id===quote.providerId && p.type===quote.type))return null;
   const base=safeYen(quote.base), taxes=safeYen(quote.taxes),
     extras=safeYen(quote.extras),discount=safeYen(quote.discount),
     points=safeYen(quote.points);
