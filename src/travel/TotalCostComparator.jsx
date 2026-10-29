@@ -3,6 +3,7 @@ import { compareEnteredQuotes } from './totalCost.js';
 import { TRAVEL_PROVIDERS } from './providers.js';
 import { globalProviderTarget } from './searchLinkAdapter.js';
 import YahooTravelAd from './YahooTravelAd.jsx';
+import CancellationDecision from './CancellationDecision.jsx';
 import { recordFunnelEvent, recordOutboundClick } from '../shared/outboundClient.js';
 import './total-cost.css';
 
@@ -102,5 +103,6 @@ export default function TotalCostComparator({ searchCriteria = {} }){
       <p className="gx-cost-caveat">{result.caveat}</p>
       <p className="gx-cost-caveat">後日ポイントは現金支払額から差し引きません。返金可否、現地徴収、価格の通貨、換算レート、最新の空席/空室は予約先で再確認してください。</p>
     </div>
+    <CancellationDecision />
   </section>;
 }

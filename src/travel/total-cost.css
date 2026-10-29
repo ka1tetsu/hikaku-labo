@@ -52,3 +52,29 @@
 .yt-ad-creative>a{display:inline-flex;max-width:100%}
 .yt-ad-creative>a img{max-width:100%;height:auto;object-fit:contain}
 @media(max-width:560px){.gx-cost-winner{padding:17px}.gx-cost-winner .gx-cost-winning-cta{width:100%;text-align:center}}
+
+/* Trade-off calculator: a plain research-led tool, not an inferred 'best deal'. */
+.gx-cancel-decision{margin-top:42px;padding:30px 0;border-top:1px solid #d3e3d8}
+.gx-cancel-decision .gx-heading{max-width:760px}
+.gx-cancel-decision .gx-heading h3{font-size:clamp(22px,2.8vw,30px);color:#184835;line-height:1.5}
+.gx-cancel-decision .gx-heading p{font-size:13px;line-height:1.95;color:#365e48}
+.gx-cancel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.gx-cancel-grid fieldset{border:1px solid #d4e3d9;border-radius:10px;min-width:0;padding:19px;background:#fff;display:flex;flex-direction:column;gap:14px}
+.gx-cancel-grid legend{font-size:13px;font-weight:850;color:#194b37;padding:0 7px}
+.gx-cancel-grid label{font-size:12px;color:#315746;font-weight:700;display:flex;flex-direction:column;gap:7px;line-height:1.7}
+.gx-cancel-grid input{width:100%;min-height:44px;border:1px solid #bacfc2;border-radius:7px;padding:9px 11px;font:inherit;background:white;color:#1a4230}
+.gx-cancel-grid input:focus-visible,.gx-cancel-decision button:focus-visible{outline:3px solid #659878;outline-offset:2px}
+.gx-cancel-confirm{display:flex;align-items:flex-start;gap:11px;margin:19px 0;font-size:12px;line-height:1.8;color:#29513b}
+.gx-cancel-confirm input{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:#19694e}
+.gx-cancel-action{min-height:46px;border:0;background:#175d44;color:#fff;border-radius:8px;padding:11px 18px;font-weight:800;cursor:pointer}
+.gx-cancel-action:disabled{cursor:not-allowed;opacity:.45}
+.gx-cancel-result{margin-top:22px;padding:24px;border:1px solid #a5c9b3;border-radius:10px;background:#f4f8f4}
+.gx-cancel-result h4{font-size:18px;color:#1d4e39;margin:0 0 15px}
+.gx-cancel-result dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:0}
+.gx-cancel-result dl div{background:#fff;border:1px solid #dbe9df;border-radius:8px;padding:15px}
+.gx-cancel-result dt{font-size:12px;color:#44634f}
+.gx-cancel-result dd{font-size:18px;font-weight:850;color:#174a35;margin:7px 0 0;line-height:1.5}
+.gx-cancel-result p,.gx-cancel-note{font-size:12px;line-height:1.95;color:#4a6756}
+.gx-cancel-result>a{font-weight:850;color:#125c42}
+.gx-cancel-note{margin-top:17px}
+@media(max-width:620px){.gx-cancel-grid,.gx-cancel-result dl{grid-template-columns:1fr}.gx-cancel-grid fieldset{padding:15px}.gx-cancel-result{padding:17px}}
