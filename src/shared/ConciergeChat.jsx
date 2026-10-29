@@ -178,11 +178,11 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
   }
 
   return <div className={'hcx-chat' + (compact ? ' hcx-compact' : '')}>
-    <div className="hcx-log" ref={logRef} role="log" aria-live="polite" aria-label="コンシェルジュとの会話">
+    <div className="hcx-log" ref={logRef} role="log" aria-live="polite" aria-label="条件検索アシスタントとの会話">
       {messages.map((message, index) => message.role === 'user'
         ? <div className="hcx-msg hcx-msg-user" key={index}><div className="hcx-bubble">{message.text[0]}</div></div>
         : <AssistantMessage key={index} message={message} onSend={send} onAction={onAction} />)}
-      {thinking && <div className="hcx-msg hcx-msg-bot"><span className="hcx-avatar" aria-hidden="true">✳</span><div className="hcx-bubble hcx-typing" aria-label="回答を考えています"><span /><span /><span /></div></div>}
+      {thinking && <div className="hcx-msg hcx-msg-bot"><span className="hcx-avatar" aria-hidden="true">✳</span><div className="hcx-bubble hcx-typing" aria-label="掲載データから候補を整理中"><span /><span /><span /></div></div>}
     </div>
     <form className="hcx-composer" onSubmit={e => { e.preventDefault(); send(input); }}>
       <label htmlFor={'hcx-input-' + section + (compact ? '-c' : '')} className="hcx-visually-hidden">コンシェルジュへのメッセージ</label>
@@ -197,7 +197,7 @@ export default function ConciergeChat({ section = 'site', onAction = runConcierg
       </div>
     </form>
     <p className="hcx-disclaimer">{compact
-      ? '外部AI APIは不使用。ブラウザ内でVivlicaのデータから提案します。料金・在庫・入国条件は公式・販売サイトで確認してください。'
-      : '外部のAI APIは使わず、ブラウザ内のルールエンジンがVivlicaのデータから提案します。会話の内容はサーバーに保存されません（商品の提案時のみ、検索キーワードで楽天市場の商品を検索します）。料金・在庫・入国条件などは公式情報や販売・予約サイトで確認してください。'}</p>
+      ? '生成AIの回答ではなく、ブラウザ内の条件と掲載データから候補を整理します。料金・在庫・入国条件は公式で確認してください。'
+      : '回答は生成AIではなく、ブラウザ内のルールと掲載データを使っています。会話はサーバーに保存しませんが、商品検索ではキーワードが楽天市場へ送信される場合があります。料金・在庫・入国条件は公式で確認してください。'}</p>
   </div>;
 }
