@@ -4,11 +4,12 @@
 import { providerGate } from '../server/providerGate.js';
 import { upstreamResponse } from '../server/upstream.js';
 import { detectPlatform, OPENAPI_ENDPOINT } from '../server/rakutenCredentials.js';
+import { SITE_ORIGIN } from '../src/shared/site.js';
 
 // --- 認証情報 ---------------------------------------------------------------
 // いずれも環境変数を優先。未設定時は下記の既定値にフォールバックします。
 const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '4c29f89d-b874-4910-a38b-1d8e0314c2a3';
-const SITE_URL = process.env.SITE_URL || 'https://hikaku-labo.vercel.app';
+const SITE_URL = process.env.SITE_URL || SITE_ORIGIN;
 
 // 💰 収益の生命線。affiliateId を送らないと楽天APIは affiliateUrl / affiliateRate を
 // 返さず、商品リンクは全て非アフィリエイトの素のURLになり成果が1円も発生しません。
@@ -34,7 +35,7 @@ export function searchFilters(query = {}) {
     };
 }
 
-function buildParams({ keyword, genreId, page, withAccessKey, filters = {} }) {
+function buildParams({ keyword, genreId, page, filters = {} }) {
     const params = new URLSearchParams({
         format: 'json',
         keyword,
@@ -46,7 +47,6 @@ function buildParams({ keyword, genreId, page, withAccessKey, filters = {} }) {
     if (genreId) params.append('genreId', genreId);
     for (const [key, value] of Object.entries(filters)) if (value && value !== 'standard') params.append(key, value);
     if (RAKUTEN_AFFILIATE_ID) params.append('affiliateId', RAKUTEN_AFFILIATE_ID);
-    if (withAccessKey && RAKUTEN_ACCESS_KEY) params.append('accessKey', RAKUTEN_ACCESS_KEY);
     return params;
 }
 
@@ -54,6 +54,8 @@ function fetchRakuten(url, timeoutMs) {
     return upstreamResponse(url, {
         timeoutMs,
         headers: {
+            // The Rakuten API accepts accessKey in headers; never put it in a URL or proxy log.
+            'accessKey': RAKUTEN_ACCESS_KEY,
             'Referer': SITE_URL + '/',
             'Origin': SITE_URL,
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
@@ -72,7 +74,7 @@ export async function fetchRakutenSearch(opts) {
     // 未登録だと HTTP_REFERRER_NOT_ALLOWED で全体が失敗する。
     // 商品が1件も出ないよりは、成果計測なしでも表示できる方を優先し、
     // 失敗した場合は affiliateId を外して再試行する。
-    const paramsWithAffiliate = buildParams({ ...opts, withAccessKey: true });
+    const paramsWithAffiliate = buildParams(opts);
     const paramsWithout = new URLSearchParams(paramsWithAffiliate);
     paramsWithout.delete('affiliateId');
 
