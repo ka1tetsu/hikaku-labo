@@ -23,7 +23,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
   const [breakfast,setBreakfast]=useState(false);
   const [rating,setRating]=useState('any');
   const [cabin,setCabin]=useState('economy');
-  const [category,setCategory]=useState('flight');
+  const [category,setCategory]=useState('hotel');
   const [mobileFilters,setMobileFilters]=useState(false);
   const [status,setStatus]=useState('');
   const [fares,setFares]=useState(null);
