@@ -102,7 +102,7 @@ export default function MultiProviderBoard({ providers, category, criteria, onOu
             </td>)}</tr></tbody>
         </table>
       </div>
-      <p>最大4社まで。実際の販売料金と最新の空室は取得していません。サイトで確認した総額は、<a href="#travel-total-cost">支払総額の比較ツール</a>に入力できます。</p>
+      <p>最大4社まで。実際の販売料金を取得していません。最新の空席・空室も未取得です。サイトで確認した総額は、<a href="#travel-total-cost">支払総額の比較ツール</a>に入力できます。</p>
     </section>}
     {category === 'hotel' && <div className="mp-yahoo-sponsor">
       <h3>Yahoo!トラベルも宿泊候補に</h3>
