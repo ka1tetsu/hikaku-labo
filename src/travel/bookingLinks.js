@@ -12,6 +12,10 @@ export const ORIGINS = Object.freeze([
   { code: 'SPK', label: '札幌（新千歳）', skyscanner: 'cts' },
   { code: 'OKA', label: '沖縄（那覇）', skyscanner: 'oka' },
   { code: 'SDJ', label: '仙台', skyscanner: 'sdj' },
+  { code: 'KIJ', label: '新潟', skyscanner: 'kij' },
+  { code: 'HKD', label: '函館', skyscanner: 'hkd' },
+  { code: 'NGS', label: '長崎', skyscanner: 'ngs' },
+  { code: 'KOJ', label: '鹿児島', skyscanner: 'koj' },
   { code: 'HIJ', label: '広島', skyscanner: 'hij' },
 ]);
 
