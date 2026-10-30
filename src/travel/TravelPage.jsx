@@ -112,7 +112,7 @@ export default function TravelPage() {
         pace={pace} setPace={setPace} styleChoice={styleChoice} setStyleChoice={setStyleChoice}
         hotelSearch={<StaySearch />} concierge={<Concierge onShow={showFromConcierge}/>}/>
       <GlobalTravelSearch showHero={false} onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName}
-        nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} departureDate={depart} setDepartureDate={setDepart}/>
+        nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} departureDate={depart} setDepartureDate={setDepart}/>
 
       <section className="tv-wrap tv-planner-section" id="planner">
         <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
