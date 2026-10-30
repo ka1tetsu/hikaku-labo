@@ -94,9 +94,9 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
         <div>
           <div className="tvx-eyebrow">旅先・宿・交通を比較</div>
           <h1 id="tvx-title">旅先を探し、<br/><em>旅費と宿を比べる。</em></h1>
-          <p className="tvx-hero-lead">国内も海外も、都市名・国名・名所・「やりたいこと」で検索。条件検索アシスタントを使えば、モデルコースから航空券・ホテルの比較、旅の予算までひとつの画面で。</p>
+          <p className="tvx-hero-lead">国内外の行き先を探して、航空券・ホテルなど29の予約・比較サイトへ。出発日・人数・泊数を一度指定し、条件を引き継げるサイトから調べられます。実際の予約価格は各社で確認します。</p>
           <TravelSearchBox onDestination={goToDestination} onScope={applyScope} onExternal={setExternal}/>
-          <nav className="tv-booking-shortcuts" aria-label="旅行先が決まっている方へ"><a className="tv-cheapest-shortcut" href="#travel-total-cost">予約候補の支払総額を比較 →</a><a href="#stay-search">日程・人数から空室を探す →</a><a href="#booking">宿・航空券を探す →</a><a href="#planner">旅行予算を計算する →</a></nav>
+          <nav className="tv-booking-shortcuts" aria-label="旅行先が決まっている方へ"><a className="tv-cheapest-shortcut" href="#global-travel-compare">29サイトの旅行検索先を比較 →</a><a href="#travel-total-cost">予約候補の支払総額を比較 →</a><a href="#stay-search">日程・人数から空室を探す →</a><a href="#booking">宿・航空券を探す →</a><a href="#planner">旅行予算を計算する →</a></nav>
           {external&&<div className="tvw-external" role="region" aria-label="掲載外の場所の検索">
             <div className="tvw-external-head"><strong>「{external}」を世界中の予約サイトで検索</strong><button type="button" onClick={()=>setExternal('')} aria-label="閉じる">×</button></div>
             <p>編集部のモデルコースは未掲載の場所です。情報を作り話で補わず、宿・航空券・地図を直接検索できるリンクを用意しました。</p>
