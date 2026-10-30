@@ -53,6 +53,13 @@ test('Expedia flights handoff only with a supported route and valid date, never 
   assert.equal(empty.carriesSearch,false);
   assert.equal(empty.url,provider.url);
 });
+test('Niigata is a supported real departure for itinerary-based flight comparison',()=>{
+  const provider=TRAVEL_PROVIDERS.find(x=>x.id==='trip');
+  const link=globalProviderTarget(provider,{...criteria,originCode:'KIJ'});
+  assert.equal(link.carriesSearch,true);
+  assert.equal(new URL(link.url).searchParams.get('dcity'),'kij');
+  assert.equal(link.sponsored,false);
+});
 test('sites without verified compatible deep links do not imply that any search conditions were carried',()=>{
   const row=prepareProviderRows(TRAVEL_PROVIDERS,criteria).find(x=>x.provider.id==='yahoo-travel');
   assert.equal(row.hasSearchHandoff,false);
