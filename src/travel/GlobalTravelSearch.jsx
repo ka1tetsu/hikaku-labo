@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ALL_TRAVEL_DESTINATIONS, autocompleteDestinations, findDestination, parseTravelQuery, buildGeneralItinerary } from './globalSearch.js';
 import { TRAVEL_PROVIDERS, TRAVEL_PROVIDER_TYPES } from './providers.js';
-import { globalProviderTarget } from './searchLinkAdapter.js';
+import MultiProviderBoard from './MultiProviderBoard.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { buildStayLinks } from './bookingLinks.js';
 import TotalCostComparator from './TotalCostComparator.jsx';
@@ -86,8 +86,8 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
     try{await navigator.clipboard.writeText(summaryText());setStatus('検索条件をコピーしました。各予約サイトで貼り付け・再設定できます。');}
     catch{setStatus('コピーできないため、以下の条件欄を参照してください。');}
   }
-  function providerClick(provider,sponsored){
-    recordOutboundClick({section:'travel',merchant:provider.id,placement:'global-'+category,sponsored});
+  function providerClick(provider,sponsored,placement){
+    recordOutboundClick({section:'travel',merchant:provider.id,placement:placement==='global-shortlist'?'global-shortlist':'global-'+category,sponsored});
   }
   async function loadFares(){
     if(!fromIata||!toIata||!departureDate){setStatus('参考価格を調べるには、出発地と目的地の空港コードおよび出発日が必要です。');return;}
@@ -177,20 +177,14 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
           <span>外部サービスへ自動入力できない条件は、移動先で設定してください。</span></div>
       </div>
       <div className="gx-summary"><strong>比較条件</strong><p>{origin||'出発地未指定'} → {destination||'目的地未指定'} ／ {departureDate||'日程未指定'} ／ {travelers}名 ／ {maxBudget?yen(Number(maxBudget))+'以下':'予算未指定'} ／ {nonstop?'直行便希望':'乗継条件なし'}</p></div>
-      <div className="gx-heading gx-provider-heading"><span className="gx-kicker">TRAVEL PROVIDER DIRECTORY</span><h2>主要旅行サイトで、条件を照合。</h2>
-        <p>比較先をタブで切り替えられます。料金を取得できない旅行会社については価格を表示せず、公式の検索ページへ案内します。</p></div>
+      <div className="gx-heading gx-provider-heading"><span className="gx-kicker">TRAVEL SITE COMPARISON</span>
+        <h2>航空券・ホテル・体験を予約サイト別に比較。</h2>
+        <p>目的地・日程・人数を指定すると、引き継ぎ可能な予約サイトを優先表示。サイト名や機能で絞り込み、最大4社を横並びで確認できます。料金を取得していないサイトは、公式サイトで最終価格をご確認ください。</p></div>
       <div className="gx-type-tabs" role="tablist" aria-label="旅行サービスの分類">{TRAVEL_PROVIDER_TYPES.map(type=>
         <button role="tab" aria-selected={category===type.id} key={type.id} type="button" onClick={()=>{setCategory(type.id);setFares(null);}} className={category===type.id?'active':''}>{type.emoji} {type.label} <small>{TRAVEL_PROVIDERS.filter(p=>p.type===type.id).length}社</small></button>)}</div>
-      <div className="gx-provider-grid">{providers.map(provider=>{
-        const target=globalProviderTarget(provider, { stayLinks, originCode: fromIata, destination: location, departureDate, returnDate, nights, travelers, config: LINK_CONFIG });
-        return <article key={provider.id} className="gx-provider-card">
-          <div className="gx-provider-top"><span className="gx-provider-avatar">{provider.name.slice(0,1)}</span><div><strong>{provider.name}</strong><small>{provider.capabilities.join('・')}</small></div></div>
-          <p>{target.note || '公式サイトに移動し、上の検索条件を設定して最終支払額を確認。'}</p>
-          <div className="gx-provider-bottom"><span>{target.sponsored?'PR・成果報酬リンク':'公式リンク / 報酬計測なし'}{target.carriesSearch?' · 一部検索条件を引継ぎ':''}</span>
-            <a href={target.url} target="_blank" rel={target.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
-              onClick={()=>providerClick(provider,target.sponsored)}>{target.carriesSearch?'条件を引き継いで検索':target.sponsored?'提携ページを見る':'公式サイトで調べる'} ↗</a></div>
-        </article>;
-      })}</div>
+      <MultiProviderBoard providers={providers} category={category}
+        criteria={{ stayLinks, originCode: fromIata, destination: location, departureDate, returnDate, nights, travelers, rooms, config: LINK_CONFIG }}
+        onOutbound={providerClick}/>
       <div className="gx-live-prices">
         <div><strong>航空券の参考価格データ（連携後に利用可能）</strong><p>Travelpayoutsの商用APIを有効にすると、指定路線の過去検索に基づく参考価格を表示できます。リアルタイムの空席・最終価格・世界最安値ではありません。</p></div>
         <button type="button" disabled={loadingFares||!departureDate||!fromIata||!toIata||fromIata===toIata} onClick={loadFares}>{loadingFares?'取得中…':'参考航空券データを確認 ↗'}</button>
