@@ -1,6 +1,7 @@
 // Verified provider homepages ONLY. No unapproved partner links, undocumented deep links,
 // unauthorized scraping or claims that one service is cheaper than another.
 export const TRAVEL_PROVIDERS=Object.freeze([
+  {id:'expedia-flights',name:'Expedia 航空券',type:'flight',url:'https://www.expedia.co.jp/Flights',capabilities:['航空券','ホテルと組合せ'],affiliate:false},
   {id:'google-flights',name:'Google Flights',type:'flight',url:'https://www.google.com/travel/flights?hl=ja&curr=JPY',capabilities:['柔軟な日程','直行便','手荷物'],affiliate:false},
   {id:'skyscanner',name:'Skyscanner',type:'flight',url:'https://www.skyscanner.jp/',capabilities:['広い航空会社比較','日付変更','ホテル'],affiliate:false},
   {id:'kayak',name:'KAYAK',type:'flight',url:'https://www.kayak.co.jp/',capabilities:['航空券','ホテル','レンタカー'],affiliate:false},
@@ -9,6 +10,10 @@ export const TRAVEL_PROVIDERS=Object.freeze([
   {id:'aviasales',name:'Aviasales',type:'flight',url:'https://www.aviasales.com/',capabilities:['航空券','複数航空会社'],affiliate:false},
   {id:'ana',name:'ANA',type:'flight',url:'https://www.ana.co.jp/',capabilities:['航空会社直販','運送条件確認'],affiliate:false},
   {id:'jal',name:'JAL',type:'flight',url:'https://www.jal.co.jp/',capabilities:['航空会社直販','運送条件確認'],affiliate:false},
+  {id:'trip-hotels',name:'Trip.com',type:'hotel',url:'https://jp.trip.com/hotels/',capabilities:['国内外のホテル','宿泊プラン'],affiliate:false},
+  {id:'ikyu',name:'一休.com',type:'hotel',url:'https://www.ikyu.com/',capabilities:['国内ホテル・旅館','高級宿'],affiliate:false},
+  {id:'relux',name:'Relux',type:'hotel',url:'https://rlx.jp/',capabilities:['国内ホテル・旅館','厳選宿'],affiliate:false},
+  {id:'jtb',name:'JTB',type:'hotel',url:'https://www.jtb.co.jp/kokunai-hotel/',capabilities:['国内ホテル・旅館','旅行パック'],affiliate:false},
   {id:'booking',name:'Booking.com',type:'hotel',url:'https://www.booking.com/',capabilities:['世界の宿','取消条件','宿泊レビュー'],affiliate:false},
   {id:'agoda',name:'Agoda',type:'hotel',url:'https://www.agoda.com/',capabilities:['世界の宿','多様なプラン'],affiliate:false},
   {id:'expedia',name:'Expedia',type:'hotel',url:'https://www.expedia.co.jp/',capabilities:['ホテル','航空券＋ホテル'],affiliate:false},

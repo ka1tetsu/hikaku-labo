@@ -5,7 +5,7 @@ import { providerTarget } from './providers.js';
 // date / route / party. No speculative airport or date defaults: otherwise show
 // the provider's official homepage rather than silently searching wrong dates.
 const PROVIDER_MAP = Object.freeze({
-  trip: 'trip-com', skyscanner: 'skyscanner',
+  trip: 'trip-com', skyscanner: 'skyscanner', 'expedia-flights': 'expedia',
   expedia: 'expedia', 'google-flights': 'google-flights',
 });
 
@@ -44,8 +44,10 @@ export function globalProviderTarget(provider, criteria = {}) {
       url: found.href, sponsored: found.sponsored,
       note: found.note + '。出発地・目的地・出発日の条件を引継ぎ（他の条件は予約先で再確認）',
       carriesSearch: true,
+      transferredFields: ['出発地','目的地','搭乗日','人数'],
     };
   }
   const result = providerTarget(provider, { stayLinks: criteria.stayLinks || [] });
-  return { ...result, carriesSearch: provider.type === 'hotel' && Boolean(criteria.stayLinks?.some(row => row.merchant === provider.id)) };
+  const selected = provider.type === 'hotel' && criteria.stayLinks?.find(row => row.merchant === provider.id && row.href === result.url);
+  return { ...result, carriesSearch: Boolean(selected), transferredFields: selected ? (provider.id === 'rakuten-travel' ? ['目的地'] : ['目的地','宿泊日','人数','部屋数']) : [] };
 }
