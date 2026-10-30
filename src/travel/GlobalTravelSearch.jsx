@@ -3,7 +3,7 @@ import { ALL_TRAVEL_DESTINATIONS, autocompleteDestinations, findDestination, par
 import { TRAVEL_PROVIDERS, TRAVEL_PROVIDER_TYPES } from './providers.js';
 import MultiProviderBoard from './MultiProviderBoard.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
-import { buildStayLinks } from './bookingLinks.js';
+import { addDays, buildStayLinks } from './bookingLinks.js';
 import TotalCostComparator from './TotalCostComparator.jsx';
 import { LINK_CONFIG } from './linkConfig.js';
 import './global-travel.css';
@@ -11,7 +11,7 @@ import './global-travel.css';
 const yen=n=>'¥'+n.toLocaleString('ja-JP');
 const LOCAL_IATA={tokyo:'TYO',osaka:'OSA',sapporo:'SPK',fukuoka:'FUK',naha:'OKA',niigata:'KIJ',nagoya:'NGO',sendai:'SDJ',hakodate:'HKD',hiroshima:'HIJ',nagasaki:'NGS'};
 
-export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, rooms, departureDate, setDepartureDate, showHero = true }) {
+export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, rooms, setRooms, departureDate, setDepartureDate, showHero = true }) {
   const [query,setQuery]=useState('');
   const [parsed,setParsed]=useState(null);
   const [origin,setOrigin]=useState('東京');
@@ -28,11 +28,13 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
   const [status,setStatus]=useState('');
   const [fares,setFares]=useState(null);
   const [loadingFares,setLoadingFares]=useState(false);
+  const calculatedCheckout = departureDate && nights > 0 ? addDays(departureDate, nights) : '';
+  const effectiveCheckout = returnDate && (!departureDate || returnDate > departureDate) ? returnDate : calculatedCheckout;
   const location=useMemo(()=>findDestination(destination),[destination]);
   const stayLinks = useMemo(() => buildStayLinks({
     destination: location ? { ...location, area: location.area || (location.international ? 'overseas' : 'domestic') } : null,
-    query: destination, checkin: departureDate, checkout: returnDate || undefined, nights, adults: travelers, rooms, config: LINK_CONFIG,
-  }).filter(link => location || link.merchant !== 'rakuten-travel'), [location, destination, departureDate, returnDate, nights, travelers, rooms]);
+    query: destination, checkin: departureDate, checkout: effectiveCheckout || undefined, nights, adults: travelers, rooms, config: LINK_CONFIG,
+  }).filter(link => location || link.merchant !== 'rakuten-travel'), [location, destination, departureDate, effectiveCheckout, nights, travelers, rooms]);
   const supported=useMemo(()=>ALL_TRAVEL_DESTINATIONS.filter(d=>d.country!=='日本'),[]);
   const suggestions=useMemo(()=>autocompleteDestinations(destination,6),[destination]);
   const providers=useMemo(()=>TRAVEL_PROVIDERS.filter(p=>p.type===category),[category]);
@@ -53,7 +55,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
       setDestination(query.trim());
     if(result.departureDate)setDepartureDate(result.departureDate);
     if(result.travelers)setTravelers(result.travelers);
-    if(result.nights!==null)setNights(result.nights);
+    if(result.nights!==null){setNights(result.nights);setReturnDate('');}
     if(result.budgetJPY!==null)setMaxBudget(result.budgetJPY);
     if(result.nonstop)setNonstop(true);
     if(result.checkedBag)setCheckedBag(true);
@@ -71,7 +73,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
   function summaryText(){
     return [
       '目的地: '+(destination||'未指定'),'出発地: '+(origin||'未指定'),
-      '出発: '+(departureDate||'未指定'),'帰着: '+(returnDate||'未指定'),
+      '出発: '+(departureDate||'未指定'),'帰着・チェックアウト: '+(effectiveCheckout||'未指定'),
       '旅行人数: '+travelers+'名','日数: '+(nights===0?'日帰り':nights+'泊'),
       '予算上限: '+(maxBudget?yen(Number(maxBudget)):'未指定'),
       '直行便希望: '+(nonstop?'はい':'指定なし'),
@@ -155,12 +157,19 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
           <label>出発地 / 空港都市コード<input value={origin} onChange={e=>setOrigin(e.target.value)} placeholder="例：東京、TYO、ソウル"/></label>
           <label>目的地（世界中の都市名を入力可能）<input value={destination} onChange={e=>setDestination(e.target.value)} placeholder="例：パリ、京都、カトマンズ" list="gx-destinations"/></label>
           <datalist id="gx-destinations">{ALL_TRAVEL_DESTINATIONS.map(item=><option key={item.id} value={item.name}/>)}</datalist>
-          <label>出発日<input type="date" value={departureDate} onChange={e=>setDepartureDate(e.target.value)}/></label>
-          <label>帰着日（任意）<input type="date" value={returnDate} min={departureDate||undefined} onChange={e=>setReturnDate(e.target.value)}/></label>
+          <label>出発日<input type="date" value={departureDate} onChange={e=>{setDepartureDate(e.target.value);setReturnDate('');}}/></label>
+          <label>帰着・チェックアウト日<input type="date" value={effectiveCheckout}
+            disabled={nights===0} min={departureDate?addDays(departureDate,1):undefined}
+            max={departureDate?addDays(departureDate,14):undefined}
+            onChange={e=>{const value=e.target.value;setReturnDate(value);
+              if(value&&departureDate&&value>departureDate){const count=Math.round((Date.parse(value+'T00:00:00Z')-Date.parse(departureDate+'T00:00:00Z'))/86400000);
+                if(count>=1&&count<=14)setNights(count);}}}/></label>
         </div>
         {destination.trim()&&suggestions.length>0&&<div className="gx-destination-pills">{suggestions.map(item=><button key={item.id} type="button" onClick={()=>choosePlace(item)}>{item.name} <small>{item.country}</small></button>)}</div>}
         <div className="gx-form-line"><label>旅行人数<select value={travelers} onChange={e=>setTravelers(Number(e.target.value))}>{Array.from({length:10},(_,i)=><option key={i} value={i+1}>{i+1}名</option>)}</select></label>
-          <label>宿泊数<select value={nights} onChange={e=>setNights(Number(e.target.value))}>{Array.from({length:15},(_,i)=><option key={i} value={i}>{i===0?'日帰り':i+'泊'}</option>)}</select></label>
+          <label>宿泊数<select value={nights} onChange={e=>{setNights(Number(e.target.value));setReturnDate('');}}>{Array.from({length:15},(_,i)=><option key={i} value={i}>{i===0?'日帰り':i+'泊'}</option>)}</select></label>
+          <label>部屋数<select value={rooms} onChange={e=>setRooms(Number(e.target.value))}>
+            {[1,2,3,4,5].map(number=><option key={number} value={number}>{number}室</option>)}</select></label>
           <label>旅行の予算上限（円）<input type="number" inputMode="numeric" min="0" max="10000000" step="1000" value={maxBudget} onChange={e=>setMaxBudget(e.target.value)} placeholder="予算を入力"/></label>
           <button type="button" className="gx-expand-button" aria-expanded={mobileFilters} onClick={()=>setMobileFilters(v=>!v)}>さらに詳細条件 {mobileFilters?'−':'＋'}</button></div>
         <div className={'gx-advanced'+(mobileFilters?' expanded':'')}>
@@ -183,7 +192,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
       <div className="gx-type-tabs" role="tablist" aria-label="旅行サービスの分類">{TRAVEL_PROVIDER_TYPES.map(type=>
         <button role="tab" aria-selected={category===type.id} key={type.id} type="button" onClick={()=>{setCategory(type.id);setFares(null);}} className={category===type.id?'active':''}>{type.emoji} {type.label} <small>{TRAVEL_PROVIDERS.filter(p=>p.type===type.id).length}社</small></button>)}</div>
       <MultiProviderBoard providers={providers} category={category}
-        criteria={{ stayLinks, originCode: fromIata, destination: location, departureDate, returnDate, nights, travelers, rooms, config: LINK_CONFIG }}
+        criteria={{ stayLinks, originCode: fromIata, destination: location, departureDate, returnDate: effectiveCheckout, nights, travelers, rooms, config: LINK_CONFIG }}
         onOutbound={providerClick}/>
       <div className="gx-live-prices">
         <div><strong>航空券の参考価格データ（連携後に利用可能）</strong><p>Travelpayoutsの商用APIを有効にすると、指定路線の過去検索に基づく参考価格を表示できます。リアルタイムの空席・最終価格・世界最安値ではありません。</p></div>
