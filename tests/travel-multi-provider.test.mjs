@@ -82,6 +82,15 @@ test('comparison ranking depends on search handoff, never ad commissions or fake
   assert.deepEqual(filterProviderRows(input,{phrase:'実在しないサイト名'}),[]);
   assert.equal(providerComparisonRows().find(x=>x.label==='現在の料金').get(ranked[0]),'未取得：予約サイトで確認');
 });
+test('shared hotel and airline search exposes room count and keeps check-out aligned with nights',()=>{
+  const search=source('src/travel/GlobalTravelSearch.jsx');
+  const travel=source('src/travel/TravelPage.jsx');
+  assert.match(search,/calculatedCheckout/);
+  assert.match(search,/effectiveCheckout/);
+  assert.match(search,/帰着・チェックアウト日/);
+  assert.match(search,/setRooms\(Number\(e.target.value\)\)/);
+  assert.match(travel,/setRooms=\{setRooms\}/);
+});
 test('multi-site OTA UI supports filters, accessible 4-way comparison and transparent pricing',()=>{
   const board=source('src/travel/MultiProviderBoard.jsx');
   const search=source('src/travel/GlobalTravelSearch.jsx');
