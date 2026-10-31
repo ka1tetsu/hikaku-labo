@@ -407,3 +407,45 @@ body{margin:0}
 .cp-consumer-score :is(a,button,summary):focus-visible{outline:3px solid #247e59;outline-offset:3px}
 @media(max-width:850px){.cp-score-list,.cp-score-formula{grid-template-columns:1fr}}
 @media(max-width:580px){.cp-score-metrics{grid-template-columns:1fr}.cp-score-item-actions button{width:100%}.cp-score-modes button{flex:1 1 44%}}
+
+
+/* Comparison-first shopping table: fetched price vs verified free-shipping total. */
+.cp-site-prices{margin:12px 0 22px;border-top:1px solid #c2d7c8;border-bottom:1px solid #c2d7c8;padding:18px 0 20px;scroll-margin-top:18px}
+.cp-site-prices-title{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.cp-site-prices-title>div{flex:1 1 300px}
+.cp-site-prices-title h3{font-size:22px;line-height:1.4;color:#174c36;margin:5px 0 4px}
+.cp-site-prices-title p{font-size:12px;line-height:1.75;color:#496a55;margin:0}
+.cp-site-prices-title p>span{font-weight:800;color:#255d3f}
+.cp-site-prices-count{padding:8px 12px;border:1px solid #c7d9cc;font-size:12px;white-space:nowrap;color:#2b5c41;margin:0}
+.cp-site-prices-count strong{font-size:19px;color:#145b3c;font-variant-numeric:tabular-nums}
+.cp-site-prices-best{padding:12px 15px;border:1px solid #afcdb9;background:#f1f8f3;margin:0 0 14px;color:#265940;line-height:1.75;font-size:12px}
+.cp-site-prices-best b{font-size:23px;margin:0 6px;color:#ac452d;font-variant-numeric:tabular-nums}
+.cp-site-prices-best small{display:block;font-size:11px;color:#567260}
+.cp-site-prices-table-wrap{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.cp-site-prices-table{width:100%;border-collapse:collapse;min-width:575px}
+.cp-site-prices-table caption{text-align:left;font-size:11px;color:#577160;padding:5px 0}
+.cp-site-prices-table th,.cp-site-prices-table td{border-bottom:1px solid #dce8df;padding:12px 9px;text-align:left;vertical-align:middle}
+.cp-site-prices-table thead th{font-weight:750;font-size:11px;color:#456a53;background:#f8faf7}
+.cp-site-prices-table tbody th{width:26%;font-size:13px;color:#255b3e}
+.cp-site-prices-table tbody th small{display:block;font-size:10px;font-weight:500;line-height:1.6;color:#61816d;margin-top:4px}
+.cp-site-prices-table td>strong{font-size:16px;color:#a7472d;font-variant-numeric:tabular-nums}
+.cp-site-prices-table td>small{display:block;margin-top:4px;color:#5f7865;font-size:10px;line-height:1.5}
+.cp-site-prices-table td>span{font-size:12px;color:#617467}
+.cp-site-price-action>a{display:inline-flex;min-height:44px;align-items:center;padding:9px 10px;border:1px solid #bcd4c4;color:#195b41;text-decoration:none;font-size:12px;line-height:1.5;font-weight:750}
+.cp-site-price-action>a small{font-size:10px}
+.cp-site-price-missing td{background:#fafbfa}
+.cp-site-prices-expand{border-top:1px solid #d6e5da;margin:12px 0;padding:8px 0}
+.cp-site-prices-expand>summary{display:flex;align-items:center;cursor:pointer;min-height:44px;font-size:12px;font-weight:800;color:#165e40;list-style:revert;padding:10px 0}
+.cp-site-prices-notice{font-size:12px;line-height:1.75;color:#55705d;background:#f8faf8;padding:12px;margin:10px 0}
+.cp-site-prices-foot{font-size:11px;line-height:1.8;color:#526e5b;margin:13px 0 0}
+.cp-site-prices :is(a,summary):focus-visible{outline:3px solid #237f59;outline-offset:3px}
+@media(max-width:640px){.cp-site-prices-title h3{font-size:20px}.cp-site-prices-table{min-width:0}
+.cp-site-prices-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.cp-site-prices-table tbody,.cp-site-prices-table tr,.cp-site-prices-table td,.cp-site-prices-table th{display:block;width:100%}
+.cp-site-prices-table tr{border:1px solid #d6e4da;margin:0 0 10px;padding:7px 11px}
+.cp-site-prices-table th,.cp-site-prices-table td{padding:5px 0;border:0}
+.cp-site-prices-table td:before{content:attr(data-label);display:block;font-size:10px;color:#627f69;margin:3px 0}
+.cp-site-prices-table td>strong{font-size:20px}
+.cp-site-price-action>a{margin-top:4px}
+.cp-site-price-action:before{content:'購入先・検索先';display:block;font-size:10px;color:#627f69;margin:3px 0}
+}

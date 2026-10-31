@@ -15,6 +15,7 @@ import ReviewResearchPanel from './ReviewResearchPanel.jsx';
 import PurchaseReasonPanel from './PurchaseReasonPanel.jsx';
 import ConsumerScorePanel from './ConsumerScorePanel.jsx';
 import ShopPriceBoard from './ShopPriceBoard.jsx';
+import SitePriceOverview from './SitePriceOverview.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
 import PriceTargetMemo from './PriceTargetMemo.jsx';
@@ -211,11 +212,14 @@ export default function ComparePage() {
           </div>
           {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
           <nav className="cp-quick-nav" aria-label="商品比較の目次">
+            <a href="#site-prices">サイト別の価格を一覧で見る</a>
             <a href="#cp-research-title">商品・販売店の口コミを調べる</a>
             <a href="#cp-score-title">口コミ・価格の参考指数を計算</a>
             <a href="#cp-allshops-title">送料込みの最安候補を確認</a>
             <a href="#cp-manual-heading">18ショップの確認済み価格を比較</a>
           </nav>
+          <SitePriceOverview offers={rawOffers} stores={stores} sources={sources} fetchedAt={state.data?.fetchedAt||''}
+            queryMode={queryMode} loading={state.loading}/>
           <OfferFilters filters={filters} onChange={changeFilter}
             storeOptions={[{id:'rakuten',name:'楽天市場'},{id:'yahoo',name:'Yahoo!ショッピング'}]}
             visibleCount={offers.length} totalCount={rawOffers.length}
