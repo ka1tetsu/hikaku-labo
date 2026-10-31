@@ -18,12 +18,14 @@ export function reviewCoverage(offers=[]) {
 }
 export function reviewResearchOffers(offers=[],limit=4) {
   const list=Array.isArray(offers)?offers:[];
-  const rated=list.filter(o=>reviewMetrics(o.reviewAverage,o.reviewCount).available);
-  const same=rated.filter(o=>o.sameProduct===true&&['jan','model'].includes(o.matchBasis));
-  // Never rank similar/possibly different models as if they are the same product.
-  const pool=same.length?same:rated;
+  const verified=list.filter(o=>o.sameProduct===true&&['jan','model'].includes(o.matchBasis));
+  const verifiedOnly=verified.length>0;
+  // If the product is identifiable but has no ratings, don't replace its
+  // missing evidence with a highly rated accessory or a different model.
+  const matchingPool=verifiedOnly?verified:list;
+  const pool=matchingPool.filter(o=>reviewMetrics(o.reviewAverage,o.reviewCount).available);
   return {
-    verifiedOnly:same.length>0,
+    verifiedOnly,
     rows:[...pool].sort((a,b)=>score(b)-score(a)
       || b.reviewCount-a.reviewCount || a.price-b.price)
       .slice(0,Number.isInteger(limit)&&limit>0&&limit<=12?limit:4),
