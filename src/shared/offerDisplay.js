@@ -3,8 +3,6 @@
 export const PRICE_SORTS = Object.freeze({
   cash: { label: '商品価格が安い順（標準）' },
   points: { label: 'ポイント考慮後の参考額順' },
-  rating: { label: '口コミ評価の高い順' },
-  reviews: { label: '口コミ件数の多い順' },
 });
 const finite=value=>typeof value==='number' && Number.isFinite(value) && value>=0 ? value : Number.POSITIVE_INFINITY;
 export function displayValue(offer, sort='cash') {
