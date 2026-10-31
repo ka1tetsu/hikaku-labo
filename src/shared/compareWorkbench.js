@@ -3,6 +3,7 @@
 import { displayValue, sortDisplayedOffers } from './offerDisplay.js';
 
 export const OFFER_SORTS=Object.freeze({
+  recommended:'おすすめ順（取得元の検索関連度）',
   cash:'商品価格が安い順',
   points:'ポイント差引後の参考額順',
   rating:'口コミ評価が高い順',
@@ -32,7 +33,8 @@ export function filterOffers(offers, {
     if(search && ![offer.title,offer.shopName,offer.storeName].join(' ').normalize('NFKC').toLocaleLowerCase('ja').includes(search)) return false;
     return true;
   });
-  if(sort==='rating')result=result.sort((a,b)=>b.reviewAverage-a.reviewAverage||a.price-b.price);
+  if(sort==='recommended')result=result.sort((a,b)=>Number(b.sameProduct)-Number(a.sameProduct) || (a.sourceRank??99)-(b.sourceRank??99) || (b.reviewCount||0)-(a.reviewCount||0));
+  else if(sort==='rating')result=result.sort((a,b)=>b.reviewAverage-a.reviewAverage||a.price-b.price);
   else if(sort==='reviews')result=result.sort((a,b)=>b.reviewCount-a.reviewCount||a.price-b.price);
   else result=sortDisplayedOffers(result,sort==='points'?'points':'cash');
   return result;
