@@ -9,7 +9,7 @@ const newRows = () => MANUAL_STORES.map(storeId => ({
   storeId, price: '', shipping: '', discount: '0', points: '0',
 }));
 
-export default function ManualStoreCompare({ keyword, stores }) {
+export default function ManualStoreCompare({ keyword, stores, openRequested = false }) {
   const [rows, setRows] = useState(newRows);
   const [sameProduct, setSameProduct] = useState(false);
   const [sort, setSort] = useState('cash');
@@ -21,9 +21,11 @@ export default function ManualStoreCompare({ keyword, stores }) {
     setRows(newRows());
     setSameProduct(false);
     setReviewed(false);
-    setOpened(false);
+    setOpened(Boolean(openRequested));
     setSort('cash');
   }, [keyword]);
+
+  useEffect(()=>{ if(openRequested) setOpened(true); },[openRequested]);
 
   const change = (storeId, key, value) => {
     setRows(previous => previous.map(row => row.storeId === storeId ? { ...row, [key]: value } : row));

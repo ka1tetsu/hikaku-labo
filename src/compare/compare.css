@@ -208,3 +208,25 @@ body{margin:0}
 .cp-pagination span{font-size:12px;color:#456553;text-align:center;font-variant-numeric:tabular-nums}
 .cp-google-links a:focus-visible,.cp-pagination button:focus-visible{outline:3px solid #318467;outline-offset:3px}
 @media(max-width:640px){.cp-google-links a{width:100%}.cp-pagination{gap:6px}.cp-pagination span{flex-basis:100%;order:-1}}
+
+
+/* Transparent research: 3 providers, but price only from authenticated APIs. */
+.cp-three-way{border-top:1px solid #b9cebf;border-bottom:1px solid #b9cebf;margin:17px 0 21px;padding:17px 0}
+.cp-three-way-head h3{font-size:20px;line-height:1.4;color:#1c4937;margin:0 0 5px}
+.cp-three-way-head p,.cp-three-way-action p,.cp-three-way-caution{font-size:12px;line-height:1.8;color:#456251;margin:0 0 12px}
+.cp-three-way-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cp-three-way-shop{display:flex;flex-direction:column;gap:8px;border:1px solid #ceddd2;padding:16px;min-width:0;background:#fff}
+.cp-three-way-shop h4{color:#1c4634;margin:0;font-size:15px}
+.cp-three-way-shop>span{color:#4b6655;font-size:11px;line-height:1.7}
+.cp-three-way-price{color:#a5442b;font-size:23px;font-variant-numeric:tabular-nums}
+.cp-three-way-unknown{color:#3f5c4a;font-size:14px;line-height:1.65}
+.cp-three-way-shop>a{display:inline-flex;justify-content:center;align-items:center;gap:4px;margin-top:auto;min-height:45px;padding:9px 12px;background:#15664e;color:#fff!important;border-radius:5px;text-decoration:none;text-align:center;font-weight:800;font-size:12px;line-height:1.5}
+.cp-three-way-shop>a small{font-size:10px;border:1px solid currentColor;padding:1px 3px}
+.cp-three-way-action{display:flex;align-items:center;gap:15px;justify-content:space-between;margin:14px 0 4px;flex-wrap:wrap}
+.cp-three-way-action p{max-width:550px;flex:1 1 270px;margin:0}
+.cp-three-way-action button{background:transparent;border:1px solid #18724d;color:#126146;padding:10px 14px;min-height:46px;cursor:pointer;font-size:13px;font-weight:850}
+.cp-three-way-caution{margin:12px 0 0}
+.cp-review-evidence,.cp-seller-evidence>a,.product-review-source,.product-seller-review>a{font-size:11px;line-height:1.7;color:#14664f;text-decoration:underline;text-underline-offset:3px}
+.cp-seller-evidence{font-size:11px;color:#4b6655;margin:2px 0}
+.cp-review-evidence:focus-visible,.cp-seller-evidence a:focus-visible,.cp-three-way a:focus-visible,.cp-three-way button:focus-visible{outline:3px solid #318467;outline-offset:3px}
+@media(max-width:750px){.cp-three-way-grid{grid-template-columns:1fr}.cp-three-way-shop{gap:6px}.cp-three-way-action button{width:100%}}

@@ -18,6 +18,7 @@ import ComparisonTable from './components/ComparisonTable';
 import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl, buildRakutenSearchAffiliateUrl } from './api';
 import { searchCatalogItems } from './shared/catalogSearch.js';
 import { isSpecificProductQuery } from './shared/productSearchIntent.js';
+import { confidenceAdjustedRating } from './shared/reviewEvidence.js';
 import { CATALOG_FILTER_DEFAULTS, catalogFilterCount, filterCatalogResults } from './shared/catalogFilters.js';
 import './index.css';
 
@@ -74,7 +75,8 @@ export default function App() {
       case 'price-desc': return list.sort((a, b) => b.itemPrice - a.itemPrice);
       case 'effective-asc': return list.sort((a, b) => a.effectivePrice - b.effectivePrice);
       case 'review': return list.sort((a, b) =>
-        b.reviewAverage - a.reviewAverage || b.reviewCount - a.reviewCount);
+        confidenceAdjustedRating(b.reviewAverage,b.reviewCount)-confidenceAdjustedRating(a.reviewAverage,a.reviewCount)
+        || b.reviewCount-a.reviewCount || a.itemPrice-b.itemPrice);
       case 'review-count': return list.sort((a, b) => b.reviewCount - a.reviewCount);
       default: return list; // Yahoo! API's official recommendation/search relevance order
     }
@@ -277,7 +279,7 @@ export default function App() {
                 <option value="effective-asc">ポイント考慮後の参考額順</option>
                 <option value="price-asc">価格が安い順</option>
                 <option value="price-desc">価格が高い順</option>
-                <option value="review">レビュー評価順</option>
+                <option value="review">口コミの評価順（投稿件数を考慮）</option>
                 <option value="review-count">レビュー件数順</option>
               </select>
               <div className="view-toggle">

@@ -182,3 +182,9 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
  .hl-catalog-filters>.hl-shipping-checkbox{grid-column:1/-1;max-width:none}
  .hl-reset-filters{grid-column:1/-1}
 }
+
+
+/* Verifiable product reviews and separate seller reputation in shopping cards. */
+.product-review-source,.product-seller-review a{display:inline-flex;min-height:24px;align-items:center;font-size:11px;color:#14664f;text-decoration:underline;text-underline-offset:3px;margin-left:5px}
+.product-seller-review{color:#4f6b59;font-size:11px;line-height:1.65;margin:5px 0}
+.product-review-source:focus-visible,.product-seller-review a:focus-visible{outline:3px solid #318467;outline-offset:2px}

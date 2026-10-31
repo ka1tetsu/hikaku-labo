@@ -1,1 +1,3 @@
 .vl-footer-links{max-width:1200px;margin:24px auto;padding:20px;display:flex;justify-content:center;flex-wrap:wrap;gap:14px 24px;border-top:1px solid #dce5e1;font:500 12px/1.7 system-ui,sans-serif}.vl-footer-links a{color:inherit;text-decoration:underline;text-underline-offset:4px}.vl-footer-links a:focus-visible{outline:3px solid #167957;outline-offset:4px}
+
+.vl-amazon-associate-notice{max-width:1180px;margin:0 auto;padding:0 18px 18px;color:#476456;font-size:12px;line-height:1.7}

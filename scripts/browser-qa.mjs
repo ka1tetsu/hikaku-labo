@@ -160,6 +160,41 @@ try{
    if(!(await page.locator('.cp-watch-list').innerText()).includes('¥30,000'))throw Error('Price target did not persist locally');
    await watch.screenshot({path:path.join(out,'interaction-price-target-mobile.png'),animations:'disabled'});
  });
+ await interaction('amazon-review-evidence-manual-handoff',{width:375,height:812},async page=>{
+   const offer=(price,store='yahoo')=>({
+     store,storeName:store==='yahoo'?'Yahoo!ショッピング':'楽天市場',shopName:'サンプル販売店',
+     title:'SONY WH-1000XM5',price,point:0,effectivePrice:price,
+     url:store==='yahoo'?'https://store.shopping.yahoo.co.jp/store/1.html':'https://item.rakuten.co.jp/store/1/',
+     sponsored:false,image:'',reviewAverage:4.5,reviewCount:120,
+     reviewUrl:store==='yahoo'?'https://shopping.yahoo.co.jp/review/item/list?store_id=store&page_key=1':null,
+     sellerReviewAverage:4.8,sellerReviewCount:200,
+     storeUrl:store==='yahoo'?'https://store.shopping.yahoo.co.jp/store/':null,
+     shippingStatus:'free',sameProduct:true,matchBasis:'model',sourceRank:0
+   });
+   await page.route('**/api/compare?**',route=>route.fulfill({
+     status:200,contentType:'application/json',
+     body:JSON.stringify({sources:{yahoo:'ok',rakuten:'ok'},mode:'price',pageCount:1,
+       fetchedAt:'2026-10-31T09:00:00.000Z',offers:[offer(31900),offer(33300,'rakuten')]})
+   }));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-three-way-amazon').waitFor({timeout:10000});
+   if(!(await page.locator('.cp-three-way-amazon').innerText()).includes('価格・星評価は未取得')) throw Error('Amazon false price/ratings claim');
+   const amz=page.locator('.cp-three-way-amazon a');
+   if(!(await amz.getAttribute('href')).includes('amazon.co.jp')) throw Error('Amazon search action broken');
+   const review=page.locator('.cp-review-evidence').first();
+   if(!(await review.getAttribute('href')).startsWith('https://shopping.yahoo.co.jp/review/')) throw Error('Official product review URL missing');
+   if(!(await page.locator('.cp-seller-evidence').first().innerText()).includes('販売店の評価')) throw Error('Seller feedback not separate');
+   await page.getByRole('button',{name:'Amazonの価格を入力して3社比較する'}).click();
+   await page.locator('#cp-manual form').waitFor({timeout:5000});
+   if(!(await page.locator('#cp-manual form').innerText()).includes('Amazon')) throw Error('Amazon manual price entry did not open');
+   if(!(await page.locator('.cp-three-way-shop').first().innerText()).includes('¥33,300')) {
+     // Source order does not matter; compare display must include both known source prices.
+     const content=await page.locator('.cp-three-way').innerText();
+     if(!content.includes('¥31,900')||!content.includes('¥33,300'))throw Error('Retrieved source prices not displayed');
+   }
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Amazon/review panel overflow '+overflow+'px');
+ });
  await interaction('shopping-purchase-choice-mobile',{width:375,height:812},async page=>{
    const makeOffer=(shop,price,shippingStatus,url)=>({
      store:'yahoo',storeName:'Yahoo!ショッピング',shopName:shop,

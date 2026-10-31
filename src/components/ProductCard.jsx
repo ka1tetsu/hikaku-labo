@@ -69,14 +69,19 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     {item.reviewCount > 0 ? (
                         <div className="product-review">
                             <StarRating score={item.reviewAverage} />
-                            <span className="review-count">({item.reviewCount.toLocaleString()}件のレビュー)</span>
+                            <span className="review-count">商品口コミ（{item.reviewCount.toLocaleString('ja-JP')}件・取得元の評価）</span>
+                            {item.reviewUrl && <a className="product-review-source" href={item.reviewUrl} target="_blank" rel="noopener noreferrer">口コミを原文で読む ↗</a>}
                         </div>
                     ) : (
-                        <div className="product-review no-review">レビューなし</div>
+                        <div className="product-review no-review">商品口コミ評価は未取得</div>
                     )}
+                    {item.sellerReviewCount>0 && <p className="product-seller-review">販売店の評価 ★{item.sellerReviewAverage.toFixed(1)}（{item.sellerReviewCount.toLocaleString('ja-JP')}件）{item.storeUrl && <a href={item.storeUrl} target="_blank" rel="noopener noreferrer">店舗情報 ↗</a>}</p>}
                 </div>
 
                 <div className="product-features">
+                    {item.condition === 'new' && <span className="feature-tag">新品（取得元の表示）</span>}
+                    {item.condition === 'used' && <span className="feature-tag">中古（取得元の表示）</span>}
+                    {item.inStock === false && <span className="feature-tag muted">在庫なし（取得時点）</span>}
                     <span className={`feature-tag ${item.isFreeShipping ? '' : 'muted'}`}>
                         {item.isFreeShipping ? '送料無料' : item.shippingStatus === 'conditional' ? '条件付き送料無料（条件要確認）' : item.postageFlag === 1 ? '送料別' : '送料情報未取得'}
                     </span>

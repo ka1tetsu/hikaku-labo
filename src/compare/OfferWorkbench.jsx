@@ -33,10 +33,13 @@ export function OfferShortlist({offers,onRemove,onClear}){
   const rows=[
     {name:'商品価格（支払額の一部）',get:o=>yen(o.price)},
     {name:'送料',get:shippingLabel},
+    {name:'商品状態',get:o=>o.condition==='new'?'新品（取得元の表示）':o.condition==='used'?'中古（取得元の表示）':'未取得'},
+    {name:'在庫',get:o=>o.inStock===true?'あり（取得時点）':o.inStock===false?'なし（取得時点）':'未取得'},
     {name:'ポイント相当額',get:o=>(o.point||0).toLocaleString('ja-JP')+'pt（現金値引きではない）'},
     {name:'型番・JAN照合',get:o=>o.matchBasis==='jan'?'JAN一致':o.matchBasis==='model'?'型番一致（色・容量未照合）':'商品名が類似・未照合'},
     {name:'販売店',get:o=>o.shopName||'店舗名未取得'},
-    {name:'口コミ',get:o=>o.reviewCount>0?'★'+o.reviewAverage.toFixed(1)+' / '+o.reviewCount+'件':'未取得'},
+    {name:'商品口コミ（取得元別）',get:o=>o.reviewCount>0?'★'+o.reviewAverage.toFixed(1)+' / '+o.reviewCount+'件':'未取得'},
+    {name:'店舗評価（商品評価とは別）',get:o=>o.sellerReviewCount>0?'★'+o.sellerReviewAverage.toFixed(1)+' / '+o.sellerReviewCount+'件':'未取得'},
   ];
   return <section className="cp-shortlist" aria-labelledby="cp-shortlist-title">
     <div className="cp-shortlist-head"><div><span>購入先を決める前に</span><h3 id="cp-shortlist-title">選んだ{offers.length}件を並べて確認</h3></div>
