@@ -160,6 +160,35 @@ try{
    if(!(await page.locator('.cp-watch-list').innerText()).includes('¥30,000'))throw Error('Price target did not persist locally');
    await watch.screenshot({path:path.join(out,'interaction-price-target-mobile.png'),animations:'disabled'});
  });
+ await interaction('shopping-purchase-choice-mobile',{width:375,height:812},async page=>{
+   const makeOffer=(shop,price,shippingStatus,url)=>({
+     store:'yahoo',storeName:'Yahoo!ショッピング',shopName:shop,
+     title:'ソニー WH-1000XM5 ヘッドホン '+shop,price,point:300,
+     pointKind:'paypay-limited',effectivePrice:price-300,shippingStatus,shippingFree:shippingStatus==='free',
+     image:'',url,sponsored:true,reviewAverage:4.5,reviewCount:80,matchBasis:'model',sameProduct:true,
+   });
+   await page.route('**/api/compare?**',route=>route.fulfill({
+     status:200,contentType:'application/json',
+     body:JSON.stringify({
+       sources:{rakuten:'error',yahoo:'ok'},fetchedAt:'2026-10-31T06:00:00.000Z',
+       offers:[makeOffer('A店',20000,'unknown','https://store.shopping.yahoo.co.jp/a/1.html'),
+         makeOffer('B店',21100,'free','https://store.shopping.yahoo.co.jp/b/2.html')]
+     }),
+   }));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-choice-link').first().waitFor({timeout:8000});
+   const choiceCards=page.locator('.cp-choice-option');
+   if(await choiceCards.count()!==2)throw Error('Missing cash and free shipping decision paths');
+   if(!(await choiceCards.first().innerText()).includes('¥20,000'))throw Error('Cheapest cash candidate not featured');
+   if(!(await choiceCards.nth(1).innerText()).includes('送料無料'))throw Error('Free-shipping alternative missing');
+   if(!(await page.locator('.cp-provider-notice').innerText()).includes('楽天市場は今回取得できませんでした'))throw Error('Provider outage hidden');
+   const link=await choiceCards.first().locator('a').getAttribute('href');
+   if(!link?.startsWith('https://store.shopping.yahoo.co.jp/'))throw Error('Source link not retained');
+   if(!(await choiceCards.first().locator('a').getAttribute('rel')).includes('sponsored'))throw Error('PR link disclosure missing');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Mobile purchase choice overflow '+overflow+'px');
+   await page.locator('.cp-choice').screenshot({path:path.join(out,'interaction-purchase-choice-mobile.png'),animations:'disabled'});
+ });
  await interaction('price-search',{width:1440,height:900},async page=>{
    await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
    await page.locator('#cp-q').fill('WH-1000XM5');
