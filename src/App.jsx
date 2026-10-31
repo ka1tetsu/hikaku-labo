@@ -79,8 +79,8 @@ export default function App() {
   // 実質価格が最安の商品（同額なら先頭）
   const cheapestCode = useMemo(() => {
     if (products.length === 0 || !isSpecificProductQuery(query)) return null;
-    return products.reduce((min, p) => (p.itemPrice < min.itemPrice ? p : min)).itemCode;
-  }, [products,query]);
+    return products.reduce((min, p) => ((sortMode==='effective-asc'?p.effectivePrice:p.itemPrice) < (sortMode==='effective-asc'?min.effectivePrice:min.itemPrice) ? p : min)).itemCode;
+  }, [products,query,sortMode]);
 
   const doSearch = useCallback(async (kw, genre, pg = 1, options = {}) => {
     if (!kw && !genre) return;
@@ -335,6 +335,7 @@ export default function App() {
                   isSelected={compareList.some(p => p.itemCode === item.itemCode)}
                   onToggleCompare={toggleCompare}
                   isCheapest={item.itemCode === cheapestCode}
+                  isPointSorted={sortMode === 'effective-asc'}
                 />
               ))}
             </div>
