@@ -189,6 +189,54 @@ try{
    if(overflow>3)throw Error('Mobile purchase choice overflow '+overflow+'px');
    await page.locator('.cp-choice').screenshot({path:path.join(out,'interaction-purchase-choice-mobile.png'),animations:'disabled'});
  });
+ await interaction('yahoo-home-recommendations-mobile',{width:375,height:812},async page=>{
+   await page.route('**/api/compare?**',route=>{
+     const url=new URL(route.request().url());
+     if(url.searchParams.get('mode')!=='recommended')throw Error('Home discovery did not request recommendation mode');
+     const offer=(price,rank)=>({store:'yahoo',storeName:'Yahoo!ショッピング',shopName:'テスト店',title:'ワイヤレスイヤホン '+rank,price,point:0,effectivePrice:price,
+       url:'https://store.shopping.yahoo.co.jp/qa/'+rank+'.html',sponsored:true,image:'',reviewAverage:4.0,reviewCount:1,
+       shippingStatus:'unknown',sameProduct:false,matchBasis:'unverified',sourceRank:rank});
+     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sources:{rakuten:'skipped',yahoo:'ok'},mode:'recommended',pageCount:1,offers:[offer(9000,0),offer(7000,1)]})});
+   });
+   await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
+   await page.locator('.product-card').first().waitFor({timeout:10000});
+   const cards=page.locator('.product-card');
+   if(await cards.count()!==2)throw Error('Yahoo offers missing from home');
+   if(!(await cards.first().innerText()).includes('¥9,000'))throw Error('Relevance rank lost in discovery');
+   const link=await cards.first().locator('.btn-primary-cta').getAttribute('href');
+   if(!link?.includes('store.shopping.yahoo.co.jp/qa/0.html'))throw Error('Yahoo product was misrouted to Rakuten/Amazon');
+   if(!(await page.locator('.hl-travel-priority').innerText()).includes('航空券'))throw Error('Travel priority entry not visible');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Home horizontal overflow '+overflow+'px');
+ });
+ await interaction('model-search-ascending-yahoo',{width:1440,height:900},async page=>{
+   await page.route('**/api/compare?**',route=>{
+     const url=new URL(route.request().url());
+     if(url.searchParams.get('mode')!=='price')throw Error('Exact model did not request price sorting');
+     const offer=(price)=>({store:'yahoo',storeName:'Yahoo!ショッピング',shopName:'テスト店',title:'ソニー WH-1000XM5',price,point:0,effectivePrice:price,
+       url:'https://store.shopping.yahoo.co.jp/qa/'+price+'.html',sponsored:false,image:'',reviewAverage:4.5,reviewCount:20,
+       shippingStatus:'free',sameProduct:true,matchBasis:'model'});
+     return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sources:{rakuten:'error',yahoo:'ok'},mode:'price',pageCount:1,offers:[offer(45000),offer(31000)]})});
+   });
+   await page.goto(origin+'/?keyword=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.product-card').first().waitFor({timeout:10000});
+   if((await page.locator('.sort-select').inputValue())!=='price-asc')throw Error('Exact model must default to cash price');
+   if(!(await page.locator('.product-card').first().innerText()).includes('¥31,000'))throw Error('Price ascending lost');
+   if(!(await page.locator('.hl-provider-status').innerText()).includes('楽天市場 取得できませんでした'))throw Error('Rakuten outage hidden');
+ });
+ await interaction('travel-booking-hub-first',{width:375,height:812},async page=>{
+   await page.goto(origin+'/travel/?destination=naha',{waitUntil:'domcontentloaded'});
+   await page.locator('#booking').waitFor({timeout:10000});
+   if(!(await page.locator('#booking h3').innerText()).includes('那覇'))throw Error('Requested city not shown in booking hub');
+   if(!(await page.locator('.tvw-google-discovery').innerText()).includes('Google'))throw Error('Google discovery links absent');
+   const pos=await page.evaluate(()=>({
+     booking:[...document.querySelectorAll('*')].indexOf(document.querySelector('#booking')),
+     itinerary:[...document.querySelectorAll('*')].indexOf(document.querySelector('.tvx-itinerary')),
+   }));
+   if(pos.booking<0||pos.itinerary<0||pos.booking>pos.itinerary)throw Error('Booking hub still appears after itinerary');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Travel hub horizontal overflow '+overflow+'px');
+ });
  await interaction('price-search',{width:1440,height:900},async page=>{
    await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
    await page.locator('#cp-q').fill('WH-1000XM5');
