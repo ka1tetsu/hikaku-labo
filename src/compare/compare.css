@@ -325,3 +325,7 @@ body{margin:0}
 #cp-offer-list{scroll-margin-top:18px}
 @media(max-width:800px){.cp-research-list{grid-template-columns:1fr}.cp-research-coverage{max-width:none;width:100%}}
 @media(max-width:480px){.cp-research-item{grid-template-columns:minmax(0,1fr) 116px}.cp-research-other>a{width:100%}.cp-research-preset button{flex:1 1 100%}}
+
+.cp-filter-recovery{padding:14px;border-top:1px solid #cadace;border-bottom:1px solid #cadace;margin:16px 0}
+.cp-filter-recovery p{font-size:13px;line-height:1.8}
+.cp-filter-recovery button{min-height:44px;border:1px solid #a1c9b5;background:#fff;color:#17593e;padding:10px 14px;font-weight:800;cursor:pointer}
