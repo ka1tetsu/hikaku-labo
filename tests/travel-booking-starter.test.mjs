@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validBooking } from '../src/travel/BookingStarter.jsx';
+import { validBooking } from '../src/travel/bookingStarter.js';
 import { buildStayLinks } from '../src/travel/bookingLinks.js';
 const sample={place:'京都駅',checkin:'2026-11-09',checkout:'2026-11-11',adults:2,rooms:1};
 test('explicit valid travel buyer conditions preserve date and guests',()=>{
