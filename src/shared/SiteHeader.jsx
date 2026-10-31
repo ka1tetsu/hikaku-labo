@@ -22,7 +22,7 @@ export default function SiteHeader({ active = 'products', children }) {
           ><img src={'/icons/tabler/' + section.icon + '.svg'} alt="" aria-hidden="true" width="18" height="18"/><span>{section.nav}</span></a>)}
         </nav>
         <button type="button" className="hl-header-ai" onClick={() => openConcierge()}><span aria-hidden="true">✳</span> 条件から相談</button>
-        <a className="hl-header-link" href={active === 'travel' ? '/travel/#destinations' : '/life/#savings'}>{active === 'travel' ? '旅行先を探す' : '固定費を診断'} <img src="/icons/tabler/arrow-up-right.svg" alt="" aria-hidden="true" width="16" height="16"/></a>
+        <a className="hl-header-link" href={active === 'travel' ? '/travel/#booking' : '/life/#savings'}>{active === 'travel' ? '航空券・宿を比較' : '固定費を診断'} <img src="/icons/tabler/arrow-up-right.svg" alt="" aria-hidden="true" width="16" height="16"/></a>
       </div>
     </div>
     <details className="hl-evidence-details"><summary><strong>{evidence.title}</strong><span>{evidence.short}</span></summary><dl>
