@@ -99,7 +99,7 @@ export default function ComparePage() {
   const similar = offers.filter(o => !o.sameProduct);
   const main = same.length ? same : similar;
   const rest = same.length ? similar : [];
-  const cheapest = main[0];
+  const cheapest = main.length? [...main].sort((a,b)=>displayValue(a,priceSort==='points'?'points':'cash')-displayValue(b,priceSort==='points'?'points':'cash'))[0]:null;
   const range = displayRange(main, priceSort);
   const searchTerm = query.q || query.jan || input.trim();
   const stores = storeLinks(searchTerm, { env: ENV, reference: query.ref });
