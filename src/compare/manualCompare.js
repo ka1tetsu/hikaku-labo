@@ -6,6 +6,7 @@ export const MANUAL_STORES = Object.freeze(['rakuten', 'amazon', 'yahoo-shopping
 export const EXTRA_MANUAL_STORES = Object.freeze([
   'au-pay','qoo10','yodobashi','biccamera','apple','iherb',
   'mercari','rakuma','paypay-fleamarket',
+  'edion','joshin','nojima','sofmap','kojima','tsukumo',
 ]);
 export const ALL_MANUAL_STORES = Object.freeze([...MANUAL_STORES,...EXTRA_MANUAL_STORES]);
 const amount = value => {
