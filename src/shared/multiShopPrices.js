@@ -4,7 +4,6 @@
 // affirmative same-product confirmation. Unknowns are never treated as ¥0.
 import { manualOfferCost } from '../compare/manualCompare.js';
 
-const yen = n => Number.isFinite(n) && n >= 0 ? n : null;
 const validOffer = o => o?.sameProduct === true &&
   ['jan','model'].includes(o?.matchBasis) &&
   Number.isSafeInteger(o.price) && o.price > 0 &&
