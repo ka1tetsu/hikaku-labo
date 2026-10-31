@@ -146,3 +146,16 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
 
 /* Editorial hero proportions: prevent isolated trailing syllables on wide screens. */
 .hl-directory h1{font-size:clamp(30px,3.3vw,44px);line-height:1.35}
+
+
+/* Visible route to flight/hotel research before merchandise categories. */
+.hl-travel-priority{display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:1180px;margin:16px auto 8px;padding:14px 18px;background:#f5faf6;border:1px solid #cbded1;border-radius:8px;color:#18432d}
+.hl-travel-priority>div{flex:1 1 350px}
+.hl-travel-priority span{display:block;color:#4b725b;font-weight:800;font-size:10px;letter-spacing:.09em}
+.hl-travel-priority strong{display:block;font-size:16px;line-height:1.45}
+.hl-travel-priority p{font-size:11px;line-height:1.7;color:#3e5c4d;margin:3px 0 0}
+.hl-travel-priority a{padding:11px 14px;font-size:12px;line-height:1.45;font-weight:800;min-height:44px;display:flex;align-items:center;justify-content:center;color:#135a3d;border:1px solid #a7c4b4;background:#fff;border-radius:5px}
+.hl-travel-priority a:first-of-type{background:#14664f;color:#fff;border-color:#14664f}
+.hl-provider-status,.hl-match-status{font-size:12px;line-height:1.7;padding:5px 0;color:#486653}
+.product-offer-source{font-size:11px;line-height:1.65;color:#3d6049;margin:4px 0}
+@media(max-width:760px){.hl-travel-priority{margin:10px 12px}.hl-travel-priority a{flex:1 1 100%}}
