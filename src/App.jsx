@@ -15,7 +15,9 @@ import CategoryNav from './components/CategoryNav';
 import RankingSection from './components/RankingSection';
 import ArticleSection from './components/ArticleSection';
 import ComparisonTable from './components/ComparisonTable';
-import { searchRakutenItems, buildAmazonAffiliateUrl, buildYahooAffiliateUrl, buildRakutenSearchAffiliateUrl } from './api';
+import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl, buildRakutenSearchAffiliateUrl } from './api';
+import { searchCatalogItems } from './shared/catalogSearch.js';
+import { isSpecificProductQuery } from './shared/productSearchIntent.js';
 import './index.css';
 
 const CATEGORIES = [
@@ -35,6 +37,8 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [providerSources, setProviderSources] = useState({});
+  const [verifiedOnly,setVerifiedOnly]=useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -74,9 +78,9 @@ export default function App() {
 
   // 実質価格が最安の商品（同額なら先頭）
   const cheapestCode = useMemo(() => {
-    if (products.length === 0) return null;
-    return products.reduce((min, p) => (p.effectivePrice < min.effectivePrice ? p : min)).itemCode;
-  }, [products]);
+    if (products.length === 0 || !isSpecificProductQuery(query)) return null;
+    return products.reduce((min, p) => (p.itemPrice < min.itemPrice ? p : min)).itemCode;
+  }, [products,query]);
 
   const doSearch = useCallback(async (kw, genre, pg = 1, options = {}) => {
     if (!kw && !genre) return;
@@ -88,15 +92,18 @@ export default function App() {
     setError(null);
     document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     try {
-      const data = await searchRakutenItems(kw, genre, pg, { ...options, signal: controller.signal });
+      const data = await searchCatalogItems(kw, genre, pg, { ...options, signal: controller.signal });
       if (controller.signal.aborted) return;
       setProducts(data.items);
+      setProviderSources(data.sources);
+      setVerifiedOnly(data.verifiedOnly);
       setTotalPages(Math.min(data.pageCount, 100));
       setPage(pg);
     } catch (e) {
       if (controller.signal.aborted) return;
       setError(e.message || '商品データの取得に失敗しました。');
       setProducts([]);
+      setProviderSources({});
     } finally {
       if (searchController.current === controller && !controller.signal.aborted) setLoading(false);
     }
@@ -128,6 +135,7 @@ export default function App() {
       setQuery(kw);
       setActiveCategory(null);
       setSmart(null);
+      setSortMode(isSpecificProductQuery(kw)?'price-asc':'popular');
       doSearch(kw, '', 1);
       document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
@@ -143,12 +151,15 @@ export default function App() {
     if (!interpreted) {
       setSmart(null);
       setQuery(text);
+      setSortMode(isSpecificProductQuery(text)?'price-asc':'popular');
       doSearch(text, '', 1);
       return;
     }
     const options = { minPrice: request.minPrice, maxPrice: request.maxPrice, sort: request.sort, freeShipping: request.freeShipping };
     setSmart({ original: text, keyword: request.keyword, options, summary: describeProductRequest(request), alternatives: request.need ? request.need.keywords.filter(k => k !== request.keyword) : [] });
-    if (request.sort === '+itemPrice') setSortMode('effective-asc');
+    if (request.sort === '+itemPrice') setSortMode('price-asc');
+    else if (isSpecificProductQuery(request.keyword)) setSortMode('price-asc');
+    else if (request.sort !== '-reviewAverage') setSortMode('popular');
     if (request.sort === '-reviewAverage') setSortMode('review');
     setQuery(request.keyword);
     doSearch(request.keyword, '', 1, options);
@@ -163,12 +174,14 @@ export default function App() {
   const searchAlternative = (keyword) => {
     setSmart(current => current && { ...current, keyword, alternatives: [current.keyword, ...current.alternatives.filter(k => k !== keyword)] });
     setQuery(keyword);
+    setSortMode(isSpecificProductQuery(keyword)?'price-asc':'popular');
     doSearch(keyword, '', 1, smart?.options || {});
   };
 
   const handleCategory = (cat) => {
     setSmart(null);
     setActiveCategory(cat);
+    setSortMode('popular');
     setQuery('');
     setInputValue('');
     doSearch(cat.label, cat.genreId, 1);
@@ -192,6 +205,12 @@ export default function App() {
         onSearch={handleSearch}
       />
 
+      <section className="hl-travel-priority" aria-label="旅行比較へのクイックアクセス">
+        <div><span>FLIGHTS &amp; STAYS</span><strong>航空券とホテルを、旅行先・日付・人数から比較</strong>
+          <p>Google フライト・楽天トラベル・Booking.comほか、掲載予約サイトへの検索条件を引き継ぎます。価格は各予約先で確認。</p></div>
+        <a href="/travel/?destination=naha#booking">那覇の航空券・ホテルを探す →</a>
+        <a href="/travel/#global-travel-compare">すべての掲載予約サイトを比較 →</a>
+      </section>
       <CategoryNav
         categories={CATEGORIES}
         activeCategory={activeCategory}
@@ -220,7 +239,9 @@ export default function App() {
         </div>
 
         <div className="results-header" id="results">
-          <div className="hl-results-heading"><span className="hl-kicker"><span className="hl-kicker-dot"/> PRODUCT RESEARCH</span><h2 className="results-title">{searchTitle}</h2><p className="hl-results-caption">商品情報は楽天市場の取得時点のものです。最新の価格や送料、ポイント条件は販売ページでご確認ください。</p></div>
+          <div className="hl-results-heading"><span className="hl-kicker"><span className="hl-kicker-dot"/> PRODUCT RESEARCH</span><h2 className="results-title">{searchTitle}</h2><p className="hl-results-caption">楽天市場・Yahoo!ショッピングの取得できた公式API出品を表示します。送料・在庫・ポイント条件はショップで再確認してください。</p>
+            {hasSearched && !loading && <p className="hl-provider-status" role="status">取得状況：Yahoo!ショッピング {providerSources.yahoo==='ok'?'取得できました':providerSources.yahoo==='error'?'取得できませんでした':'未接続'} ／ 楽天市場 {providerSources.rakuten==='ok'?'取得できました':providerSources.rakuten==='error'?'取得できませんでした':'未接続'}。表示していないモールの価格は含みません。</p>}
+            {hasSearched && !loading && verifiedOnly && <p className="hl-match-status">型番・JAN一致を確認できた出品を優先。色・容量・セット内容は購入先で確認してください。</p>}</div>
           {products.length > 0 && (
             <div className="results-controls">
               <select
@@ -229,8 +250,8 @@ export default function App() {
                 onChange={e => setSortMode(e.target.value)}
                 className="sort-select"
               >
-                <option value="popular">楽天の標準順</option>
-                <option value="effective-asc">実質価格が安い順（ポイント還元後）</option>
+                <option value="popular">おすすめ順（取得元の関連度）</option>
+                <option value="effective-asc">ポイント考慮後の参考額順</option>
                 <option value="price-asc">価格が安い順</option>
                 <option value="price-desc">価格が高い順</option>
                 <option value="review">レビュー評価順</option>
@@ -276,8 +297,10 @@ export default function App() {
 
         {error && (
           <div className="error-box">
-            <strong>商品データを取得できませんでした。</strong>
-            <p>現在、商品情報を読み込めません。上のショップ検索から価格・在庫を直接確認できます。</p>
+            <strong>今回、公式APIの商品情報を取得できませんでした。</strong>
+            <p>楽天が停止していてもYahoo!の出品を表示できるように修正しました。両方取得できない場合は下のGoogle検索またはショップの検索結果で探せます。</p>
+            <a href={'https://www.google.com/search?q='+encodeURIComponent((query||activeCategory?.label||'商品')+' 価格 比較')} target="_blank" rel="noopener noreferrer">Googleでショップを横断検索 ↗</a>
+            <a href={'/compare/?q='+encodeURIComponent(query||activeCategory?.label||'')} >商品価格比較ページで探す →</a>
             <button type="button" className="page-btn" onClick={() => doSearch(query || activeCategory?.label || 'おすすめ 人気', activeCategory?.genreId || '', page, smart?.options || {})}>もう一度読み込む</button>
           </div>
         )}
