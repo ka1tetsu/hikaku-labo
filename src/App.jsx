@@ -117,11 +117,16 @@ export default function App() {
     const genre = params.get('genreId') || '';
 
     if (kw || genre) {
+      setSortMode(isSpecificProductQuery(kw)?'price-asc':'popular');
       setInputValue(kw);
       setQuery(kw);
       const matched = CATEGORIES.find(c => c.genreId === genre);
       if (matched) setActiveCategory(matched);
       doSearch(kw || matched?.label || '', genre, 1);
+    } else {
+      // Load a clearly identified popular category, not fabricated recommendations.
+      setQuery('ワイヤレスイヤホン');
+      doSearch('ワイヤレスイヤホン', '', 1);
     }
   }, [doSearch]);
 
@@ -195,7 +200,7 @@ export default function App() {
     ? `「${activeCategory.label}」の掲載商品・価格一覧`
     : query
       ? `「${query}」の検索結果`
-      : '商品名・型番から価格を調べる';
+      : 'おすすめ商品を探す';
 
   return (
     <div className="app-wrapper">
@@ -240,7 +245,7 @@ export default function App() {
 
         <div className="results-header" id="results">
           <div className="hl-results-heading"><span className="hl-kicker"><span className="hl-kicker-dot"/> PRODUCT RESEARCH</span><h2 className="results-title">{searchTitle}</h2><p className="hl-results-caption">楽天市場・Yahoo!ショッピングの取得できた公式API出品を表示します。送料・在庫・ポイント条件はショップで再確認してください。</p>
-            {hasSearched && !loading && <p className="hl-provider-status" role="status">取得状況：Yahoo!ショッピング {providerSources.yahoo==='ok'?'取得できました':providerSources.yahoo==='error'?'取得できませんでした':'未接続'} ／ 楽天市場 {providerSources.rakuten==='ok'?'取得できました':providerSources.rakuten==='error'?'取得できませんでした':'未接続'}。表示していないモールの価格は含みません。</p>}
+            {hasSearched && !loading && <p className="hl-provider-status" role="status">取得状況：Yahoo!ショッピング {providerSources.yahoo==='ok'?'取得できました':providerSources.yahoo==='error'?'取得できませんでした':'未接続'} ／ 楽天市場 {providerSources.rakuten==='ok'?'取得できました':providerSources.rakuten==='error'?'取得できませんでした':providerSources.rakuten==='skipped'?'おすすめ検索では対象外':'未接続'}。表示していないモールの価格は含みません。</p>}
             {hasSearched && !loading && verifiedOnly && <p className="hl-match-status">型番・JAN一致を確認できた出品を優先。色・容量・セット内容は購入先で確認してください。</p>}</div>
           {products.length > 0 && (
             <div className="results-controls">
@@ -307,7 +312,7 @@ export default function App() {
 
         {!loading && !error && hasSearched && products.length === 0 && (
           <div className="empty-state">
-            <p>🔍 商品が見つかりませんでした。別のキーワードをお試しください。</p>
+            <p>{Object.values(providerSources).some(s=>s==='ok')?'今回の条件では該当商品を取得できませんでした。型番やキーワードを変更するか各ショップで検索してください。':'今回、取得元のAPIから出品を取得できませんでした。Google検索・Yahoo!・楽天のリンクから直接確認できます。'}</p>
           </div>
         )}
 
