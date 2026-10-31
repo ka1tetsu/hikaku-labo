@@ -49,12 +49,12 @@ export default function ShopPriceBoard({offers=[],stores=[],onOpenManual}) {
     </details>}
     <div className="cp-allshops-web">
       <div className="cp-allshops-web-head"><h4>他の通販サイトでも同じ型番を探す</h4>
-        <p>以下は公式サイトの検索結果へのリンクです。未接続サイトの価格・口コミは自動取得していません。</p></div>
+        <p>各社の検索ページまたは公式サイト内に絞ったGoogle検索へ移動します。未接続サイトの価格・口コミは自動取得していません。</p></div>
       <div className="cp-allshops-web-grid">
         {stores.map(store=><a key={store.id} href={store.url} target="_blank"
           rel={store.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
           onClick={()=>recordOutboundClick({section:'products',merchant:store.id,placement:'multistore-search',sponsored:store.sponsored})}>
-          <strong>{store.name}</strong><span>価格を調べる ↗{store.sponsored&&<small> PR</small>}</span>
+          <strong>{store.name}</strong><span>{store.viaGoogle?'Googleで公式サイトを探す':'価格を調べる'} ↗{store.sponsored&&<small> PR</small>}</span>
         </a>)}
       </div>
     </div>
