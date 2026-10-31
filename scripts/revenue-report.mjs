@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import { merchantFinancials } from './merchant-financials.mjs';
 import { affiliateEnvKey } from '../src/shared/affiliateConfig.js';
 import { SERVICE_IDS } from '../src/services/catalog.js';
 import { SERVICES } from '../src/tools/catalog.js';
@@ -27,7 +28,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
   const pages = new Map(), placements = new Map(), merchants = new Map();
   let unattributedClicks = 0, ignoredRecords = 0, includedRecords = 0;
   const rowFor = page => {
-    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0, travelQuotesReady: 0, travelQuoteBookingClicks: 0, travelCancellationReviews: 0, productManualReady: 0, productManualResearchClicks: 0, productManualResultClicks: 0, travelDirectSearchClicks: 0 });
+    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0, travelQuotesReady: 0, travelQuoteBookingClicks: 0, travelCancellationReviews: 0, productManualReady: 0, productManualResearchClicks: 0, productManualResultClicks: 0, travelDirectSearchClicks: 0, productSearches: 0, productResultsReady: 0, productOffersSelected: 0, productTargetsSaved: 0 });
     return pages.get(page);
   };
   for (const record of events) {
@@ -55,7 +56,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
       placements.get(key).clicks++;
     } else if (type === 'hikaku_funnel' && validFunnelEvent({ event: 'funnel', ...fields })) {
       const row = rowFor(fields.page);
-      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons', travel_quote_ready: 'travelQuotesReady', travel_cancellation_review: 'travelCancellationReviews', product_manual_ready: 'productManualReady' }[fields.action];
+      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons', travel_quote_ready: 'travelQuotesReady', travel_cancellation_review: 'travelCancellationReviews', product_manual_ready: 'productManualReady', product_search: 'productSearches', product_results_ready: 'productResultsReady', product_offer_selected: 'productOffersSelected', product_target_saved: 'productTargetsSaved' }[fields.action];
       if (counter) row[counter]++;
        else { ignoredRecords++; continue; }
     } else { ignoredRecords++; continue; }
@@ -68,8 +69,15 @@ export function revenueReport(events, { from, to, finance } = {}) {
     if (![confirmedCommission, operatingCosts].every(n => typeof n === 'number' && Number.isFinite(n) && n >= 0)) throw new Error('Use nonnegative numeric confirmedCommission and operatingCosts in JPY.');
     financials = { confirmedCommission, operatingCosts, profit: confirmedCommission - operatingCosts, currency: 'JPY', source: 'owner-supplied settlement and cost totals; not independently verified' };
   }
+  const settlement = merchantFinancials(finance);
   const configurable = new Set([...SERVICE_IDS, ...SERVICES.map(service => service.id)]);
   const nextActions = [];
+  if (!financials) nextActions.push({ action: 'connect_settlement_totals', message: '確定報酬と実費が未入力のため利益は不明です。同期間のASP精算と運営費を入力してください。' });
+  for (const row of settlement?.merchants || []) if (row.contribution < 0) nextActions.push({ action: 'review_merchant_costs', merchant: row.merchant, contribution: row.contribution, message: '確定報酬が案件の直接費用を下回っています。共通費の配賦前です。承認待ち期間と費用内訳を確認してから追加支出を判断してください。' });
+  for (const row of pages.values()) {
+    if (row.productSearches > 0 && row.productResultsReady === 0) nextActions.push({ action: 'review_product_results', page: row.page, searches: row.productSearches, message: '検索操作はありますが結果表示が記録されていません。価格API・0件検索・計測欠損を確認してください。' });
+    if (row.productResultsReady > 0 && row.outboundClicks === 0) nextActions.push({ action: 'review_product_next_step', page: row.page, resultInteractions: row.productResultsReady, message: '価格結果の表示はありますが送客が記録されていません。商品の一致度・送料条件・購入導線・計測を確認してください。' });
+  }
   if (financials && financials.profit < 0) nextActions.push({ action: 'review_costs', operatingCosts: financials.operatingCosts, confirmedCommission: financials.confirmedCommission, message: '同期間の確定報酬を運営費が上回っています。API・集客費用の内訳を確認してください。' });
   for (const merchant of [...merchants.values()].filter(row => row.officialClicks > 0 && configurable.has(row.merchant)).sort((a, b) => b.officialClicks - a.officialClicks).slice(0, 5)) {
     nextActions.push({ action: 'review_referral_setup', merchant: merchant.merchant, officialClicks: merchant.officialClicks, variable: affiliateEnvKey(merchant.merchant), message: '通常リンクへの送客が記録されています。提携の可否と承認済み素材の設定を確認してください。報酬の取り逃し額を示すものではありません。' });
@@ -85,6 +93,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
     merchants: [...merchants.values()].sort((a, b) => b.clicks - a.clicks),
     nextActions,
     financials,
+    merchantFinancials: settlement,
     notes: ['Clicks are interactions, not people or confirmed sales; clicks per 100 views may exceed 100.', 'Incomplete hosting logs, bots and repeated clicks affect these counts. Compare the same interval.', 'Travel quotes, cancellation checks and manually-entered product calculations count interactions, not people, bookings or revenue.', 'Legacy clicks without page attribution are kept separately. Missing views produce null, not a zero rate.', 'Without owner-supplied settlement and cost totals, profit is unknown.'],
   };
 }
