@@ -220,6 +220,11 @@ export default function ComparePage() {
         {searchTerm && <section className="cp-stores">
           <h2>ほかのショップでも探す</h2>
           <p>同じキーワードの検索結果を開きます。これらのショップは価格を自動取得していないため、価格・送料はリンク先で確認してください。</p>
+          <div className="cp-google-links">
+            <a href={'https://www.google.com/search?hl=ja&q='+encodeURIComponent(searchTerm+' 価格 比較 送料')} target="_blank" rel="noopener noreferrer">Googleですべての公開Web検索結果を探す ↗</a>
+            <a href={'https://www.google.com/search?hl=ja&tbm=shop&q='+encodeURIComponent(searchTerm)} target="_blank" rel="noopener noreferrer">Googleのショッピング検索で探す ↗</a>
+          </div>
+          <p className="cp-note">Googleの検索結果は外部サイトです。当サイトが全店舗の価格・送料・在庫を取得しているわけではありません。</p>
           {Object.entries(MERCHANT_KINDS).map(([kind, label]) => {
             const list = stores.filter(store => store.kind === kind);
             return list.length > 0 && <div key={kind} className="cp-store-group"><h3>{label}</h3><div className="cp-store-grid">{list.map(store =>
