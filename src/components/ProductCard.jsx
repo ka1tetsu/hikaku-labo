@@ -16,7 +16,7 @@ function StarRating({ score }) {
     );
 }
 
-export default function ProductCard({ item, viewMode, isSelected, onToggleCompare, isCheapest }) {
+export default function ProductCard({ item, viewMode, isSelected, onToggleCompare, isCheapest, isPointSorted = false }) {
     // 広告文を除き、型番とブランドを他モールへ引き継ぐ。
     const keyword = deriveProductQuery(item.itemName) || item.itemName;
     const amazonUrl = buildAmazonAffiliateUrl(keyword);
@@ -43,7 +43,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     // 楽天APIは送料額を返さないため、送料別の商品が実質最安になった場合は
                     // 「送料を含まない比較」であることをバッジ自体に明示する
                     <div className={`cheapest-badge ${item.isFreeShipping ? '' : 'with-caveat'}`}>
-                        {item.isFreeShipping ? '型番照合候補の商品価格が最小' : '型番照合候補の商品価格が最小・送料要確認'}
+                        {isPointSorted ? '表示候補の参考額が最小' : item.isFreeShipping ? '型番照合候補の商品価格が最小' : '型番照合候補の商品価格が最小・送料要確認'}
                     </div>
                 )}
                 <a href={bestUrl} target="_blank" rel={primaryRel} className="card-image-link" onClick={() => recordMerchant('product-image')}>
