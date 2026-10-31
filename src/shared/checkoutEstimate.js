@@ -3,7 +3,7 @@
 export function moneyInput(value) {
   const text = String(value ?? '').trim();
   if (!text) return null;
-  if (!/^\\d{1,9}$/.test(text)) return null;
+  if (!/^[0-9]{1,9}$/.test(text)) return null;
   const amount = Number(text);
   return Number.isSafeInteger(amount) && amount <= 999999999 ? amount : null;
 }
