@@ -12,6 +12,7 @@ import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import BuyerChoices from './BuyerChoices.jsx';
 import AmazonComparePanel from './AmazonComparePanel.jsx';
 import ReviewResearchPanel from './ReviewResearchPanel.jsx';
+import PurchaseReasonPanel from './PurchaseReasonPanel.jsx';
 import ShopPriceBoard from './ShopPriceBoard.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
@@ -140,6 +141,12 @@ export default function ComparePage() {
     const id=offerKey(offer);
     return current.includes(id)?current.filter(key=>key!==id):current.length<4?[...current,id]:current;
   });};
+  const chooseFromReview=offer=>{
+    const exists=selectedKeys.includes(offerKey(offer));
+    if(!exists&&selectedKeys.length>=4)return;
+    toggleSelected(offer);
+    if(!exists)requestAnimationFrame(()=>document.getElementById('cp-shortlist-title')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  };
   const visibleMetrics=offerSummary(offers,priceSort);
   const same = offers.filter(o => o.sameProduct);
   const similar = offers.filter(o => !o.sameProduct);
@@ -212,7 +219,9 @@ export default function ComparePage() {
           {visibleMetrics && <p className="cp-result-context" role="status">表示中：{visibleMetrics.count}件／{visibleMetrics.stores}モール、JAN一致{visibleMetrics.evidence}件。型番・JANが確認できない候補は同一商品と断定しません。</p>}
           {!state.loading && <ReviewResearchPanel offers={rawOffers} stores={stores}
             activeReviewMin={filters.reviewMin} activeReviewCount={filters.minReviewCount}
-            onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}/>}
+            onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}
+            onChoose={chooseFromReview} selectedKeys={selectedKeys}/>}
+          {!state.loading && <PurchaseReasonPanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
           {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>} 
           {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
           {cheapest && <div className="cp-summary">
