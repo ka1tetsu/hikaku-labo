@@ -28,6 +28,8 @@ export function catalogFromComparison(data, keyword) {
       sellerReviewAverage: offer.sellerReviewAverage || 0,
       sellerReviewCount: offer.sellerReviewCount || 0,
       storeUrl: offer.storeUrl || null,
+      condition: offer.condition || 'unknown',
+      inStock: offer.inStock ?? null,
       pointRate: 0,
       pointBack: offer.point || 0,
       pointKind: offer.pointKind || '',
