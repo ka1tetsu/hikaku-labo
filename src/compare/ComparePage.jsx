@@ -10,6 +10,7 @@ import { displayValue, displayRange } from '../shared/offerDisplay.js';
 import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
 import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import BuyerChoices from './BuyerChoices.jsx';
+import AmazonComparePanel from './AmazonComparePanel.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
 import PriceTargetMemo from './PriceTargetMemo.jsx';
@@ -35,7 +36,11 @@ function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFu
     <div className="cp-offer-body">
       <div className="cp-offer-store"><b className={'cp-store cp-store-' + offer.store}>{offer.storeName}</b><span>{offer.shopName}</span>{cheapest && <em className="cp-best">{sort === 'points' ? '表示候補の参考額が最小' : '表示候補の価格が最小'}</em>}</div>
       <p className="cp-offer-title">{offer.title.length > 90 ? offer.title.slice(0, 90) + '…' : offer.title}</p>
-      <p className="cp-offer-meta">{shippingLabel(offer)}{offer.reviewCount > 0 ? `・★${offer.reviewAverage.toFixed(1)}（${offer.reviewCount.toLocaleString('ja-JP')}件）` : ''}</p>
+      <p className="cp-offer-meta">{shippingLabel(offer)}{offer.reviewCount>0
+        ? `・商品口コミ ★${offer.reviewAverage.toFixed(1)}（${offer.reviewCount.toLocaleString('ja-JP')}件）` : '・商品口コミ評価は未取得'}</p>
+      {offer.reviewUrl && <a className="cp-review-evidence" href={offer.reviewUrl} target="_blank" rel="noopener noreferrer">取得元の口コミを読む ↗</a>}
+      {offer.sellerReviewCount>0 && <p className="cp-seller-evidence">販売店の評価 ★{offer.sellerReviewAverage.toFixed(1)}（{offer.sellerReviewCount.toLocaleString('ja-JP')}件）
+        {offer.storeUrl&&<a href={offer.storeUrl} target="_blank" rel="noopener noreferrer">店舗情報 ↗</a>}</p>}
       <p className="cp-identity">{offer.matchBasis==='jan'?'JAN一致':offer.matchBasis==='model'?'型番一致・仕様は要確認':'商品名が類似・同一商品か未確認'}</p>
       <label className="cp-pick"><input type="checkbox" checked={selected} disabled={!selected&&selectionFull} onChange={()=>onToggle(offer)}/>比較表に追加</label>
     </div>
@@ -66,6 +71,7 @@ export default function ComparePage() {
   const [selectedKeys,setSelectedKeys]=useState([]);
   const [displayLimit,setDisplayLimit]=useState(15);
   const [shareStatus,setShareStatus]=useState('');
+  const [manualRequested,setManualRequested]=useState(false);
 
   const queryMode=searchModeFor(query.q || query.jan);
   useEffect(()=>{ setPriceSort(queryMode==='recommended'?'recommended':'cash'); },[queryMode,query.q,query.jan]);
@@ -93,7 +99,7 @@ export default function ComparePage() {
     const next = comparisonInput(text);
     setQuery(next);
     recordFunnelEvent('product_search');
-    setPage(1);setShowSimilar(false);setSelectedKeys([]);setDisplayLimit(15);setShareStatus('');
+    setManualRequested(false);setPage(1);setShowSimilar(false);setSelectedKeys([]);setDisplayLimit(15);setShareStatus('');
     const url = new URL(window.location.href);
     url.search = new URLSearchParams(Object.entries(next).filter(([, v]) => v)).toString();
     window.history.replaceState({}, '', url.pathname + url.search);
@@ -105,7 +111,7 @@ export default function ComparePage() {
     try{await navigator.clipboard.writeText(url.href);setShareStatus('比較条件のリンクをコピーしました。');}
     catch{setShareStatus('アドレスバーのURLをコピーしてください。');}
   }
-  const pick = text => { recordFunnelEvent('product_search');setPage(1);setInput(text); setSelectedKeys([]);setDisplayLimit(15);setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
+  const pick = text => { recordFunnelEvent('product_search');setManualRequested(false);setPage(1);setInput(text); setSelectedKeys([]);setDisplayLimit(15);setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
 
   function changePage(next){
     if(next<1||next>20||state.loading)return;
@@ -135,6 +141,10 @@ export default function ComparePage() {
   const stores = storeLinks(searchTerm, { env: ENV, reference: query.ref });
   const sources = state.data?.sources || {};
   const providerNotice = sourceNotice(sources);
+  const openManualCompare=()=>{
+    setManualRequested(true);
+    requestAnimationFrame(()=>document.getElementById('cp-manual')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  };
 
   return <div className="cp-page">
     <SiteHeader active="products" />
@@ -190,6 +200,7 @@ export default function ComparePage() {
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
           {state.error && <p className="cp-error">{state.error} <a href="#cp-manual">3ショップの価格を手入力して比較する →</a></p>}
           {visibleMetrics && <p className="cp-result-context" role="status">表示中：{visibleMetrics.count}件／{visibleMetrics.stores}モール、JAN一致{visibleMetrics.evidence}件。型番・JANが確認できない候補は同一商品と断定しません。</p>}
+          {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>}
           {cheapest && <div className="cp-summary">
             <div><span>{priceSort === "points" ? "ポイント差引後の最も低い参考額" : (same.length ? "型番・JAN照合候補の最も低い商品価格" : "類似出品の最も低い商品価格")}</span><strong>{yen(displayValue(cheapest, priceSort))}</strong><small>{priceSort === "points" ? "現金支払額ではありません · " : ""}{cheapest.storeName}・{cheapest.shopName}</small></div>
             <div><span>{priceSort === "points" ? "ポイント考慮後の参考額の幅" : "商品価格の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
@@ -215,7 +226,7 @@ export default function ComparePage() {
 
         <PriceTargetMemo query={query} data={state.data} loading={state.loading}/>
 
-        {(query.q || query.jan) && <ManualStoreCompare keyword={searchTerm} stores={stores} />}
+        {(query.q || query.jan) && <ManualStoreCompare keyword={searchTerm} stores={stores} openRequested={manualRequested} />}
 
         {searchTerm && <section className="cp-stores">
           <h2>ほかのショップでも探す</h2>
@@ -236,6 +247,7 @@ export default function ComparePage() {
 
         <section className="cp-disclosure">
           <h2>広告・データについて</h2>
+          <p>Yahoo!ショッピングの口コミ点数・件数・レビューURLは公式商品検索API由来です。販売店の評価は商品評価とは別です。件数を考慮する口コミ参考順は小標本の極端な評価を抑えるための統計上の補正値であり、独自の実機レビューではありません。Amazonの価格・レビューはAPI未接続のため自動取得・転載せず、Amazonで確認した価格は手入力で比較できます。</p>
           <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で購入が成立すると、VivlicaがショップやASPから紹介料を受け取る場合があります。並び順は商品価格を安い順に並べるのが標準です。口コミ評価・件数やポイント差引後の参考額でも並び替えられます。ポイントは購入時の現金値引きではなく、広告報酬額は順位計算に使っていません。</p>
           <p>価格・ポイント・送料・在庫は各ショップの公式APIから取得した時点の情報です。購入前に販売ページで最新の条件を確認してください。APIのないショップの価格を自動収集（スクレイピング）することはしていません。</p>
         </section>
