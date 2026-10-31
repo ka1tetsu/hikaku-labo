@@ -79,6 +79,9 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                 </div>
 
                 <div className="product-features">
+                    {item.condition === 'new' && <span className="feature-tag">新品（取得元の表示）</span>}
+                    {item.condition === 'used' && <span className="feature-tag">中古（取得元の表示）</span>}
+                    {item.inStock === false && <span className="feature-tag muted">在庫なし（取得時点）</span>}
                     <span className={`feature-tag ${item.isFreeShipping ? '' : 'muted'}`}>
                         {item.isFreeShipping ? '送料無料' : item.shippingStatus === 'conditional' ? '条件付き送料無料（条件要確認）' : item.postageFlag === 1 ? '送料別' : '送料情報未取得'}
                     </span>
