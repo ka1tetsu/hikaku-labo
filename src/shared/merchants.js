@@ -16,6 +16,15 @@ export const MERCHANTS = Object.freeze([
   { id: 'qoo10', name: 'Qoo10', kind: 'mall', search: q => `https://www.qoo10.jp/s/?keyword=${enc(q)}`, env: 'VITE_AFF_QOO10' },
   { id: 'yodobashi', name: 'ヨドバシ.com', kind: 'electronics', search: q => `https://www.yodobashi.com/?word=${enc(q)}`, env: 'VITE_AFF_YODOBASHI' },
   { id: 'biccamera', name: 'ビックカメラ.com', kind: 'electronics', search: q => `https://www.biccamera.com/bc/category/?q=${enc(q)}`, env: 'VITE_AFF_BICCAMERA' },
+
+  // These retailers do not expose a general public product-price API. Use
+  // Google site-scoped discovery, not unlicensed scraping or fabricated rates.
+  { id: 'edion', name: 'エディオンネットショップ', kind: 'electronics', search: q => 'https://www.google.com/search?hl=ja&q='+enc('site:edion.com '+q), viaGoogle: true },
+  { id: 'joshin', name: 'Joshin webショップ', kind: 'electronics', search: q => 'https://www.google.com/search?hl=ja&q='+enc('site:joshinweb.jp '+q), viaGoogle: true },
+  { id: 'nojima', name: 'ノジマオンライン', kind: 'electronics', search: q => 'https://www.google.com/search?hl=ja&q='+enc('site:online.nojima.co.jp '+q), viaGoogle: true },
+  { id: 'sofmap', name: 'ソフマップ', kind: 'electronics', search: q => 'https://www.google.com/search?hl=ja&q='+enc('site:sofmap.com '+q), viaGoogle: true },
+  { id: 'kojima', name: 'コジマネット', kind: 'electronics', search: q => 'https://www.google.com/search?hl=ja&q='+enc('site:kojima.net '+q), viaGoogle: true },
+  { id: 'tsukumo', name: 'ツクモ', kind: 'electronics', search: q => 'https://www.google.com/search?hl=ja&q='+enc('site:shop.tsukumo.co.jp '+q), viaGoogle: true },
   { id: 'apple', name: 'Apple Store', kind: 'brand', match: /(apple|iphone|ipad|airpods|macbook|imac|apple ?watch|アップル)/i, search: q => `https://www.apple.com/jp/search/${enc(q)}`, env: 'VITE_AFF_APPLE' },
   { id: 'iherb', name: 'iHerb', kind: 'health', match: /(サプリ|プロテイン|ビタミン|オーガニック|supplement|vitamin|protein)/i, search: q => `https://jp.iherb.com/search?kw=${enc(q)}`, env: 'VITE_AFF_IHERB' },
   { id: 'mercari', name: 'メルカリ（中古）', kind: 'used', search: q => `https://jp.mercari.com/search?keyword=${enc(q)}`, env: 'VITE_AFF_MERCARI' },
