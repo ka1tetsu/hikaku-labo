@@ -5,6 +5,7 @@ import {recordOutboundClick} from '../shared/outboundClient.js';
 const yen=n=>'¥'+Number(n).toLocaleString('ja-JP');
 export default function PurchaseReasonPanel({offers=[],selectedKeys=[],onChoose}) {
   const candidates=buyingDecisionCandidates(offers);
+  if (!candidates.some(candidate=>candidate.offer)) return null;
   return <section className="cp-reasons" aria-labelledby="cp-reasons-heading">
     <header className="cp-reasons-head"><span>BUYER'S DECISION DESK</span>
       <h3 id="cp-reasons-heading">何を重視して購入先を決めますか？</h3>
