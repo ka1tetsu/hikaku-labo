@@ -6,7 +6,7 @@ import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { MERCHANTS, MERCHANT_KINDS, storeLinks } from '../shared/merchants.js';
 import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/compareBudget.js';
-import { PRICE_SORTS, displayValue, displayRange } from '../shared/offerDisplay.js';
+import { displayValue, displayRange } from '../shared/offerDisplay.js';
 import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
 import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import { openConcierge } from '../shared/conciergeActions.js';
