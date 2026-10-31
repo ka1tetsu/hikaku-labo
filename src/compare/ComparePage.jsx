@@ -115,7 +115,7 @@ export default function ComparePage() {
     try{await navigator.clipboard.writeText(url.href);setShareStatus('比較条件のリンクをコピーしました。');}
     catch{setShareStatus('アドレスバーのURLをコピーしてください。');}
   }
-  const pick = text => { recordFunnelEvent('product_search');setManualRequested(false);setPage(1);setInput(text); setSelectedKeys([]);setDisplayLimit(15);setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
+  const pick = text => { recordFunnelEvent('product_search');setManualRequested(false);setPage(1);setInput(text); setSelectedKeys([]);setDisplayLimit(15);setFilters(v=>({...v,reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0'}));setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
 
   function changePage(next){
     if(next<1||next>20||state.loading)return;
@@ -230,7 +230,10 @@ export default function ComparePage() {
             <span>{page} / {Math.min(20,Number(state.data.pageCount))}ページ（取得元の範囲）</span>
             <button type="button" disabled={page>=Math.min(20,Number(state.data.pageCount))} onClick={()=>changePage(page+1)}>次の30件を探す</button>
           </nav>}
-          {!state.loading && state.data && offers.length === 0 && <p className="cp-muted">{Object.values(sources).some(status => status === 'ok') ? '今回の取得結果に表示できる出品がありません。下のショップでも確認できます。' : '現在はショップの価格を自動取得できません。各ショップの検索結果で価格・在庫を直接確認してください。'}</p>}
+          {!state.loading && state.data && offers.length === 0 && <div className="cp-filter-recovery" role="status">
+            <p>{rawOffers.length>0?'絞り込み条件に一致する商品がありません。評価・件数が未取得の出品を除外している可能性があります。':'取得した出品がありません。別の型番・JANで再検索するか、各ショップを直接確認してください。'}</p>
+            {rawOffers.length>0&&<button type="button" onClick={()=>{setFilters({store:'all',shipping:'all',reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});setFreeOnly(false);}}>絞り込みを解除してすべて表示</button>}
+          </div>}
           {rest.length > 0 && <div className="cp-similar">
             <button type="button" onClick={() => setShowSimilar(v => !v)} aria-expanded={showSimilar}>{showSimilar ? '▲' : '▼'} 型番が異なる・近い商品（{rest.length}件）</button>
             {showSimilar && <ol className="cp-offers">{rest.map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={false} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
