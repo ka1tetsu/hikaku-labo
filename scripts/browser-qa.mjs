@@ -206,6 +206,16 @@ try{
    const link=await cards.first().locator('.btn-primary-cta').getAttribute('href');
    if(!link?.includes('store.shopping.yahoo.co.jp/qa/0.html'))throw Error('Yahoo product was misrouted to Rakuten/Amazon');
    if(!(await page.locator('.hl-travel-priority').innerText()).includes('航空券'))throw Error('Travel priority entry not visible');
+   if(await page.evaluate(()=>window.scrollY)>70)throw Error('Homepage unexpectedly auto-scrolled past travel entry');
+   if(!(await cards.first().locator('.btn-primary-cta').innerText()).includes('PR'))throw Error('Primary affiliate action missing visible PR disclosure');
+   await page.locator('.hl-catalog-filters select').nth(2).selectOption('4.5');
+   await page.locator('.hl-filter-empty').waitFor({timeout:4000});
+   if(await cards.count()!==0)throw Error('Review filter did not remove low-rated results');
+   await page.getByRole('button',{name:'絞り込みを解除'}).click();
+   if(await cards.count()!==2)throw Error('Reset filters did not restore results');
+   await page.locator('.hl-shipping-checkbox input').check();
+   await page.locator('.hl-filter-empty').waitFor({timeout:4000});
+   await page.getByRole('button',{name:'絞り込みを解除'}).click();
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
    if(overflow>3)throw Error('Home horizontal overflow '+overflow+'px');
  });
