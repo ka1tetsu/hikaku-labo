@@ -20,7 +20,7 @@ export function shippingLabel(offer) {
   return SHIPPING_LABEL[offer?.shippingStatus] || (offer?.shippingFree ? SHIPPING_LABEL.free : SHIPPING_LABEL.unknown);
 }
 export function filterOffers(offers, {
-  store='all', shipping='all', reviewMin=0, includeUnverified=true,
+  store='all', shipping='all', reviewMin=0, minReviewCount=0, sellerRatingMin=0, includeUnverified=true,
   keyword='', sort='cash', maxPrice=0,
 }={}){
   const search=String(keyword).normalize('NFKC').toLocaleLowerCase('ja').trim();
@@ -30,6 +30,8 @@ export function filterOffers(offers, {
     if(shipping==='free' && !offer.shippingFree) return false;
     if(shipping==='known' && shippingLabel(offer)===SHIPPING_LABEL.unknown) return false;
     if(Number(reviewMin)>0 && !(offer.reviewCount>0 && offer.reviewAverage>=Number(reviewMin))) return false;
+    if(Number(minReviewCount)>0 && !(Number(offer.reviewCount)>=Number(minReviewCount))) return false;
+    if(Number(sellerRatingMin)>0 && !(Number(offer.sellerReviewCount)>0 && Number(offer.sellerReviewAverage)>=Number(sellerRatingMin))) return false;
     if(Number(maxPrice)>0 && !(offer.price<=Number(maxPrice))) return false;
     if(search && ![offer.title,offer.shopName,offer.storeName].join(' ').normalize('NFKC').toLocaleLowerCase('ja').includes(search)) return false;
     return true;
