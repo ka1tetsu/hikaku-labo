@@ -171,7 +171,7 @@ body{margin:0}
 @media(max-width:380px){.cp-checkout-fields{grid-template-columns:1fr}.cp-watch-form>div{flex-direction:column}}
 
 /* Buyer decision desk: show verifiable tradeoffs without invented checkout totals. */
-.cp-provider-notice{font-size:12px;line-height:1.8;border-left:3px solid #57946e;padding:10px 14px;margin:12px 0;background:#f3f8f3;color:#28513a}
+.cp-provider-notice{font-size:12px;line-height:1.8;border-top:1px solid #b7d2bf;padding:10px 14px;margin:12px 0;background:#f3f8f3;color:#28513a}
 .cp-choice{padding:19px 0 24px;margin:16px 0 22px;border-top:1px solid #d4e2d7;border-bottom:1px solid #d4e2d7}
 .cp-choice-intro{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:0 0 14px}
 .cp-choice-intro h3{font-size:19px;color:#193e30;margin:0 0 5px}
