@@ -2,8 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { matchEvidence, normalizeRakutenOffer, normalizeYahooOffer, rankOffers } from '../src/shared/priceCompare.js';
-import { SHIPPING_LABEL, filterOffers, offerSummary, shippingLabel, offerKey } from '../src/shared/compareWorkbench.js';
-import { PRICE_SORTS } from '../src/shared/offerDisplay.js';
+import { SHIPPING_LABEL, OFFER_SORTS, filterOffers, offerSummary, shippingLabel, offerKey } from '../src/shared/compareWorkbench.js';
 
 const make=(title,price,extra={})=>({store:'rakuten',storeName:'楽天市場',title,price,effectivePrice:price-100,point:100,
   url:'https://item.rakuten.co.jp/example/'+price+'/',reviewAverage:4,reviewCount:30,shopName:'テスト店',
@@ -62,7 +61,7 @@ test('buyer can filter by store, shipping, review, price and title and compare d
   assert.deepEqual(filterOffers(rows,{maxPrice:42000,reviewMin:4.5}).map(x=>x.price),[30000]);
   assert.equal(offerSummary(rows).evidence,1);
   assert.equal(new Set(rows.map(offerKey)).size,3);
-  assert.ok(PRICE_SORTS.rating&&PRICE_SORTS.reviews);
+  assert.ok(OFFER_SORTS.rating&&OFFER_SORTS.reviews);
 });
 test('price workbench is wired into real main comparison UI and remains transparent about unconnected merchants',()=>{
   const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
