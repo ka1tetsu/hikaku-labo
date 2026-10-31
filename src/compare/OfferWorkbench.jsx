@@ -1,4 +1,5 @@
 import { shippingLabel, offerKey } from '../shared/compareWorkbench.js';
+import CheckoutEstimator from './CheckoutEstimator.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 const yen=n=>'¥'+Math.round(n).toLocaleString('ja-JP');
 
@@ -55,6 +56,7 @@ export function OfferShortlist({offers,onRemove,onClear}){
               {o.storeName}で確認 ↗ {o.sponsored?'（PR）':''}</a></td>)}</tr>
         </tbody>
       </table></div>
+    <CheckoutEstimator offers={offers}/>
     <p>型番が一致していても色・容量・セット内容・新品/中古の一致は保証できません。ポイントは現金支払額を減らさず、送料・クーポン・保証・納期は予約ではなく購入直前の画面で確認してください。</p>
   </section>;
 }
