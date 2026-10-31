@@ -34,3 +34,18 @@
 .cp-manual-results .cp-manual-disclosure{font-size:12px;border-top:1px solid #e1e9e3;padding-top:13px}
 @media(max-width:960px){.cp-manual-rows{grid-template-columns:1fr 1fr}}
 @media(max-width:680px){.cp-manual-head{align-items:stretch;flex-direction:column}.cp-manual-open{width:100%;min-width:0}.cp-manual-rows{grid-template-columns:1fr}.cp-manual-results li{align-items:stretch;flex-direction:column}.cp-manual-results li>a{width:100%}}
+
+
+/* Opt-in shop expansion and combined automatic / manually confirmed totals. */
+.cp-manual-add{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 0 16px}
+.cp-manual-add label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#265841;font-weight:800}
+.cp-manual-add select{min-height:44px;padding:9px 12px;border:1px solid #aacdb9;background:#fff;min-width:235px;max-width:100%;border-radius:5px;color:#1c5039}
+.cp-manual-add>span{font-size:12px;color:#4f715b}
+.cp-manual-remove{display:block;border:0;color:#a13e30;background:transparent;padding:5px 0;font-size:11px;font-weight:800;text-decoration:underline;cursor:pointer}
+.cp-manual-winner{padding:15px;border:1px solid #a6cab3;background:#f2f7f3;margin:8px 0 17px;display:flex;flex-direction:column;gap:5px}
+.cp-manual-winner>span{font-size:12px;color:#25543d}
+.cp-manual-winner>strong{font-size:28px;color:#ab412d}
+.cp-manual-winner>b{font-size:14px;color:#1d5639}
+.cp-manual-winner>small,.cp-manual-source{font-size:11px;color:#4b6855;font-weight:500}
+.cp-manual-source{margin-left:6px}
+@media(max-width:640px){.cp-manual-add select{width:100%;min-width:0}.cp-manual-add label{width:100%}}
