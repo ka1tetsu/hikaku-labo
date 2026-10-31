@@ -71,6 +71,7 @@ export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
   const point = Math.floor(price * pointRate / 100);
   const url = raw.affiliateUrl || wrapUrl(raw.itemUrl);
   return {
+    shippingStatus: raw.postageFlag === 0 ? 'free' : raw.postageFlag === 1 ? 'extra' : 'unknown',
     store: 'rakuten', storeName: '楽天市場', shopName: raw.shopName || '', title: raw.itemName || '',
     price, shippingFree: raw.postageFlag === 0, point, effectivePrice: price - point,
     url, sponsored: Boolean(raw.affiliateUrl) || Boolean(url && url !== raw.itemUrl),
@@ -83,6 +84,7 @@ export function normalizeYahooOffer(raw, wrapUrl = url => url) {
   const price = Number(raw.price) || 0;
   const point = Number(raw.point?.amount) || 0;
   return {
+    shippingStatus: raw.shipping?.code === 2 ? 'free' : 'unknown',
     store: 'yahoo', storeName: 'Yahoo!ショッピング', shopName: raw.seller?.name || '', title: raw.name || '',
     price, shippingFree: raw.shipping?.code === 2, point, effectivePrice: price - point,
     url: wrapUrl(raw.url), sponsored: wrapUrl(raw.url) !== raw.url,
@@ -91,13 +93,39 @@ export function normalizeYahooOffer(raw, wrapUrl = url => url) {
   };
 }
 
-// Same-product offers first, each group cheapest first (effective price after points).
+// A similar title is not proof of the same physical model. Promote an offer to
+// verified-model only when JAN or model code provides positive evidence.
+// A title containing an accessory or a conflicting JAN must not be promoted.
+export function matchEvidence(reference, offer, referenceJan = '') {
+  const ref = String(reference || '').normalize('NFKC').trim();
+  const candidate = String(offer?.title || '');
+  const refCodes = extractModelCodes(ref);
+  const candidateCodes = extractModelCodes(candidate);
+  const jan = String(offer?.jan || '');
+  const score = matchScore(ref, candidate, { referenceJan, candidateJan: jan });
+  if (referenceJan && jan && referenceJan !== jan) return { kind: 'mismatch', score: 0, sameProduct: false };
+  if (referenceJan && jan && referenceJan === jan) return { kind: 'jan', score: 100, sameProduct: true };
+  if (refCodes.length && score >= SAME_PRODUCT &&
+      refCodes.some(code => candidateCodes.some(other => normalizedCode(code) === normalizedCode(other))) &&
+      accessoryKind(ref) === accessoryKind(candidate)) return { kind: 'model', score, sameProduct: true };
+  return { kind: 'unverified', score, sameProduct: false };
+}
+
+// Same-product evidence first; source list prices are not checkout totals.
+// Deduplicate by store URL, never by title (same model can have different shops).
 export function rankOffers(offers, reference = '', referenceJan = '') {
+  const known = new Set();
   return offers
-    .filter(offer => offer.price > 0 && offer.url)
-    .map(offer => ({ ...offer, match: reference || referenceJan ? matchScore(reference, offer.title, { referenceJan, candidateJan: offer.jan }) : 100 }))
-    .map(offer => ({ ...offer, sameProduct: offer.match >= SAME_PRODUCT }))
-    .sort((a, b) => Number(b.sameProduct) - Number(a.sameProduct) || a.effectivePrice - b.effectivePrice || b.reviewCount - a.reviewCount);
+    .filter(offer => {
+      if (!(offer.price > 0) || typeof offer.url !== 'string' || !/^https:\/\//.test(offer.url) || known.has(offer.store + ':' + offer.url)) return false;
+      known.add(offer.store + ':' + offer.url);
+      return true;
+    })
+    .map(offer => {
+      const evidence = matchEvidence(reference, offer, referenceJan);
+      return { ...offer, match: evidence.score, matchBasis: evidence.kind, sameProduct: evidence.sameProduct };
+    })
+    .sort((a, b) => Number(b.sameProduct) - Number(a.sameProduct) || a.price - b.price || b.reviewCount - a.reviewCount);
 }
 
 export function summarizeOffers(offers) {
