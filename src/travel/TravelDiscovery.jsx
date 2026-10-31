@@ -116,6 +116,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
       <div><b>03</b><span>航空券・宿を比較</span></div><div><b>04</b><span>旅の予算を計算</span></div>
     </div>
 
+    <div className="tv-wrap tv-priority-booking"><BookingHub key={destination.id} destination={destination} nights={nights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} depart={depart} setDepart={setDepart}/></div>
     <BookingStarter/>
     {hotelSearch}
     {concierge}
@@ -226,7 +227,6 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           </div>)}</div>
           <div className="tvx-itinerary-source"><span>現地で確認：</span><a href={destination.source} target="_blank" rel="noopener noreferrer">{destination.sourceLabel} ↗</a><span>{destination.note}</span></div>
         </div>
-        <BookingHub key={destination.id} destination={destination} nights={nights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} depart={depart} setDepart={setDepart}/>
         <div className="tvx-plan-bottom">
           <div><strong>旅費も一緒に考える。</strong><p>この旅を実現するための宿泊費・交通費を、ご自身の予算から計算できます。</p></div>
           <a href="#planner" className="tvx-plan-budget-link">この旅の予算を計算する →</a>
