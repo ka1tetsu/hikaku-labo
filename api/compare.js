@@ -36,19 +36,19 @@ export function compareParams(query = {}) {
   return { q: clip(query.q, 80), ref: clip(query.ref, 200), jan };
 }
 
-async function rakutenOffers(q, budget) {
-  const result = await fetchRakutenSearch({ keyword: q, genreId: '', page: 1, filters: { sort: '+itemPrice', ...budget } });
+async function rakutenOffers(q, budget, mode = 'price', page = 1) {
+  const result = await fetchRakutenSearch({ keyword: q, genreId: '', page, filters: { sort: mode === 'recommended' ? 'standard' : '+itemPrice', ...budget } });
   if (!result.ok) return { status: 'error', offers: [] };
   const data = JSON.parse(result.text);
   const items = (data.Items || []).map(entry => entry.Item ?? entry);
   // The provider can omit affiliateUrl after its affiliate-parameter fallback.
   // Keep the same public-ID referral fallback used by product cards.
-  return { status: 'ok', offers: items.map(item => normalizeRakutenOffer(item, wrapRakuten)) };
+  return { status: 'ok', offers: items.map((item, index) => ({ ...normalizeRakutenOffer(item, wrapRakuten), sourceRank: index })) };
 }
 
-async function yahooOffers(q, jan, budget) {
+async function yahooOffers(q, jan, budget, mode = 'price', page = 1) {
   if (!YAHOO_CLIENT_ID) return { status: 'disabled', offers: [] };
-  const params = new URLSearchParams({ appid: YAHOO_CLIENT_ID, results: '30', sort: '+price', in_stock: 'true', condition: 'new', image_size: '146' });
+  const params = new URLSearchParams({ appid: YAHOO_CLIENT_ID, results: '30', start: String(1 + (page - 1) * 30), sort: mode === 'recommended' ? '-score' : '+price', in_stock: 'true', condition: 'new', image_size: '146' });
   if (budget.minPrice) params.set('price_from', budget.minPrice);
   if (budget.maxPrice) params.set('price_to', budget.maxPrice);
   if (jan) params.set('jan_code', jan); else params.set('query', q);
@@ -56,7 +56,7 @@ async function yahooOffers(q, jan, budget) {
     const response = await upstreamResponse(`${YAHOO_ENDPOINT}?${params}`, { headers: { 'User-Agent': 'hikaku-labo/1.0' } });
     if (!response.ok) return { status: 'error', offers: [] };
     const data = JSON.parse(response.text);
-    return { status: 'ok', offers: (data.hits || []).map(hit => normalizeYahooOffer(hit, wrapYahoo)) };
+    return { status: 'ok', offers: (data.hits || []).map((hit, index) => ({ ...normalizeYahooOffer(hit, wrapYahoo), sourceRank: index })), total: Number(data.totalResultsAvailable) || 0 };
   } catch {
     return { status: 'error', offers: [] };
   }
@@ -68,18 +68,29 @@ export default async function handler(req, res) {
   const { q, ref, jan } = compareParams(req.query);
   if (!q && !jan) return res.status(400).json({ error: 'q_or_jan_required' });
   const budget = compareBudget(req.query);
+  // Homepage discovery uses Yahoo's official relevance ranking. Exact models use price order.
+  const mode = req.query.mode === 'recommended' ? 'recommended' : 'price';
+  const page = Number.isInteger(Number(req.query.page)) && Number(req.query.page) >= 1 && Number(req.query.page) <= 20 ? Number(req.query.page) : 1;
   if (budget.minPrice && budget.maxPrice && budget.minPrice > budget.maxPrice) return res.status(400).json({ error: 'invalid_price_range' });
 
   const [rakuten, yahoo] = await Promise.all([
-    rakutenOffers(q || jan, budget).catch(() => ({ status: 'error', offers: [] })),
-    yahooOffers(q, jan, budget),
+    rakutenOffers(q || jan, budget, mode, page).catch(() => ({ status: 'error', offers: [] })),
+    yahooOffers(q, jan, budget, mode, page),
   ]);
   // Preserve both cash-cheapest and rewards-cheapest candidates for client-side criteria.
-  const offers = rankOffers([...rakuten.offers, ...yahoo.offers].filter(offer => withinCompareBudget(offer, budget)), ref || q, jan).slice(0, 80);
+  const ranked = rankOffers([...rakuten.offers, ...yahoo.offers].filter(offer => withinCompareBudget(offer, budget)), ref || q, jan);
+  // For discovery, preserve each provider's relevance order; do NOT pretend that
+  // a cheap accessory or similar item is the most recommended product.
+  const offers = (mode === 'recommended'
+    ? ranked.sort((a, b) => Number(b.sameProduct) - Number(a.sameProduct)
+      || (a.sourceRank ?? 99) - (b.sourceRank ?? 99)
+      || (b.reviewCount || 0) - (a.reviewCount || 0))
+    : ranked).slice(0, 80);
   res.setHeader('Cache-Control', [rakuten.status, yahoo.status].includes('ok') ? 's-maxage=300, stale-while-revalidate=300' : 'no-store');
   return res.status(200).json({
     query: q, reference: ref, jan,
     ...budget,
+    mode, page, pageCount: Math.max(1, Math.min(20, Math.ceil((yahoo.total || offers.length) / 30))),
     sources: { rakuten: rakuten.status, yahoo: yahoo.status },
     summary: summarizeOffers(offers),
     offers,
