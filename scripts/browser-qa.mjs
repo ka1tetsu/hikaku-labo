@@ -232,6 +232,36 @@ try{
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
    if(overflow>3)throw Error('Review research mobile horizontal overflow '+overflow+'px');
  });
+ await interaction('review-to-price-shortlist-mobile',{width:375,height:812},async page=>{
+   const offer=(price,count,average,shop,sellerAverage)=>({
+     store:'yahoo',storeName:'Yahoo!ショッピング',shopName:shop,title:'SONY WH-1000XM5',
+     price,point:0,effectivePrice:price,url:'https://store.shopping.yahoo.co.jp/qa/'+price+'.html',
+     reviewAverage:average,reviewCount:count,
+     reviewUrl:'https://shopping.yahoo.co.jp/review/item/list?store_id=qa&page_key='+price,
+     sellerReviewAverage:sellerAverage,sellerReviewCount:80,
+     storeUrl:'https://store.shopping.yahoo.co.jp/qa/',inStock:true,shippingStatus:'free',
+     sponsored:false,sameProduct:true,matchBasis:'model',
+   });
+   await page.route('**/api/compare?**',route=>route.fulfill({
+     status:200,contentType:'application/json',
+     body:JSON.stringify({sources:{yahoo:'ok',rakuten:'error'},mode:'price',pageCount:1,
+       fetchedAt:'2026-10-31T09:00:00Z',
+       offers:[offer(23000,1,5,'星5が1件の店',4.2),offer(26000,220,4.6,'レビューが多い店',4.9)]})
+   }));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-research-item').first().waitFor({timeout:10000});
+   if(!(await page.locator('.cp-research-item').first().innerText()).includes('レビューが多い店'))throw Error('Tiny five-star rating dominated evidence ranking');
+   if(!(await page.locator('.cp-reasons').innerText()).includes('商品口コミを重視'))throw Error('Independent buyer criteria missing');
+   if(!(await page.locator('.cp-quick-nav').innerText()).includes('口コミ'))throw Error('Research shortcut absent');
+   await page.locator('.cp-research-item-actions button').first().click();
+   await page.locator('.cp-shortlist').waitFor({timeout:5000});
+   if(!(await page.locator('.cp-shortlist').innerText()).includes('レビューが多い店'))throw Error('Review-led shortlist choice did not retain same shop');
+   await page.locator('.cp-reason-option').first().getByRole('button',{name:'この出品を比較表に追加'}).click();
+   await page.waitForFunction(()=>document.querySelectorAll('.cp-shortlist thead th').length===3,null,{timeout:5000});
+   if(!(await page.locator('.cp-shortlist').innerText()).includes('星5が1件の店'))throw Error('Cash-cheapest candidate was not added for side-by-side review');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Review and buyer decision mobile overflow '+overflow+'px');
+ });
  await interaction('amazon-review-evidence-manual-handoff',{width:375,height:812},async page=>{
    const offer=(price,store='yahoo')=>({
      store,storeName:store==='yahoo'?'Yahoo!ショッピング':'楽天市場',shopName:'サンプル販売店',
