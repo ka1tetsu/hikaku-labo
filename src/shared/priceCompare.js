@@ -81,7 +81,8 @@ export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
     image: (raw.mediumImageUrls?.[0]?.imageUrl || raw.mediumImageUrls?.[0] || '').toString().replace('_ex=128x128', '_ex=200x200'),
     reviewAverage: review.average, reviewCount: review.count, reviewUrl: null,
     sellerReviewAverage: 0, sellerReviewCount: 0, storeUrl: null,
-    inStock: raw.availability === 1 ? true : raw.availability === 0 ? false : null, jan: '',
+    inStock: raw.availability === 1 ? true : raw.availability === 0 ? false : null,
+    condition: 'unknown', jan: '',
   };
 }
 
@@ -107,6 +108,7 @@ export function normalizeYahooOffer(raw, wrapUrl = url => url) {
     sellerReviewAverage: sellerReview.average, sellerReviewCount: sellerReview.count,
     storeUrl: safeStoreUrl(raw.seller?.url,'yahoo'),
     inStock: typeof raw.inStock==='boolean'?raw.inStock:null,
+    condition: raw.condition === 'new' ? 'new' : raw.condition === 'used' ? 'used' : 'unknown',
     jan: raw.janCode || '',
   };
 }
