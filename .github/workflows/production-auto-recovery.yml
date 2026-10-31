@@ -1,12 +1,12 @@
 name: Vivlica production auto-recovery
 
-# GitHub Actions and Vercel may be quota-limited through October 2026.
-# No background runners or credentials required until scheduled Actions can run.
+# Recheck once a day after the rolling 24-hour Hobby deployment limit resets.
+# The SHA/CI preflight prevents deployments when current or unverified.
 on:
   workflow_dispatch:
   schedule:
-    # JST 09:17 on days 1,5,9,13,17,21,25,29. Off the busy hour.
-    - cron: '17 0 1,5,9,13,17,21,25,29 * *'
+    # JST 19:17 daily, starting in November 2026 (time gate below).
+    - cron: '17 10 * * *'
 
 permissions:
   contents: write

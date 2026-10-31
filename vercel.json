@@ -1,5 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "**": false,
+      "main": true,
+      "preview/**": true
+    }
+  },
   "framework": "vite",
   "buildCommand": "SITE_ORIGIN=https://vivlica.com npm run build",
   "outputDirectory": "dist",
