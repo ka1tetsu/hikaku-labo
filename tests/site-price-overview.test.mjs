@@ -47,7 +47,7 @@ test('all product-relevant sites are listed; unrelated categories are not forced
  // Those niche storefronts appear automatically for their matching products.
  assert.equal(rows.find(x=>x.id==='rakuten').state,'failed');
  assert.equal(rows.find(x=>x.id==='amazon').state,'not-connected');
- assert.ok(rows.filter(x=>x.state==='not-connected').length>=15);
+ assert.equal(rows.filter(x=>x.state==='not-connected').length,stores.length-2);
  for(const row of rows.filter(x=>x.state!=='priced')){
    assert.equal(row.listedPrice,null);
    assert.equal(row.totalPrice,null);
