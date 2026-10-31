@@ -12,6 +12,7 @@ import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import BuyerChoices from './BuyerChoices.jsx';
 import AmazonComparePanel from './AmazonComparePanel.jsx';
 import ReviewResearchPanel from './ReviewResearchPanel.jsx';
+import PurchaseReasonPanel from './PurchaseReasonPanel.jsx';
 import ShopPriceBoard from './ShopPriceBoard.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
@@ -40,7 +41,8 @@ function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFu
       <p className="cp-offer-title">{offer.title.length > 90 ? offer.title.slice(0, 90) + '…' : offer.title}</p>
       <p className="cp-offer-meta">{offer.condition==='new'?'新品（取得元の表示）・':offer.condition==='used'?'中古（取得元の表示）・':''}{offer.inStock===false?'在庫なし（取得時点）・':''}{shippingLabel(offer)}{offer.reviewCount>0
         ? `・商品口コミ ★${offer.reviewAverage.toFixed(1)}（${offer.reviewCount.toLocaleString('ja-JP')}件）` : '・商品口コミ評価は未取得'}</p>
-      {offer.reviewUrl && <a className="cp-review-evidence" href={offer.reviewUrl} target="_blank" rel="noopener noreferrer">取得元の口コミを読む ↗</a>}
+      {offer.reviewUrl && <a className="cp-review-evidence" href={offer.reviewUrl} target="_blank" rel="noopener noreferrer"
+        onClick={()=>recordOutboundClick({section:'products',merchant:'yahoo-shopping',placement:'review-source-row',sponsored:false})}>取得元の口コミを読む ↗</a>}
       {offer.sellerReviewCount>0 && <p className="cp-seller-evidence">販売店の評価 ★{offer.sellerReviewAverage.toFixed(1)}（{offer.sellerReviewCount.toLocaleString('ja-JP')}件）
         {offer.storeUrl&&<a href={offer.storeUrl} target="_blank" rel="noopener noreferrer">店舗情報 ↗</a>}</p>}
       {/^\d{8}$|^\d{13}$/.test(offer.jan||'') && <a className="cp-research-jan" href={'/compare/?q='+encodeURIComponent(offer.title.slice(0,80))+'&jan='+encodeURIComponent(offer.jan)}>この商品のJANで全ショップの価格を再検索 ↗</a>}
@@ -140,6 +142,12 @@ export default function ComparePage() {
     const id=offerKey(offer);
     return current.includes(id)?current.filter(key=>key!==id):current.length<4?[...current,id]:current;
   });};
+  const chooseFromReview=offer=>{
+    const exists=selectedKeys.includes(offerKey(offer));
+    if(!exists&&selectedKeys.length>=4)return;
+    toggleSelected(offer);
+    if(!exists)requestAnimationFrame(()=>document.getElementById('cp-shortlist-title')?.scrollIntoView({behavior:'smooth',block:'start'}));
+  };
   const visibleMetrics=offerSummary(offers,priceSort);
   const same = offers.filter(o => o.sameProduct);
   const similar = offers.filter(o => !o.sameProduct);
@@ -201,6 +209,11 @@ export default function ComparePage() {
             </div>
           </div>
           {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
+          <nav className="cp-quick-nav" aria-label="商品比較の目次">
+            <a href="#cp-research-title">商品・販売店の口コミを調べる</a>
+            <a href="#cp-allshops-title">送料込みの最安候補を確認</a>
+            <a href="#cp-manual-heading">18ショップの確認済み価格を比較</a>
+          </nav>
           <OfferFilters filters={filters} onChange={changeFilter}
             storeOptions={[{id:'rakuten',name:'楽天市場'},{id:'yahoo',name:'Yahoo!ショッピング'}]}
             visibleCount={offers.length} totalCount={rawOffers.length}
@@ -212,7 +225,9 @@ export default function ComparePage() {
           {visibleMetrics && <p className="cp-result-context" role="status">表示中：{visibleMetrics.count}件／{visibleMetrics.stores}モール、JAN一致{visibleMetrics.evidence}件。型番・JANが確認できない候補は同一商品と断定しません。</p>}
           {!state.loading && <ReviewResearchPanel offers={rawOffers} stores={stores}
             activeReviewMin={filters.reviewMin} activeReviewCount={filters.minReviewCount}
-            onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}/>}
+            onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}
+            onChoose={chooseFromReview} selectedKeys={selectedKeys}/>}
+          {!state.loading && <PurchaseReasonPanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
           {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>} 
           {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
           {cheapest && <div className="cp-summary">
