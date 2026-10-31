@@ -5,6 +5,7 @@ import { providerGate } from '../server/providerGate.js';
 import { upstreamResponse } from '../server/upstream.js';
 import { detectPlatform, OPENAPI_ENDPOINT } from '../server/rakutenCredentials.js';
 import { SITE_ORIGIN } from '../src/shared/site.js';
+import { rakutenPayload } from '../src/shared/rakutenPayload.js';
 
 // --- 認証情報 ---------------------------------------------------------------
 // いずれも環境変数を優先。未設定時は下記の既定値にフォールバックします。
@@ -38,6 +39,7 @@ export function searchFilters(query = {}) {
 function buildParams({ keyword, genreId, page, filters = {} }) {
     const params = new URLSearchParams({
         format: 'json',
+        formatVersion: '2',
         keyword,
         applicationId: RAKUTEN_APP_ID,
         hits: 20,
@@ -91,7 +93,14 @@ export async function fetchRakutenSearch(opts) {
             const rakutenRes = await fetchRakuten(`${OPENAPI_ENDPOINT}?${params}`, Math.max(1, Math.min(4000, deadline - Date.now())));
             const text = rakutenRes.text;
 
-            if (rakutenRes.ok) { permissionGate.reset(); return { ok: true, status: 200, text, affiliateState }; }
+            if (rakutenRes.ok) {
+                // A 200 from upstream is not proof of usable product data.
+                // Reject an unexpected body rather than reporting misleading 0-item success.
+                try { rakutenPayload(text); }
+                catch { return { ok: false, status: 502, text: 'invalid_provider_format', affiliateState: 'off' }; }
+                permissionGate.reset();
+                return { ok: true, status: 200, text, affiliateState };
+            }
 
             lastStatus = rakutenRes.status;
             lastBody = text;
