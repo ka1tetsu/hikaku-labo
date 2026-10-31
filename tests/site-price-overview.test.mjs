@@ -39,9 +39,12 @@ test('shows actual product price and separate verified free-shipping amount per 
  assert.ok(amazon.researchUrl.includes('amazon.co.jp'));
 });
 
-test('all 18 site names are visible; other sources are unknown, never invented zeros',()=>{
+test('all product-relevant sites are listed; unrelated categories are not forced into results',()=>{
  const rows=sitePriceRows([mall('yahoo',22000)],stores,{yahoo:'ok',rakuten:'error'});
- assert.equal(rows.length,18);
+ assert.equal(rows.length,stores.length);
+ assert.ok(rows.length>=16);
+ assert.ok(!rows.some(row=>row.id==='apple'||row.id==='iherb'));
+ // Those niche storefronts appear automatically for their matching products.
  assert.equal(rows.find(x=>x.id==='rakuten').state,'failed');
  assert.equal(rows.find(x=>x.id==='amazon').state,'not-connected');
  assert.ok(rows.filter(x=>x.state==='not-connected').length>=15);
