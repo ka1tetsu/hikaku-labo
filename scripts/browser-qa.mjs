@@ -160,6 +160,35 @@ try{
    if(!(await page.locator('.cp-watch-list').innerText()).includes('¥30,000'))throw Error('Price target did not persist locally');
    await watch.screenshot({path:path.join(out,'interaction-price-target-mobile.png'),animations:'disabled'});
  });
+ await interaction('site-by-site-prices-visible-mobile',{width:375,height:812},async page=>{
+   const item=(price,store,shippingStatus,shopName)=>({
+     store,storeName:store==='yahoo'?'Yahoo!ショッピング':'楽天市場',
+     shopName,title:'SONY WH-1000XM5',price,point:0,effectivePrice:price,
+     url:store==='yahoo'?'https://store.shopping.yahoo.co.jp/qa/'+price+'.html':'https://item.rakuten.co.jp/qa/'+price+'/',
+     sponsored:false,image:'',reviewAverage:4.3,reviewCount:55,
+     shippingStatus,shippingFree:shippingStatus==='free',sameProduct:true,matchBasis:'model',inStock:true
+   });
+   await page.route('**/api/compare?**',route=>route.fulfill({status:200,contentType:'application/json',
+     body:JSON.stringify({sources:{yahoo:'ok',rakuten:'ok'},mode:'price',pageCount:1,
+       fetchedAt:'2026-10-31T10:00:00Z',
+       offers:[item(18000,'yahoo','unknown','送料不明の店'),item(23000,'yahoo','free','送料無料の店'),
+         item(25000,'rakuten','free','楽天の店')]})}));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-site-prices-table [data-site-id="yahoo-shopping"]').waitFor({timeout:10000});
+   const yahoo=await page.locator('.cp-site-prices-table [data-site-id="yahoo-shopping"]').innerText();
+   const rakuten=await page.locator('.cp-site-prices-table [data-site-id="rakuten"]').innerText();
+   const amazon=await page.locator('.cp-site-prices-table [data-site-id="amazon"]').innerText();
+   if(!yahoo.includes('¥18,000')||!yahoo.includes('¥23,000'))throw Error('Yahoo base and confirmed total not separately displayed');
+   if(!rakuten.includes('¥25,000'))throw Error('Rakuten verified source price missing');
+   if(!amazon.includes('価格API未接続')||amazon.includes('¥0'))throw Error('Amazon price invented');
+   if(!(await page.locator('.cp-site-prices-best').innerText()).includes('¥23,000'))throw Error('Unknown shipping falsely won');
+   const link=await page.locator('.cp-site-prices-table [data-site-id="yahoo-shopping"] .cp-site-price-action a').getAttribute('href');
+   if(!link.includes('/23000.html'))throw Error('Linked item does not match verified total price');
+   await page.locator('.cp-site-prices-expand summary').click();
+   if((await page.locator('.cp-site-prices-expand tbody tr').count())<13)throw Error('Legal research links for other sites absent');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Per-site prices mobile overflow '+overflow+'px');
+ });
  await interaction('multi-store-verified-lowest-with-manual-price',{width:375,height:812},async page=>{
    const offer=(price,store,shippingStatus,shopName)=>{
      const root=store==='yahoo'?'https://store.shopping.yahoo.co.jp/qa/':'https://item.rakuten.co.jp/qa/';
