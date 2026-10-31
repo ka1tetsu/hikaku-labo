@@ -1,8 +1,9 @@
 import { reviewCoverage, reviewResearchOffers, REVIEW_PRESETS } from '../shared/reviewResearch.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
+import { offerKey } from '../shared/compareWorkbench.js';
 
 const money=n=>'¥'+Number(n).toLocaleString('ja-JP');
-export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,onClearPreset,activeReviewMin=0,activeReviewCount=0}) {
+export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,onClearPreset,activeReviewMin=0,activeReviewCount=0,onChoose,selectedKeys=[]}) {
   const coverage=reviewCoverage(offers);
   const {rows,verifiedOnly}=reviewResearchOffers(offers);
   const amazon=stores.find(s=>s.id==='amazon');
@@ -12,6 +13,11 @@ export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,o
       <div><span>REVIEWS / SOURCE CHECK</span><h3 id="cp-research-title">口コミ・星評価から購入先を調べる</h3>
         <p>公式APIが提供する<strong>商品レビューの平均点・投稿件数</strong>と<strong>販売店の評価</strong>を区別して確認できます。口コミ本文は転載せず、元サイトへのリンクから読めます。</p></div>
       <p role="status" className="cp-research-coverage">今回取得した{coverage.total}件中、商品評価あり <strong>{coverage.productReviewed}件</strong>・店舗評価あり <strong>{coverage.sellerReviewed}件</strong>・商品評価未取得 <strong>{coverage.productUnknown}件</strong></p>
+    </div>
+    <div className="cp-research-steps" role="note">
+      <span><b>1</b> 星評価と投稿件数を見る</span>
+      <span><b>2</b> 口コミ原文・販売店評価を確認</span>
+      <span><b>3</b> 出品を比較表に入れて送料・価格を確認</span>
     </div>
     <div className="cp-research-preset" aria-label="口コミの確認条件">
       <span>評価のある商品に絞る：</span>
@@ -40,6 +46,9 @@ export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,o
         </div>
         <div className="cp-research-item-actions">
           <span>商品価格 {money(offer.price)}</span>
+          {onChoose&&<button type="button" aria-pressed={selectedKeys.includes(offerKey(offer))}
+            disabled={!selectedKeys.includes(offerKey(offer))&&selectedKeys.length>=4}
+            onClick={()=>onChoose(offer)}>{selectedKeys.includes(offerKey(offer))?'比較対象から外す':'価格と条件の比較表に追加 →'}</button>}
           {offer.reviewUrl?<a href={offer.reviewUrl} target="_blank" rel="noopener noreferrer">商品口コミの原文を読む ↗</a>:
             <a href={offer.url} target="_blank" rel={offer.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
               onClick={()=>recordOutboundClick({section:'products',merchant:offer.store==='yahoo'?'yahoo-shopping':'rakuten',placement:'review-check',sponsored:offer.sponsored})}>
