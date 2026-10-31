@@ -197,6 +197,41 @@ try{
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
    if(overflow>3)throw Error('Multi-store comparison horizontal overflow '+overflow+'px');
  });
+ await interaction('review-evidence-presets-and-recovery-mobile',{width:375,height:812},async page=>{
+   const offer=(price,rate,count,shop,sellerRating)=>({
+     store:'yahoo',storeName:'Yahoo!ショッピング',shopName:shop,title:'SONY WH-1000XM5',
+     price,point:0,effectivePrice:price,
+     url:'https://store.shopping.yahoo.co.jp/qa/'+price+'.html',sponsored:false,image:'',
+     reviewAverage:rate,reviewCount:count,reviewUrl:'https://shopping.yahoo.co.jp/review/item/list?store_id=qa&page_key='+price,
+     sellerReviewAverage:sellerRating,sellerReviewCount:210,
+     storeUrl:'https://store.shopping.yahoo.co.jp/qa/',
+     sameProduct:true,matchBasis:'model',shippingStatus:'free',inStock:true
+   });
+   await page.route('**/api/compare?**',route=>route.fulfill({
+     status:200,contentType:'application/json',
+     body:JSON.stringify({sources:{yahoo:'ok',rakuten:'error'},mode:'price',pageCount:1,
+       fetchedAt:'2026-10-31T09:00:00Z',offers:[
+         offer(22000,5,1,'少数レビュー店舗',4.8),
+         offer(27000,4.6,60,'多数レビュー店舗',4.6),
+         {...offer(26000,0,0,'口コミ未取得店舗',4.8),reviewUrl:null,sellerReviewCount:0,sellerReviewAverage:0},
+       ]})
+   }));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-research-reviews').waitFor({timeout:10000});
+   const text=await page.locator('.cp-research-reviews').innerText();
+   if(!text.includes('商品評価あり 2件')||!text.includes('店舗評価あり 2件'))throw Error('Review and seller coverage not disclosed');
+   if(!(await page.locator('.cp-research-item').first().innerText()).includes('多数レビュー店舗'))throw Error('Single 5-star review outranked more reliable evidence');
+   const originUrl=await page.locator('.cp-research-item a').first().getAttribute('href');
+   if(!originUrl.startsWith('https://shopping.yahoo.co.jp/review/'))throw Error('Official source URL absent');
+   await page.getByRole('button',{name:'★4.5以上・50件以上'}).click();
+   await page.waitForFunction(()=>document.querySelectorAll('.cp-offers > .cp-offer').length===1,null,{timeout:5000});
+   if(!(await page.locator('.cp-offers > .cp-offer').first().innerText()).includes('多数レビュー店舗'))throw Error('Preset review filter did not keep source-backed item');
+   await page.getByLabel('口コミの最低件数').selectOption('100');
+   await page.getByRole('button',{name:'絞り込みを解除してすべて表示'}).click();
+   await page.waitForFunction(()=>document.querySelectorAll('.cp-offers > .cp-offer').length===3,null,{timeout:5000});
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Review research mobile horizontal overflow '+overflow+'px');
+ });
  await interaction('amazon-review-evidence-manual-handoff',{width:375,height:812},async page=>{
    const offer=(price,store='yahoo')=>({
      store,storeName:store==='yahoo'?'Yahoo!ショッピング':'楽天市場',shopName:'サンプル販売店',
