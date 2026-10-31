@@ -232,6 +232,35 @@ try{
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
    if(overflow>3)throw Error('Review research mobile horizontal overflow '+overflow+'px');
  });
+ await interaction('bayesian-consumer-scoring-mobile',{width:375,height:812},async page=>{
+   const offer=(price,reviewAverage,reviewCount,sellerReviewAverage,sellerReviewCount)=>({
+     store:'yahoo',storeName:'Yahoo!ショッピング',shopName:price===19000?'評価情報なしの店':'口コミ情報がある店',
+     title:'SONY WH-1000XM5',price,point:200,effectivePrice:price-200,
+     url:'https://store.shopping.yahoo.co.jp/qa/'+price+'.html',sponsored:false,image:'',
+     reviewAverage,reviewCount,sellerReviewAverage,sellerReviewCount,
+     reviewUrl:reviewCount>0?'https://shopping.yahoo.co.jp/review/item/list?store_id=qa&page_key='+price:null,
+     shippingStatus:'free',inStock:true,sameProduct:true,matchBasis:'model',
+   });
+   await page.route('**/api/compare?**',route=>route.fulfill({status:200,contentType:'application/json',
+     body:JSON.stringify({sources:{yahoo:'ok',rakuten:'error'},mode:'price',pageCount:1,
+       offers:[offer(19000,0,0,0,0),offer(25000,4.7,280,4.8,160)],
+       fetchedAt:'2026-10-31T10:00:00Z'})}));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-consumer-score').waitFor({timeout:10000});
+   const formula=await page.locator('.cp-score-formula').innerText();
+   if(!formula.includes('B = (n × R + 15 × 3.8)'))throw Error('Bayesian formula missing');
+   const balanced=await page.locator('.cp-score-list').innerText();
+   if(!balanced.includes('¥25,000')||balanced.includes('¥19,000'))throw Error('Missing ratings were silently imputed');
+   if(!(await page.locator('.cp-score-incomplete').innerText()).includes('1件'))throw Error('Unrated shop not disclosed');
+   await page.getByRole('button',{name:'価格重視',exact:true}).click();
+   await page.waitForFunction(()=>document.querySelectorAll('.cp-score-item').length===2,null,{timeout:5000});
+   if(!(await page.locator('.cp-score-item').first().innerText()).includes('¥19,000'))throw Error('Price-only mode did not include evidence-missing shop');
+   await page.locator('.cp-score-item').first().getByRole('button',{name:'横並び比較に追加'}).click();
+   await page.locator('.cp-shortlist').waitFor({timeout:5000});
+   if(!(await page.locator('.cp-shortlist').innerText()).includes('¥19,000'))throw Error('Rated item did not reach comparison shortlist');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Bayesian consumer score mobile overflow '+overflow+'px');
+ });
  await interaction('review-to-price-shortlist-mobile',{width:375,height:812},async page=>{
    const offer=(price,count,average,shop,sellerAverage)=>({
      store:'yahoo',storeName:'Yahoo!ショッピング',shopName:shop,title:'SONY WH-1000XM5',

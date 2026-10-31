@@ -363,3 +363,47 @@ body{margin:0}
 #cp-shortlist-title{scroll-margin-top:16px}
 @media(max-width:850px){.cp-reasons-grid{grid-template-columns:1fr}.cp-reason-option{gap:6px}.cp-research-steps{flex-direction:column}}
 @media(max-width:620px){.cp-quick-nav a{width:100%}}
+
+
+/* Transparent consumer score: only authoritative API input, no invented ratings. */
+.cp-consumer-score{padding:23px 0;margin:22px 0;border-top:1px solid #becfbe;border-bottom:1px solid #becfbe;scroll-margin-top:14px}
+.cp-score-header h3{margin:6px 0;font-size:21px;line-height:1.4;color:#154e36}
+.cp-score-header p{font-size:12px;color:#4d6754;line-height:1.8;max-width:860px;margin:0 0 13px}
+.cp-score-modes{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.cp-score-modes button{min-height:44px;border:1px solid #b2cab7;background:#fff;color:#1e593e;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer}
+.cp-score-modes button[aria-pressed=true]{background:#155f43;border-color:#155f43;color:#fff}
+.cp-score-weights{font-size:12px;line-height:1.8;color:#36604b;margin:9px 0 13px}
+.cp-score-formula{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0 20px}
+.cp-score-formula>div{display:flex;flex-direction:column;gap:7px;border-top:1px solid #c4d6c8;padding:13px 0;min-width:0}
+.cp-score-formula strong{font-size:13px;color:#244e39}
+.cp-score-formula code{font-size:12px;color:#1e5840;white-space:normal;overflow-wrap:anywhere;line-height:1.8}
+.cp-score-formula small{font-size:11px;line-height:1.7;color:#56705e}
+.cp-score-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cp-score-item{min-width:0;border:1px solid #cfddcf;background:#fff;padding:14px}
+.cp-score-item-heading{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.cp-score-item-heading>span{font-size:11px;font-weight:800;color:#25533a}
+.cp-score-item-heading>strong{font-size:23px;color:#ad462b;font-variant-numeric:tabular-nums}
+.cp-score-item-heading small{font-size:10px;font-weight:500;color:#567360}
+.cp-score-item>p{font-size:12px;color:#385440;line-height:1.65;margin:7px 0 10px;overflow-wrap:anywhere}
+.cp-score-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cp-score-metrics>div{display:flex;flex-direction:column;gap:5px;min-width:0;border-top:1px solid #dae6dc;padding:8px 0 5px}
+.cp-score-metrics span{font-size:10px;line-height:1.5;color:#4e6753}
+.cp-score-metrics b{font-size:13px;line-height:1.55;color:#245b40;overflow-wrap:anywhere}
+.cp-score-metrics small{font-size:10px;line-height:1.7;color:#57715d}
+.cp-score-item-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:11px}
+.cp-score-item-actions button{min-height:44px;cursor:pointer;padding:9px 11px;background:#145f45;color:#fff;border:1px solid #145f45;font-size:11px;font-weight:800}
+.cp-score-item-actions button[aria-pressed=true]{background:#e9f1e9;color:#13553c}
+.cp-score-item-actions button:disabled{opacity:.5;cursor:not-allowed}
+.cp-score-item-actions a{font-size:11px;line-height:1.5;color:#175a40;text-decoration:underline;text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px}
+.cp-score-incomplete{margin:15px 0;border-top:1px solid #d1dfd2;padding:11px 0}
+.cp-score-incomplete summary{min-height:44px;cursor:pointer;font-size:12px;font-weight:800;color:#2a6046;padding:11px 0}
+.cp-score-incomplete ul{list-style:none;padding:0;margin:0}
+.cp-score-incomplete li{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid #dfebe2;padding:8px 0;font-size:11px;color:#47624f}
+.cp-score-incomplete li small{color:#896642}
+.cp-score-incomplete li a{color:#175a40;min-height:44px;display:inline-flex;align-items:center}
+.cp-score-empty{padding:15px;background:#f5f8f5;border:1px solid #d2e1d6;color:#41664d;font-size:12px;line-height:1.7;margin:12px 0}
+.cp-score-empty button{background:#fff;color:#1b6145;padding:10px 14px;min-height:44px;border:1px solid #8bbb9d;cursor:pointer;font-weight:800}
+.cp-score-caution{margin:16px 0 0;color:#54715c;font-size:11px;line-height:1.9}
+.cp-consumer-score :is(a,button,summary):focus-visible{outline:3px solid #247e59;outline-offset:3px}
+@media(max-width:850px){.cp-score-list,.cp-score-formula{grid-template-columns:1fr}}
+@media(max-width:580px){.cp-score-metrics{grid-template-columns:1fr}.cp-score-item-actions button{width:100%}.cp-score-modes button{flex:1 1 44%}}
