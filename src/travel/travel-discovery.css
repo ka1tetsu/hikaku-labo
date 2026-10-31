@@ -115,8 +115,8 @@
 .tvx-day-index strong{font-size:27px;color:#1b6a4b;margin-left:4px}
 .tvx-day-contents h4{font-size:14px;font-weight:850;color:#365d45;margin:0 0 10px}
 .tvx-day-contents ol{margin:0;padding:0;display:flex;gap:9px;flex-wrap:wrap;list-style:none}
-.tvx-day-contents li{display:flex;gap:8px;align-items:center;background:#f3f8f4;border:1px solid #e2eee5;border-radius:9px;padding:10px 13px;font-size:13px;color:#264b35}
-.tvx-day-contents li span{background:#dae9de;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font:800 11px 'Noto Sans JP',sans-serif;color:#24583c}
+.tvx-day-contents>ol>li{display:flex;gap:8px;align-items:center;background:#f3f8f4;border:1px solid #e2eee5;border-radius:9px;padding:10px 13px;font-size:13px;color:#264b35}
+.tvx-day-contents>ol>li>span{background:#dae9de;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font:800 11px 'Noto Sans JP',sans-serif;color:#24583c}
 .tvx-itinerary-source{border-top:1px solid #e5eee5;padding-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:#657d6c}
 .tvx-itinerary-source a{color:#177150!important;text-decoration:underline}
 .tvx-plan-bottom{margin-top:21px;display:flex;align-items:center;flex-wrap:wrap;gap:12px 23px;border:1px solid #d5e6db;border-radius:13px;background:#fff;padding:21px 24px}
