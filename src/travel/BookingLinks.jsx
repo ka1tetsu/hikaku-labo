@@ -3,6 +3,8 @@ import { recordOutboundClick } from '../shared/outboundClient.js';
 import { ORIGINS, addDays, buildFlightLinks, buildRailLinks, buildStayLinks, isoDate } from './bookingLinks.js';
 import { LINK_CONFIG } from './linkConfig.js';
 import HotelAds from './HotelAds.jsx';
+import { googleTravelDiscovery } from './googleDiscovery.js';
+import { TRAVEL_PROVIDERS } from './providers.js';
 
 export function BookingLinkList({ links, placement }) {
   if (!links?.length) return null;
@@ -32,6 +34,8 @@ export default function BookingHub({ destination, nights, travelers, setTraveler
   const stays = useMemo(() => buildStayLinks({ destination, checkin: depart, checkout: ret, nights, adults, rooms, config: LINK_CONFIG }), [destination, depart, ret, nights, adults, rooms]);
   const rail = flights.length ? [] : buildRailLinks({ destination, nights, config: LINK_CONFIG });
   const today = isoDate(new Date());
+  const googleLinks = googleTravelDiscovery({place:destination.name,depart,checkout:ret,adults,type:activeTab});
+
 
   return <div className="tvw-hub" id="booking">
     <div className="tvw-hub-head">
@@ -59,6 +63,14 @@ export default function BookingHub({ destination, nights, travelers, setTraveler
       <HotelAds destinationId={destination.id} nights={nights} travelers={adults} rooms={rooms} depart={depart} checkout={ret} />
       <BookingLinkList links={stays} placement="hub-stays" />
     </>}
+    <section className="tvw-google-discovery" aria-labelledby="tvw-google-title">
+      <h4 id="tvw-google-title">Googleでさらに幅広く探す</h4>
+      <p>Google検索・Google ホテルは外部サイトです。検索キーワードを引き継ぐだけで、当サイトが全社の料金や空室を取得する機能ではありません。</p>
+      <div className="tvw-google-grid">{googleLinks.map(link=><a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">
+        <strong>{link.label} ↗</strong><small>{link.note}</small>
+      </a>)}</div>
+      <a className="tvw-all-sites" href="#global-travel-compare">掲載している{TRAVEL_PROVIDERS.length}の旅行・予約サイトから探す →</a>
+    </section>
     <AffiliateNote />
   </div>;
 }
