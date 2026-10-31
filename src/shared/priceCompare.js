@@ -1,3 +1,5 @@
+import { reviewMetrics, safeProviderReviewUrl, safeStoreUrl } from './reviewEvidence.js';
+
 // Cross-store price comparison for real products. Pure functions shared by the
 // /api/compare serverless route, the compare page and tests. Only prices returned
 // by official store APIs are compared; nothing is estimated or scraped.
@@ -70,13 +72,16 @@ export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
   const pointRate = raw.pointRate == null || raw.pointRate === '' ? 0 : Math.max(0, Number(raw.pointRate) || 0);
   const point = Math.floor(price * pointRate / 100);
   const url = raw.affiliateUrl || wrapUrl(raw.itemUrl);
+  const review = reviewMetrics(raw.reviewAverage,raw.reviewCount);
   return {
     shippingStatus: raw.postageFlag === 0 ? 'free' : raw.postageFlag === 1 ? 'extra' : 'unknown',
     store: 'rakuten', storeName: '楽天市場', shopName: raw.shopName || '', title: raw.itemName || '',
     price, shippingFree: raw.postageFlag === 0, point, effectivePrice: price - point,
     url, sponsored: Boolean(raw.affiliateUrl) || Boolean(url && url !== raw.itemUrl),
     image: (raw.mediumImageUrls?.[0]?.imageUrl || raw.mediumImageUrls?.[0] || '').toString().replace('_ex=128x128', '_ex=200x200'),
-    reviewAverage: Number(raw.reviewAverage) || 0, reviewCount: Number(raw.reviewCount) || 0, jan: '',
+    reviewAverage: review.average, reviewCount: review.count, reviewUrl: null,
+    sellerReviewAverage: 0, sellerReviewCount: 0, storeUrl: null,
+    inStock: raw.availability === 1 ? true : raw.availability === 0 ? false : null, jan: '',
   };
 }
 
@@ -89,13 +94,20 @@ export function normalizeYahooOffer(raw, wrapUrl = url => url) {
   const point = Math.max(0, Number(limited ?? raw.point?.amount) || 0);
   const pointKind = limited != null ? 'paypay-limited' : 'provider';
   const url = wrapUrl(raw.url);
+  const review = reviewMetrics(raw.review?.rate,raw.review?.count);
+  const sellerReview = reviewMetrics(raw.seller?.review?.rate,raw.seller?.review?.count);
   return {
     shippingStatus: raw.shipping?.code === 2 ? 'free' : raw.shipping?.code === 3 ? 'conditional' : 'unknown',
     store: 'yahoo', storeName: 'Yahoo!ショッピング', shopName: raw.seller?.name || '', title: raw.name || '',
     price, shippingFree: raw.shipping?.code === 2, point, pointKind, effectivePrice: price - point,
     url, sponsored: url !== raw.url,
     image: raw.image?.medium || raw.exImage?.url || '',
-    reviewAverage: Number(raw.review?.rate) || 0, reviewCount: Number(raw.review?.count) || 0, jan: raw.janCode || '',
+    reviewAverage: review.average, reviewCount: review.count,
+    reviewUrl: safeProviderReviewUrl(raw.review?.url,'yahoo'),
+    sellerReviewAverage: sellerReview.average, sellerReviewCount: sellerReview.count,
+    storeUrl: safeStoreUrl(raw.seller?.url,'yahoo'),
+    inStock: typeof raw.inStock==='boolean'?raw.inStock:null,
+    jan: raw.janCode || '',
   };
 }
 
