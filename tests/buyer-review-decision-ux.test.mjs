@@ -59,7 +59,7 @@ test('evidence-to-shortlist controls, decision section and skip-navigation are w
  const decision=read('src/compare/PurchaseReasonPanel.jsx');
  assert.match(page,/<PurchaseReasonPanel/);
  assert.match(page,/onChoose=\{chooseFromReview\}/);
- assert.match(page,/getElementById\\('cp-shortlist-title'\\)/); // matches reference to actual target
+ assert.ok(page.includes("getElementById('cp-shortlist-title')"));
  assert.match(review,/価格と条件の比較表に追加/);
  assert.match(review,/別の商品やアクセサリーの高評価を代わりに表示していません/);
  assert.match(decision,/広告料で決めたおすすめではありません/);
