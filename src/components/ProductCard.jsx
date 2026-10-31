@@ -126,7 +126,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     </span>
                 </a>
 
-                <a className="btn-compare-all" href={`/compare/?q=${encodeURIComponent(deriveProductQuery(item.itemName))}&ref=${encodeURIComponent(item.itemName.slice(0, 160))}`}>
+                <a className="btn-compare-all" href={`/compare/?q=${encodeURIComponent(deriveProductQuery(item.itemName))}&ref=${encodeURIComponent(item.itemName.slice(0, 160))}${item.jan?'&jan='+encodeURIComponent(item.jan):''}`}>
                     主要ショップで価格比較 →
                 </a>
 

@@ -11,6 +11,7 @@ import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from
 import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import BuyerChoices from './BuyerChoices.jsx';
 import AmazonComparePanel from './AmazonComparePanel.jsx';
+import ShopPriceBoard from './ShopPriceBoard.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
 import PriceTargetMemo from './PriceTargetMemo.jsx';
@@ -41,6 +42,7 @@ function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFu
       {offer.reviewUrl && <a className="cp-review-evidence" href={offer.reviewUrl} target="_blank" rel="noopener noreferrer">取得元の口コミを読む ↗</a>}
       {offer.sellerReviewCount>0 && <p className="cp-seller-evidence">販売店の評価 ★{offer.sellerReviewAverage.toFixed(1)}（{offer.sellerReviewCount.toLocaleString('ja-JP')}件）
         {offer.storeUrl&&<a href={offer.storeUrl} target="_blank" rel="noopener noreferrer">店舗情報 ↗</a>}</p>}
+      {/^\d{8}$|^\d{13}$/.test(offer.jan||'') && <a className="cp-research-jan" href={'/compare/?q='+encodeURIComponent(offer.title.slice(0,80))+'&jan='+encodeURIComponent(offer.jan)}>この商品のJANで全ショップの価格を再検索 ↗</a>}
       <p className="cp-identity">{offer.matchBasis==='jan'?'JAN一致':offer.matchBasis==='model'?'型番一致・仕様は要確認':'商品名が類似・同一商品か未確認'}</p>
       <label className="cp-pick"><input type="checkbox" checked={selected} disabled={!selected&&selectionFull} onChange={()=>onToggle(offer)}/>比較表に追加</label>
     </div>
@@ -201,6 +203,7 @@ export default function ComparePage() {
           {state.error && <p className="cp-error">{state.error} <a href="#cp-manual">3ショップの価格を手入力して比較する →</a></p>}
           {visibleMetrics && <p className="cp-result-context" role="status">表示中：{visibleMetrics.count}件／{visibleMetrics.stores}モール、JAN一致{visibleMetrics.evidence}件。型番・JANが確認できない候補は同一商品と断定しません。</p>}
           {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>}
+          {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
           {cheapest && <div className="cp-summary">
             <div><span>{priceSort === "points" ? "ポイント差引後の最も低い参考額" : (same.length ? "型番・JAN照合候補の最も低い商品価格" : "類似出品の最も低い商品価格")}</span><strong>{yen(displayValue(cheapest, priceSort))}</strong><small>{priceSort === "points" ? "現金支払額ではありません · " : ""}{cheapest.storeName}・{cheapest.shopName}</small></div>
             <div><span>{priceSort === "points" ? "ポイント考慮後の参考額の幅" : "商品価格の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
@@ -226,7 +229,7 @@ export default function ComparePage() {
 
         <PriceTargetMemo query={query} data={state.data} loading={state.loading}/>
 
-        {(query.q || query.jan) && <ManualStoreCompare keyword={searchTerm} stores={stores} openRequested={manualRequested} />}
+        {(query.q || query.jan) && <ManualStoreCompare keyword={searchTerm} stores={stores} autoOffers={rawOffers} openRequested={manualRequested} />}
 
         {searchTerm && <section className="cp-stores">
           <h2>ほかのショップでも探す</h2>

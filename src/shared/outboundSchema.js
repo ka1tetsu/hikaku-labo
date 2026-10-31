@@ -6,7 +6,7 @@ import { AREA_PAGES, SIM_PAIRS } from '../services/pages.js';
 // No IP, user agent, session IDs, search terms, destination URLs or query strings.
 export const ANALYTICS_SECTIONS = Object.freeze(['products', 'tools', 'travel', 'life']);
 export const TRAVEL_MERCHANTS = Object.freeze(['yahoo-travel', 'rakuten-travel', 'trip-com', 'skyscanner', 'expedia', 'booking', 'google-flights', 'google-maps', ...TRAVEL_PROVIDERS.map(p => p.id)].filter((id, i, all) => all.indexOf(id) === i));
-export const STORE_MERCHANTS = Object.freeze(['rakuten', 'amazon', 'yahoo-shopping', 'au-pay', 'qoo10', 'yodobashi', 'biccamera', 'apple', 'iherb', 'mercari', 'rakuma', 'paypay-fleamarket']);
+export const STORE_MERCHANTS = Object.freeze(['rakuten', 'amazon', 'yahoo-shopping', 'au-pay', 'qoo10', 'yodobashi', 'biccamera', 'apple', 'iherb', 'mercari', 'rakuma', 'paypay-fleamarket', 'edion', 'joshin', 'nojima', 'sofmap', 'kojima', 'tsukumo']);
 export const ANALYTICS_MERCHANTS = Object.freeze([...STORE_MERCHANTS, 'studio', 'wix', 'base', 'shopify', 'xserver-wp', 'kinsta', ...TRAVEL_MERCHANTS, ...SERVICE_IDS]);
 
 export function validOutboundEvent(body) {
