@@ -36,7 +36,8 @@ export function OfferShortlist({offers,onRemove,onClear}){
     {name:'ポイント相当額',get:o=>(o.point||0).toLocaleString('ja-JP')+'pt（現金値引きではない）'},
     {name:'型番・JAN照合',get:o=>o.matchBasis==='jan'?'JAN一致':o.matchBasis==='model'?'型番一致（色・容量未照合）':'商品名が類似・未照合'},
     {name:'販売店',get:o=>o.shopName||'店舗名未取得'},
-    {name:'口コミ',get:o=>o.reviewCount>0?'★'+o.reviewAverage.toFixed(1)+' / '+o.reviewCount+'件':'未取得'},
+    {name:'商品口コミ（取得元別）',get:o=>o.reviewCount>0?'★'+o.reviewAverage.toFixed(1)+' / '+o.reviewCount+'件':'未取得'},
+    {name:'店舗評価（商品評価とは別）',get:o=>o.sellerReviewCount>0?'★'+o.sellerReviewAverage.toFixed(1)+' / '+o.sellerReviewCount+'件':'未取得'},
   ];
   return <section className="cp-shortlist" aria-labelledby="cp-shortlist-title">
     <div className="cp-shortlist-head"><div><span>購入先を決める前に</span><h3 id="cp-shortlist-title">選んだ{offers.length}件を並べて確認</h3></div>
