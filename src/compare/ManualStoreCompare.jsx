@@ -68,7 +68,7 @@ export default function ManualStoreCompare({ keyword, stores=[], autoOffers=[], 
   return <section className="cp-manual" id="cp-manual" aria-labelledby="cp-manual-heading">
     <div className="cp-manual-head">
       <div><span className="cp-kicker">MULTI-STORE CASH CHECK</span>
-        <h2 id="cp-manual-heading">12ショップまで、送料込みの安い順に比較。</h2>
+        <h2 id="cp-manual-heading">18ショップまで、送料込みの安い順に比較。</h2>
         <p>楽天・Yahoo!の公式APIで取得した<strong>同一型番・送料無料の候補</strong>に、Amazon・家電量販店・その他のサイトで自分で確認した税込価格と送料を加えられます。価格入力はこの端末内で処理します。</p>
       </div>
       {!opened && <button className="cp-manual-open" type="button" onClick={()=>setOpened(true)}>他のショップの価格を追加する →</button>}
@@ -76,7 +76,7 @@ export default function ManualStoreCompare({ keyword, stores=[], autoOffers=[], 
     {opened && <form onSubmit={submit}>
       <div className="cp-manual-steps" aria-label="比較の手順"><span>1. 同じ型番・状態を確認</span><span>2. 商品価格と送料を入力</span><span>3. 全候補を安い順に比較</span></div>
       <div className="cp-manual-add">
-        <label htmlFor="cp-add-store">比較するショップを増やす（最大12サイト）
+        <label htmlFor="cp-add-store">比較するショップを増やす（最大18サイト）
           <select id="cp-add-store" defaultValue="" onChange={e=>{addStore(e.target.value);e.target.value='';}}>
             <option value="">追加するショップを選択</option>
             {available.map(store=><option key={store.id} value={store.id}>{store.name}</option>)}
