@@ -16,6 +16,12 @@ export function OfferFilters({filters,onChange,storeOptions,visibleCount,totalCo
       <label>口コミの評価<select value={filters.reviewMin} onChange={e=>onChange('reviewMin',e.target.value)}>
         <option value="0">指定しない</option><option value="3">3.0以上</option><option value="4">4.0以上</option><option value="4.5">4.5以上</option>
       </select></label>
+      <label>口コミの最低件数<select value={filters.minReviewCount||'0'} onChange={e=>onChange('minReviewCount',e.target.value)}>
+        <option value="0">指定しない</option><option value="10">10件以上</option><option value="20">20件以上</option><option value="50">50件以上</option><option value="100">100件以上</option>
+      </select></label>
+      <label>販売店の評価（商品とは別）<select value={filters.sellerRatingMin||'0'} onChange={e=>onChange('sellerRatingMin',e.target.value)}>
+        <option value="0">指定しない</option><option value="4">店舗★4.0以上</option><option value="4.5">店舗★4.5以上</option>
+      </select></label>
       <label>商品価格の上限（円）<input type="number" min="1" max="999999999" step="1" placeholder="指定しない"
         value={filters.maxPrice} onChange={e=>onChange('maxPrice',e.target.value)}/></label>
       <label className="cp-filter-search">出品名・店名で絞る<input type="search" maxLength={80} placeholder="容量・色・型番・店舗名など"
@@ -24,7 +30,7 @@ export function OfferFilters({filters,onChange,storeOptions,visibleCount,totalCo
     <div className="cp-filter-foot"><label><input type="checkbox" checked={filters.verifiedOnly}
       onChange={e=>onChange('verifiedOnly',e.target.checked)}/> 型番・JAN一致の候補だけ見る</label>
       <button type="button" onClick={onReset}>絞り込みを解除</button></div>
-    <p>出品ごとの送料・販売価格・ポイントは各ショップのAPI取得値です。未取得の料金や別の型番を補完して「最安」とは判定しません。</p>
+    <p>口コミ評価・件数は商品レビュー、店舗の星評価は販売店レビューを別々に判定します。評価が未取得の場合、評価条件で絞ると除外されます。出品ごとの送料・販売価格・ポイントは取得元APIの値であり、未取得情報は推定しません。</p>
   </section>;
 }
 
