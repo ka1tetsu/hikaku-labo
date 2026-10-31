@@ -67,7 +67,7 @@ export const SAME_PRODUCT = 80;
 
 export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
   const price = Number(raw.itemPrice) || 0;
-  const pointRate = Number(raw.pointRate) || 1;
+  const pointRate = raw.pointRate == null || raw.pointRate === '' ? 0 : Math.max(0, Number(raw.pointRate) || 0);
   const point = Math.floor(price * pointRate / 100);
   const url = raw.affiliateUrl || wrapUrl(raw.itemUrl);
   return {
@@ -82,7 +82,7 @@ export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
 
 export function normalizeYahooOffer(raw, wrapUrl = url => url) {
   const price = Number(raw.price) || 0;
-  const point = Number(raw.point?.amount) || 0;
+  const point = Math.max(0, Number(raw.point?.amount) || 0);
   return {
     shippingStatus: raw.shipping?.code === 2 ? 'free' : 'unknown',
     store: 'yahoo', storeName: 'Yahoo!ショッピング', shopName: raw.seller?.name || '', title: raw.name || '',

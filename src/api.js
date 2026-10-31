@@ -71,10 +71,10 @@ export function buildYahooAffiliateUrl(keyword) {
 // ここでモックを混ぜないこと（比較の根拠が架空になるため）。
 export function normalizeRakutenItem(raw) {
     const price = Number(raw.itemPrice) || 0;
-    const pointRate = Number(raw.pointRate) || 1;
+    const pointRate = raw.pointRate == null || raw.pointRate === '' ? 0 : Math.max(0, Number(raw.pointRate) || 0);
     const isFreeShipping = raw.postageFlag === 0;
 
-    // ポイント還元額（1倍＝通常付与1%相当）。楽天の pointRate は倍率。
+    // ポイント還元額（1倍＝1%相当）。未取得の場合は付与を推測せず0として扱う。
     const pointBack = Math.floor(price * (pointRate / 100));
 
     return {

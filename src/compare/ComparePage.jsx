@@ -9,6 +9,7 @@ import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/c
 import { displayValue, displayRange } from '../shared/offerDisplay.js';
 import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
 import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
+import PriceTargetMemo from './PriceTargetMemo.jsx';
 import { openConcierge } from '../shared/conciergeActions.js';
 import ManualStoreCompare from './ManualStoreCompare.jsx';
 import './compare.css';
@@ -183,6 +184,8 @@ export default function ComparePage() {
           </div>}
           <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 条件を変えて候補を探す</button>
         </section>}
+
+        <PriceTargetMemo query={query} data={state.data} loading={state.loading}/>
 
         {(query.q || query.jan) && <ManualStoreCompare keyword={searchTerm} stores={stores} />}
 

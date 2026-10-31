@@ -127,6 +127,39 @@ try{
    if(!(await page.locator('.cp-criteria-note').innerText()).includes('購入時の支払額ではありません'))throw Error('Missing points disclaimer');
    await page.locator('.cp-results').screenshot({path:path.join(out,'interaction-cash-vs-points.png'),animations:'disabled'});
  });
+ await interaction('checkout-and-private-price-target',{width:375,height:812},async page=>{
+   const makeOffer=(name,price,shippingStatus,url)=>({
+     store:'rakuten',storeName:'楽天市場',shopName:name,title:'WH-1000XM5 ヘッドホン '+name,
+     price,point:500,effectivePrice:price-500,shippingStatus,shippingFree:shippingStatus==='free',
+     image:'',url,sponsored:false,reviewCount:20,reviewAverage:4.5,sameProduct:true,matchBasis:'model',match:95,
+   });
+   await page.route('**/api/compare?**',async route=>route.fulfill({
+     status:200,contentType:'application/json',body:JSON.stringify({
+       sources:{rakuten:'ok',yahoo:'disabled'},fetchedAt:'2026-10-31T06:00:00.000Z',
+       offers:[makeOffer('出品店A',29900,'unknown','https://item.rakuten.co.jp/a/x/'),
+         makeOffer('出品店B',32000,'free','https://item.rakuten.co.jp/b/x/')],
+     }),
+   }));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   const picks=page.locator('.cp-offers .cp-pick input');
+   await picks.first().waitFor({timeout:8000});
+   await picks.nth(0).check();await picks.nth(1).check();
+   const checkout=page.locator('.cp-checkout');
+   if(!(await checkout.innerText()).includes('送料が未確定'))throw Error('Missing-shipping should stay unpriced');
+   await checkout.getByRole('spinbutton',{name:'出品店Aの送料'}).fill('1000');
+   await checkout.getByRole('spinbutton',{name:'出品店Aのクーポン額'}).fill('2000');
+   if(!(await checkout.innerText()).includes('¥28,900'))throw Error('Checkout total was not adjusted to ¥28,900');
+   await page.locator('#cp-target-input').fill('30000');
+   await page.locator('.cp-watch-form button').click();
+   const watch=page.locator('.cp-watch');
+   if(!(await watch.innerText()).includes('目標以下'))throw Error('Verified model price did not trigger on-visit threshold');
+   const stored=await page.evaluate(()=>localStorage.getItem('vivlica-product-targets-v1'));
+   if(!stored||stored.includes('shopName')||stored.includes('offers')||stored.includes('effectivePrice'))throw Error('Merchant data leaked into target storage');
+   await page.reload({waitUntil:'domcontentloaded'});
+   await page.locator('.cp-watch-list li').first().waitFor({timeout:8000});
+   if(!(await page.locator('.cp-watch-list').innerText()).includes('¥30,000'))throw Error('Price target did not persist locally');
+   await watch.screenshot({path:path.join(out,'interaction-price-target-mobile.png'),animations:'disabled'});
+ });
  await interaction('price-search',{width:1440,height:900},async page=>{
    await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
    await page.locator('#cp-q').fill('WH-1000XM5');
