@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { moneyInput, checkoutEstimate, checkoutComparison } from '../src/shared/checkoutEstimate.js';
+import { normalizeRakutenOffer, normalizeYahooOffer } from '../src/shared/priceCompare.js';
 import { WATCH_STORAGE_KEY, WATCH_MAX, makePriceTarget, watchQueryId, parsePriceTargets, savePriceTarget, priceTargetLink, evaluatePriceTarget } from '../src/shared/priceTargets.js';
 
 const offer=(price, options={})=>({
@@ -43,6 +44,14 @@ test('checkout ranking only considers offers with an actually calculable shippin
   assert.equal(comparison.cheapest.total,1100);
   assert.equal(comparison.difference,400);
   assert.equal(comparison.missingCount,0);
+});
+test('reward values must be evidence-backed, not assumed as 1% when missing',()=>{
+  const rakuten=normalizeRakutenOffer({ itemName:'X',itemPrice:10000,itemUrl:'https://item.rakuten.co.jp/demo/x/' });
+  assert.equal(rakuten.point,0);
+  assert.equal(rakuten.effectivePrice,10000);
+  const yahoo=normalizeYahooOffer({ name:'X',price:10000,point:{amount:-999},url:'https://shopping.yahoo.co.jp/demo' });
+  assert.equal(yahoo.point,0);
+  assert.equal(yahoo.effectivePrice,10000);
 });
 test('price targets only store search + goal and use a bounded, deduplicated list',()=>{
   const target=makePriceTarget(query,30000);
