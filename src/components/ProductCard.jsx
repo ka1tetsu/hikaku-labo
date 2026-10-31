@@ -39,7 +39,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     // 楽天APIは送料額を返さないため、送料別の商品が実質最安になった場合は
                     // 「送料を含まない比較」であることをバッジ自体に明示する
                     <div className={`cheapest-badge ${item.isFreeShipping ? '' : 'with-caveat'}`}>
-                        {item.isFreeShipping ? '実質最安' : '実質最安（送料別）'}
+                        {item.isFreeShipping ? '表示候補の参考額が最小' : '表示候補の参考額が最小・送料要確認'}
                     </div>
                 )}
                 <a href={bestUrl} target="_blank" rel="noopener noreferrer sponsored" className="card-image-link" onClick={() => recordMerchant('product-image')}>
@@ -74,7 +74,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
 
                 <div className="product-features">
                     <span className={`feature-tag ${item.isFreeShipping ? '' : 'muted'}`}>
-                        {item.isFreeShipping ? '送料無料' : '送料別'}
+                        {item.isFreeShipping ? '送料無料' : item.postageFlag === 1 ? '送料別' : '送料情報未取得'}
                     </span>
                     {item.pointRate > 1 && (
                         <span className="feature-tag point">ポイント{item.pointRate}倍</span>
@@ -96,7 +96,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                     <div className="effective-price">
                         実質 <strong>¥{item.effectivePrice.toLocaleString()}</strong>
                         <span className="effective-note">
-                            （ポイント {item.pointBack.toLocaleString()}円相当を差引{item.isFreeShipping ? '' : '／送料別'}）
+                            （ポイント {item.pointBack.toLocaleString()}円相当を差引{item.isFreeShipping ? '' : item.postageFlag === 1 ? '／送料別' : '／送料情報未取得'}）
                         </span>
                     </div>
                 </div>
