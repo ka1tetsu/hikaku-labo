@@ -36,7 +36,7 @@ function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFu
     <div className="cp-offer-body">
       <div className="cp-offer-store"><b className={'cp-store cp-store-' + offer.store}>{offer.storeName}</b><span>{offer.shopName}</span>{cheapest && <em className="cp-best">{sort === 'points' ? '表示候補の参考額が最小' : '表示候補の価格が最小'}</em>}</div>
       <p className="cp-offer-title">{offer.title.length > 90 ? offer.title.slice(0, 90) + '…' : offer.title}</p>
-      <p className="cp-offer-meta">{shippingLabel(offer)}{offer.reviewCount>0
+      <p className="cp-offer-meta">{offer.condition==='new'?'新品（取得元の表示）・':offer.condition==='used'?'中古（取得元の表示）・':''}{offer.inStock===false?'在庫なし（取得時点）・':''}{shippingLabel(offer)}{offer.reviewCount>0
         ? `・商品口コミ ★${offer.reviewAverage.toFixed(1)}（${offer.reviewCount.toLocaleString('ja-JP')}件）` : '・商品口コミ評価は未取得'}</p>
       {offer.reviewUrl && <a className="cp-review-evidence" href={offer.reviewUrl} target="_blank" rel="noopener noreferrer">取得元の口コミを読む ↗</a>}
       {offer.sellerReviewCount>0 && <p className="cp-seller-evidence">販売店の評価 ★{offer.sellerReviewAverage.toFixed(1)}（{offer.sellerReviewCount.toLocaleString('ja-JP')}件）
