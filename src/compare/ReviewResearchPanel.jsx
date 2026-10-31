@@ -7,7 +7,7 @@ export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,o
   const coverage=reviewCoverage(offers);
   const {rows,verifiedOnly}=reviewResearchOffers(offers);
   const amazon=stores.find(s=>s.id==='amazon');
-  const evidenceMissing=coverage.total===0||coverage.productReviewed===0;
+  const evidenceMissing=rows.length===0;
   return <section className="cp-research-reviews" aria-labelledby="cp-research-title">
     <div className="cp-research-heading">
       <div><span>REVIEWS / SOURCE CHECK</span><h3 id="cp-research-title">口コミ・星評価から購入先を調べる</h3>
@@ -30,7 +30,7 @@ export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,o
       <strong>{verifiedOnly?'型番・JAN照合できた出品の口コミ情報':'商品名が似た出品の口コミ情報（同一商品とは未確認）'}</strong>
       <small>各行は別々の出品・レビュー母集団です。星評価の単純合算はせず、下の並びは口コミ件数を考慮した参考順で、品質を保証するものではありません。</small>
     </div>}
-    {evidenceMissing?<p className="cp-research-empty">この検索ページでは、取得元が提供する商品評価を確認できませんでした。評価なしを「低評価」と扱わず、販売先の最新レビューを直接確認してください。</p>:
+    {evidenceMissing?<p className="cp-research-empty">{verifiedOnly?'型番・JANを照合できた商品の口コミが未取得です。別の商品やアクセサリーの高評価を代わりに表示していません。':'この検索ページでは、取得元が提供する商品評価を確認できませんでした。'} 評価なしを「低評価」と扱わず、販売先の最新レビューを直接確認してください。</p>:
       <div className="cp-research-list">{rows.map(offer=><article className="cp-research-item" key={offer.store+':'+offer.url}>
         <div className="cp-research-item-name"><strong>{offer.storeName}</strong><span>{offer.shopName||'販売店名未取得'}</span>
           <p>{offer.title.length>90?offer.title.slice(0,90)+'…':offer.title}</p></div>
