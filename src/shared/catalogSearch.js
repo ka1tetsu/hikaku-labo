@@ -39,6 +39,7 @@ export function catalogFromComparison(data, keyword) {
       postageFlag: offer.shippingStatus === 'extra' ? 1 : offer.shippingStatus === 'free' ? 0 : undefined,
       sameProduct: Boolean(offer.sameProduct),
       matchBasis: offer.matchBasis || 'unverified',
+      jan: /^\d{8}$|^\d{13}$/.test(String(offer.jan||'')) ? String(offer.jan) : '',
     }));
   // Show the source result order, unless this is a known product model.
   if (specific) items.sort((a,b) => a.itemPrice-b.itemPrice);
