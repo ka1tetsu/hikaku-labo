@@ -13,6 +13,7 @@ import BuyerChoices from './BuyerChoices.jsx';
 import AmazonComparePanel from './AmazonComparePanel.jsx';
 import ReviewResearchPanel from './ReviewResearchPanel.jsx';
 import PurchaseReasonPanel from './PurchaseReasonPanel.jsx';
+import ConsumerScorePanel from './ConsumerScorePanel.jsx';
 import ShopPriceBoard from './ShopPriceBoard.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
@@ -211,6 +212,7 @@ export default function ComparePage() {
           {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
           <nav className="cp-quick-nav" aria-label="商品比較の目次">
             <a href="#cp-research-title">商品・販売店の口コミを調べる</a>
+            <a href="#cp-score-title">口コミ・価格の参考指数を計算</a>
             <a href="#cp-allshops-title">送料込みの最安候補を確認</a>
             <a href="#cp-manual-heading">18ショップの確認済み価格を比較</a>
           </nav>
@@ -227,6 +229,7 @@ export default function ComparePage() {
             activeReviewMin={filters.reviewMin} activeReviewCount={filters.minReviewCount}
             onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}
             onChoose={chooseFromReview} selectedKeys={selectedKeys}/>}
+          {!state.loading && <ConsumerScorePanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
           {!state.loading && <PurchaseReasonPanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
           {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>} 
           {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
@@ -279,6 +282,7 @@ export default function ComparePage() {
 
         <section className="cp-disclosure">
           <h2>広告・データについて</h2>
+          <p>数式で計算する参考指数には、当サイトで定めた事前評価★3.8と仮の15件によるベイズ補正を採用しています。価格・商品評価・販売店評価を指定配点で加重平均しますが、評価が未取得の出品を0点や平均点として補完せず順位を保留します。参考指数は品質を証明したものではありません。</p>
           <p>Yahoo!ショッピングの口コミ点数・件数・レビューURLは公式商品検索API由来です。販売店の評価は商品評価とは別です。件数を考慮する口コミ参考順は小標本の極端な評価を抑えるための統計上の補正値であり、独自の実機レビューではありません。Amazonの価格・レビューはAPI未接続のため自動取得・転載せず、Amazonで確認した価格は手入力で比較できます。</p>
           <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で購入が成立すると、VivlicaがショップやASPから紹介料を受け取る場合があります。並び順は商品価格を安い順に並べるのが標準です。口コミ評価・件数やポイント差引後の参考額でも並び替えられます。ポイントは購入時の現金値引きではなく、広告報酬額は順位計算に使っていません。</p>
           <p>価格・ポイント・送料・在庫は各ショップの公式APIから取得した時点の情報です。購入前に販売ページで最新の条件を確認してください。APIのないショップの価格を自動収集（スクレイピング）することはしていません。</p>
