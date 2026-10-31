@@ -106,3 +106,17 @@ test('real comparison screens expose 18-store search, source-backed lowest and o
  assert.match(form,/recordFunnelEvent\('product_manual_ready'\)/);
  assert.doesNotMatch(form,/localStorage|sessionStorage|fetch\(/);
 });
+
+test('selected API product JAN survives home catalog link and narrows next comparison',async()=>{
+ const {catalogFromComparison}=await import('../src/shared/catalogSearch.js');
+ const src={offers:[{store:'yahoo',title:'人気イヤホン',price:15000,
+   url:'https://store.shopping.yahoo.co.jp/demo/sku.html',jan:'4548736132580',sameProduct:false,matchBasis:'unverified'}]};
+ const items=catalogFromComparison(src,'イヤホン').items;
+ assert.equal(items.length,1);
+ assert.equal(items[0].jan,'4548736132580');
+ src.offers[0].jan='false-id';
+ assert.equal(catalogFromComparison(src,'イヤホン').items[0].jan,'');
+ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+ assert.match(read('src/components/ProductCard.jsx'),/item\.jan\?'&jan='/);
+ assert.match(read('src/compare/ComparePage.jsx'),/この商品のJANで全ショップの価格を再検索/);
+});
