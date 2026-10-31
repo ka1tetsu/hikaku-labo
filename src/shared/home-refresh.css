@@ -159,3 +159,26 @@ body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
 .hl-provider-status,.hl-match-status{font-size:12px;line-height:1.7;padding:5px 0;color:#486653}
 .product-offer-source{font-size:11px;line-height:1.65;color:#3d6049;margin:4px 0}
 @media(max-width:760px){.hl-travel-priority{margin:10px 12px}.hl-travel-priority a{flex:1 1 100%}}
+
+
+/* Narrow real-source shortlist without claiming whole-market coverage. */
+.hl-catalog-filter-panel{padding:16px 0 19px;margin:14px 0 17px;border-top:1px solid #c9d8ce;border-bottom:1px solid #c9d8ce}
+.hl-catalog-filter-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.hl-catalog-filter-heading strong{font-size:15px;color:#1a4937}
+.hl-catalog-filter-heading span{font-size:12px;color:#4d6959;font-variant-numeric:tabular-nums}
+.hl-catalog-filters{display:flex;align-items:flex-end;flex-wrap:wrap;gap:10px 16px}
+.hl-catalog-filters>label{display:flex;flex-direction:column;min-width:130px;gap:5px;font-size:12px;font-weight:750;color:#315240}
+.hl-catalog-filters select{border:1px solid #a9c4b4;background:#fff;color:#1b4935;border-radius:5px;padding:9px 12px;min-height:44px;font-size:13px}
+.hl-catalog-filters>.hl-shipping-checkbox{flex-direction:row;align-items:center;gap:8px;padding-bottom:8px;min-height:44px;max-width:250px;font-weight:650}
+.hl-shipping-checkbox input{width:18px;height:18px;accent-color:#14664f;flex-shrink:0}
+.hl-reset-filters,.hl-filter-empty button{min-height:44px;background:transparent;border:1px solid #a9c4b4;border-radius:5px;color:#1b6247;font-size:12px;font-weight:750;cursor:pointer;padding:8px 12px}
+.hl-catalog-filter-panel>p{margin:10px 0 0;color:#546c5c;font-size:11px;line-height:1.7}
+.hl-filter-empty{display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px solid #d9e4dc;padding:10px 0;margin-top:10px;color:#4b6655;font-size:12px}
+.product-pr-tag{display:inline-block;line-height:1.3;margin-left:3px;padding:2px 5px;border:1px solid currentColor;border-radius:2px;font-size:10px;font-weight:800;vertical-align:middle}
+@media(max-width:700px){
+ .hl-catalog-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .hl-catalog-filters>label{min-width:0}
+ .hl-catalog-filters select{max-width:100%;width:100%;font-size:12px;padding:8px 6px}
+ .hl-catalog-filters>.hl-shipping-checkbox{grid-column:1/-1;max-width:none}
+ .hl-reset-filters{grid-column:1/-1}
+}
