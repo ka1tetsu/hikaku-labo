@@ -1,6 +1,5 @@
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { shippingLabel } from '../shared/compareWorkbench.js';
-import { confidenceAdjustedRating } from '../shared/reviewEvidence.js';
 
 const yen=n=>'¥'+Number(n).toLocaleString('ja-JP');
 const storefronts=[['rakuten','楽天市場'],['yahoo','Yahoo!ショッピング']];
