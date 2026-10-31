@@ -125,7 +125,7 @@ export function rankOffers(offers, reference = '', referenceJan = '') {
       const evidence = matchEvidence(reference, offer, referenceJan);
       return { ...offer, match: evidence.score, matchBasis: evidence.kind, sameProduct: evidence.sameProduct };
     })
-    .sort((a, b) => Number(b.sameProduct) - Number(a.sameProduct) || a.price - b.price || b.reviewCount - a.reviewCount);
+    .sort((a, b) => Number(b.sameProduct) - Number(a.sameProduct) || a.effectivePrice - b.effectivePrice || b.reviewCount - a.reviewCount);
 }
 
 export function summarizeOffers(offers) {
