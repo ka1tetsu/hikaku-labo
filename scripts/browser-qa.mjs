@@ -81,6 +81,29 @@ try{
    await option.click();
    if(await option.getAttribute('aria-pressed')!=='true')throw Error('Mobile-plan selection did not update');
  });
+ await interaction('tokyo-itinerary-nearby-hotels-mobile',{width:375,height:812},async page=>{
+   await page.goto(origin+'/travel/?destination=tokyo&nights=2&pace=standard&style=classic',{waitUntil:'domcontentloaded'});
+   const hotels=page.locator('.tvx-day-hotels');
+   await hotels.first().waitFor({timeout:8000});
+   if(await hotels.count()!==2)throw Error('A 2-night Tokyo trip must offer hotel areas only on nights 1 and 2');
+   const day1=await hotels.nth(0).innerText(),day2=await hotels.nth(1).innerText();
+   if(!day1.includes('浅草・上野')||!day1.includes('リッチモンドホテルプレミア浅草')||!day1.includes('浅草東武ホテル'))throw Error('Asakusa overnight hotels missing');
+   if(!day2.includes('東京駅・丸の内')||!day2.includes('ホテルメトロポリタン丸の内')||!day2.includes('東京ステーションホテル'))throw Error('Tokyo Station overnight hotels missing');
+   if(await page.locator('.tvx-day-hotels .tvx-day-hotel').count()!==4)throw Error('Four curated hotels expected for two overnight areas');
+   const official=page.locator('.tvx-day-hotel').first().getByRole('link',{name:'公式サイトで立地確認'});
+   if(!(await official.getAttribute('href')).startsWith('https://richmondhotel.jp/'))throw Error('Verified official hotel source missing');
+   const url=new URL(await page.locator('.tvx-hotel-booking').first().getAttribute('href'));
+   if(url.hostname!=='www.booking.com'||!url.searchParams.get('ss')?.includes('リッチモンドホテルプレミア浅草'))throw Error('Named hotel Booking.com search not wired');
+   if(!url.searchParams.get('checkin')||!url.searchParams.get('checkout')||url.searchParams.get('group_adults')!=='2'||url.searchParams.get('no_rooms')!=='1')throw Error('Trip dates or party size not carried to stay search');
+   if(!day1.includes('宿泊料金・評価は取得していません'))throw Error('Hotel rate and rating are not explicitly unverified');
+   const controls=page.locator('.tvx-trip-controls select').first();
+   await controls.selectOption('0');
+   if(await hotels.count()!==0)throw Error('Day trip wrongly advertises overnight hotels');
+   await controls.selectOption('1');
+   if(await hotels.count()!==1)throw Error('One-night plan shows extra overnight options');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Tokyo hotel recommendations overflow mobile width '+overflow+'px');
+ });
  await interaction('travel-choose-destination',{width:375,height:812},async page=>{
    await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
    await page.locator('.tvx-shortcuts button').filter({hasText:'京都'}).first().click();

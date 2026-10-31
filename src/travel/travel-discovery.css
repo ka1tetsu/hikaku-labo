@@ -115,8 +115,8 @@
 .tvx-day-index strong{font-size:27px;color:#1b6a4b;margin-left:4px}
 .tvx-day-contents h4{font-size:14px;font-weight:850;color:#365d45;margin:0 0 10px}
 .tvx-day-contents ol{margin:0;padding:0;display:flex;gap:9px;flex-wrap:wrap;list-style:none}
-.tvx-day-contents li{display:flex;gap:8px;align-items:center;background:#f3f8f4;border:1px solid #e2eee5;border-radius:9px;padding:10px 13px;font-size:13px;color:#264b35}
-.tvx-day-contents li span{background:#dae9de;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font:800 11px 'Noto Sans JP',sans-serif;color:#24583c}
+.tvx-day-contents>ol>li{display:flex;gap:8px;align-items:center;background:#f3f8f4;border:1px solid #e2eee5;border-radius:9px;padding:10px 13px;font-size:13px;color:#264b35}
+.tvx-day-contents>ol>li>span{background:#dae9de;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font:800 11px 'Noto Sans JP',sans-serif;color:#24583c}
 .tvx-itinerary-source{border-top:1px solid #e5eee5;padding-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:#657d6c}
 .tvx-itinerary-source a{color:#177150!important;text-decoration:underline}
 .tvx-plan-bottom{margin-top:21px;display:flex;align-items:center;flex-wrap:wrap;gap:12px 23px;border:1px solid #d5e6db;border-radius:13px;background:#fff;padding:21px 24px}
@@ -156,3 +156,27 @@
 .tvx-domestic-quick button{border:0;border-radius:8px;background:#166248;color:#fff;font-weight:800;font-size:12px;padding:10px 15px;white-space:nowrap;cursor:pointer}
 .tvx-domestic-quick>p{width:100%;color:#92362e;font-size:12px}
 @media(max-width:570px){.tvx-domestic-quick{align-items:stretch;flex-direction:column;gap:9px}.tvx-domestic-quick>div{min-width:0;flex-direction:column}}
+
+
+/* Hotel candidates are sourced location references, not quoted inventories. */
+.tvx-day-hotels{margin-top:19px;border-top:1px solid #d4e4d8;padding-top:15px;min-width:0}
+.tvx-day-hotels-header{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.tvx-day-hotels-header>div>span{font-size:11px;font-weight:750;color:#50735b}
+.tvx-day-hotels-header h5{color:#184a34;font-size:15px;line-height:1.5;margin:4px 0}
+.tvx-day-hotels-header>span{font-size:11px;color:#567565;border:1px solid #cfdfd3;padding:5px 8px}
+.tvx-day-hotels-help{font-size:12px;line-height:1.8;color:#4d6b58;margin:8px 0 12px}
+.tvx-day-hotel-list{list-style:none!important;margin:0!important;padding:0!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important}
+.tvx-day-hotel{display:flex!important;flex-direction:column;gap:10px!important;align-items:stretch!important;border:1px solid #ccdecf!important;background:white!important;padding:13px!important;border-radius:4px!important;min-width:0}
+.tvx-day-hotel-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+.tvx-day-hotel-info strong{font-size:13px;line-height:1.6;color:#214f37}
+.tvx-day-hotel-info span{font-size:11px;line-height:1.65;color:#466751;overflow-wrap:anywhere}
+.tvx-day-hotel-info small{font-size:10px;line-height:1.7;color:#577565}
+.tvx-day-hotel-links{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:auto}
+.tvx-day-hotel-links a,.tvx-hotel-area-search{display:inline-flex;align-items:center;min-height:44px;padding:9px 0;font-size:11px;font-weight:800;color:#186046;text-decoration:underline;text-underline-offset:3px}
+.tvx-day-hotel-links .tvx-hotel-booking{background:#14664f;color:white!important;text-decoration:none;padding:9px 12px;border-radius:4px}
+.tvx-day-hotel-links a small,.tvx-hotel-area-search small{border:1px solid currentColor;padding:1px 4px;margin-left:5px}
+.tvx-hotel-area-search{margin-top:8px}
+.tvx-day-hotels-disclaimer{font-size:10px;line-height:1.8;color:#5d7564;margin:8px 0 0}
+.tvx-day-hotels a:focus-visible{outline:3px solid #308767;outline-offset:3px}
+@media(max-width:820px){.tvx-day-hotel-list{grid-template-columns:1fr}}
+@media(max-width:550px){.tvx-day-hotels-header>span{display:none}.tvx-day-hotel-links a{flex:1 1 95px;justify-content:center}.tvx-day-hotel-links .tvx-hotel-booking{flex-basis:100%}}

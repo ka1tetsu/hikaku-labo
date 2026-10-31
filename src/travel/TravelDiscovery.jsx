@@ -9,6 +9,7 @@ import { LINK_CONFIG } from './linkConfig.js';
 import TravelSearchBox from './TravelSearchBox.jsx';
 import BookingStarter from './BookingStarter.jsx';
 import BookingHub, { AffiliateNote, BookingLinkList } from './BookingLinks.jsx';
+import ItineraryNearbyHotels from './ItineraryNearbyHotels.jsx';
 
 const getCity = id => DESTINATION_CATALOG.find(city=>city.id===id)||DESTINATION_CATALOG[0];
 const tags = ids => INTERESTS.filter(i=>ids.includes(i.id)).map(i=>i.label);
@@ -223,7 +224,8 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           {copyState&&<p className="tvx-copy-state" role="status">{copyState}</p>}
           <div className="tvx-itinerary-days">{routes.map(day=><div className="tvx-day" key={day.day}>
             <div className="tvx-day-index">DAY <strong>{String(day.day).padStart(2,'0')}</strong></div>
-            <div className="tvx-day-contents"><h4>{day.label}</h4><ol>{day.stops.map((stop,index)=><li key={stop}><span aria-hidden="true">{index+1}</span>{stop}</li>)}</ol></div>
+            <div className="tvx-day-contents"><h4>{day.label}</h4><ol>{day.stops.map((stop,index)=><li key={stop}><span aria-hidden="true">{index+1}</span>{stop}</li>)}</ol>
+            <ItineraryNearbyHotels destination={destination} day={day} nights={nights} depart={depart} travelers={travelers} rooms={rooms}/></div>
           </div>)}</div>
           <div className="tvx-itinerary-source"><span>現地で確認：</span><a href={destination.source} target="_blank" rel="noopener noreferrer">{destination.sourceLabel} ↗</a><span>{destination.note}</span></div>
         </div>
