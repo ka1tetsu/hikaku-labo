@@ -74,7 +74,7 @@ export default async function handler(req, res) {
   if (budget.minPrice && budget.maxPrice && budget.minPrice > budget.maxPrice) return res.status(400).json({ error: 'invalid_price_range' });
 
   const [rakuten, yahoo] = await Promise.all([
-    rakutenOffers(q || jan, budget, mode, page).catch(() => ({ status: 'error', offers: [] })),
+    mode === 'recommended' ? Promise.resolve({status:'skipped',offers:[]}) : rakutenOffers(q || jan, budget, mode, page).catch(() => ({ status: 'error', offers: [] })),
     yahooOffers(q, jan, budget, mode, page),
   ]);
   // Preserve both cash-cheapest and rewards-cheapest candidates for client-side criteria.
