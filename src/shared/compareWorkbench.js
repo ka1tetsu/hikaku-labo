@@ -11,6 +11,7 @@ export const OFFER_SORTS=Object.freeze({
 export const SHIPPING_LABEL=Object.freeze({
   free:'送料無料（取得元の表示）',
   extra:'送料別（要確認）',
+  conditional:'条件付き送料無料（条件要確認）',
   unknown:'送料条件未取得',
 });
 export function shippingLabel(offer) {

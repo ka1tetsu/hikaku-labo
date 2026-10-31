@@ -82,12 +82,18 @@ export function normalizeRakutenOffer(raw, wrapUrl = url => url) {
 
 export function normalizeYahooOffer(raw, wrapUrl = url => url) {
   const price = Number(raw.price) || 0;
-  const point = Math.max(0, Number(raw.point?.amount) || 0);
+  // In 2025 Yahoo migrated store PayPay points to the limited-time fields.
+  // The old amount field is retained only for legacy API responses and tests.
+  // Do not add premium/member-specific rewards to a general shopper's price.
+  const limited = raw.point?.lyLimitedBonusAmount;
+  const point = Math.max(0, Number(limited ?? raw.point?.amount) || 0);
+  const pointKind = limited != null ? 'paypay-limited' : 'provider';
+  const url = wrapUrl(raw.url);
   return {
-    shippingStatus: raw.shipping?.code === 2 ? 'free' : 'unknown',
+    shippingStatus: raw.shipping?.code === 2 ? 'free' : raw.shipping?.code === 3 ? 'conditional' : 'unknown',
     store: 'yahoo', storeName: 'Yahoo!ショッピング', shopName: raw.seller?.name || '', title: raw.name || '',
-    price, shippingFree: raw.shipping?.code === 2, point, effectivePrice: price - point,
-    url: wrapUrl(raw.url), sponsored: wrapUrl(raw.url) !== raw.url,
+    price, shippingFree: raw.shipping?.code === 2, point, pointKind, effectivePrice: price - point,
+    url, sponsored: url !== raw.url,
     image: raw.image?.medium || raw.exImage?.url || '',
     reviewAverage: Number(raw.review?.rate) || 0, reviewCount: Number(raw.review?.count) || 0, jan: raw.janCode || '',
   };
