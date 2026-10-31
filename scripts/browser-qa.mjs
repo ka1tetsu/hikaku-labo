@@ -160,6 +160,43 @@ try{
    if(!(await page.locator('.cp-watch-list').innerText()).includes('¥30,000'))throw Error('Price target did not persist locally');
    await watch.screenshot({path:path.join(out,'interaction-price-target-mobile.png'),animations:'disabled'});
  });
+ await interaction('multi-store-verified-lowest-with-manual-price',{width:375,height:812},async page=>{
+   const offer=(price,store,shippingStatus,shopName)=>{
+     const root=store==='yahoo'?'https://store.shopping.yahoo.co.jp/qa/':'https://item.rakuten.co.jp/qa/';
+     return {store,storeName:store==='yahoo'?'Yahoo!ショッピング':'楽天市場',shopName,
+       title:'ソニー WH-1000XM5',price,point:500,effectivePrice:price-500,
+       url:root+price+'.html',sponsored:false,image:'',reviewAverage:4.2,reviewCount:80,
+       shippingStatus,shippingFree:shippingStatus==='free',sameProduct:true,matchBasis:'model',inStock:true};
+   };
+   await page.route('**/api/compare?**',route=>route.fulfill({
+     status:200,contentType:'application/json',
+     body:JSON.stringify({sources:{yahoo:'ok',rakuten:'ok'},mode:'price',page:1,pageCount:1,
+       offers:[offer(1000,'yahoo','unknown','送料未定'),offer(26000,'yahoo','free','A店'),offer(30000,'rakuten','free','B店')],
+       fetchedAt:'2026-10-31T09:00:00.000Z'})
+   }));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-allshops').waitFor({timeout:10000});
+   const board=await page.locator('.cp-allshops').innerText();
+   if(!board.includes('¥26,000')||!board.includes('¥30,000'))throw Error('Verified multi-seller prices missing');
+   if(!(await page.locator('.cp-allshops-winner').innerText()).includes('¥26,000'))throw Error('Unknown shipping listing falsely won');
+   if((await page.locator('.cp-allshops-web-grid a').count())<16)throw Error('Not enough merchant discovery links');
+   await page.getByRole('button',{name:'他社の価格を加えて最安を探す'}).click();
+   await page.locator('#cp-manual form').waitFor({timeout:7000});
+   await page.locator('#cp-add-store').selectOption('edion');
+   const row=page.locator('.cp-manual-row').filter({hasText:'エディオンネットショップ'});
+   await row.locator('input[type=number]').nth(0).fill('25000');
+   await row.locator('input[type=number]').nth(1).fill('0');
+   await row.locator('input[type=number]').nth(2).fill('500');
+   await row.locator('input[type=number]').nth(3).fill('200');
+   await page.locator('.cp-manual-confirm input').check();
+   await page.getByRole('button',{name:'確認できた全ショップを安い順に比較する'}).click();
+   await page.locator('.cp-manual-winner').waitFor({timeout:5000});
+   const best=await page.locator('.cp-manual-winner').innerText();
+   if(!best.includes('¥24,500')||!best.includes('エディオン'))throw Error('User verified retailer did not become cheapest');
+   if(!(await page.locator('.cp-manual-results').innerText()).includes('¥26,000'))throw Error('API price excluded from merged ranking');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Multi-store comparison horizontal overflow '+overflow+'px');
+ });
  await interaction('amazon-review-evidence-manual-handoff',{width:375,height:812},async page=>{
    const offer=(price,store='yahoo')=>({
      store,storeName:store==='yahoo'?'Yahoo!ショッピング':'楽天市場',shopName:'サンプル販売店',
