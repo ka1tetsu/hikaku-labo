@@ -3,7 +3,6 @@ import {recordOutboundClick} from '../shared/outboundClient.js';
 import {shippingLabel} from '../shared/compareWorkbench.js';
 
 const money=n=>'¥'+Math.round(n).toLocaleString('ja-JP');
-const sourceName={rakuten:'楽天市場',yahoo:'Yahoo!ショッピング'};
 
 export default function ShopPriceBoard({offers=[],stores=[],onOpenManual}) {
   const comparison=combinedPriceComparison({offers});
