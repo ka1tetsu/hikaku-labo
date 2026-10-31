@@ -7,7 +7,7 @@ import { recordOutboundClick } from '../shared/outboundClient.js';
 import { MERCHANTS, MERCHANT_KINDS, storeLinks } from '../shared/merchants.js';
 import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/compareBudget.js';
 import { PRICE_SORTS, displayValue, displayRange } from '../shared/offerDisplay.js';
-import { filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
+import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
 import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import { openConcierge } from '../shared/conciergeActions.js';
 import ManualStoreCompare from './ManualStoreCompare.jsx';
@@ -151,7 +151,7 @@ export default function ComparePage() {
             <div className="cp-result-controls">
               <label className="cp-sort-label" htmlFor="cp-price-sort">比較基準
                 <select id="cp-price-sort" value={priceSort} onChange={e => setPriceSort(e.target.value)}>
-                  {Object.entries(PRICE_SORTS).map(([value, option]) => <option value={value} key={value}>{option.label}</option>)}
+                  {Object.entries(OFFER_SORTS).map(([value,label]) => <option value={value} key={value}>{label}</option>)}
                 </select>
               </label>
               <label className="cp-toggle"><input type="checkbox" checked={freeOnly} onChange={e => setFreeOnly(e.target.checked)} />送料無料のみ</label>
