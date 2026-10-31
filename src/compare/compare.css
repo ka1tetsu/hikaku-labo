@@ -197,3 +197,14 @@ body{margin:0}
 .cp-choice-unknown p{font-size:12px;margin:0;color:#536958;line-height:1.8}
 .cp-choice a:focus-visible{outline:3px solid #5bab82;outline-offset:3px}
 @media(max-width:760px){.cp-choice-grid{grid-template-columns:1fr}.cp-choice-intro{flex-direction:column;gap:8px}}
+
+
+/* Source-based recommendations and real multi-page browsing. */
+.cp-google-links{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0 6px}
+.cp-google-links a{display:inline-flex;align-items:center;min-height:44px;padding:9px 14px;border:1px solid #bdcfc2;background:#fff;color:#174d39;font-size:13px;font-weight:750;line-height:1.5;text-decoration:none}
+.cp-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;margin:22px 0 4px;padding-top:18px;border-top:1px solid #d8e4db}
+.cp-pagination button{min-height:44px;padding:7px 15px;background:#fff;color:#164c38;border:1px solid #b9d0c2;cursor:pointer;font-size:13px;font-weight:800}
+.cp-pagination button:disabled{cursor:not-allowed;opacity:.45}
+.cp-pagination span{font-size:12px;color:#456553;text-align:center;font-variant-numeric:tabular-nums}
+.cp-google-links a:focus-visible,.cp-pagination button:focus-visible{outline:3px solid #318467;outline-offset:3px}
+@media(max-width:640px){.cp-google-links a{width:100%}.cp-pagination{gap:6px}.cp-pagination span{flex-basis:100%;order:-1}}

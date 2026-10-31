@@ -237,6 +237,32 @@ try{
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
    if(overflow>3)throw Error('Travel hub horizontal overflow '+overflow+'px');
  });
+ await interaction('compare-recommended-pages-google-mobile',{width:375,height:812},async page=>{
+   let calls=0;
+   await page.route('**/api/compare?**',route=>{
+     const params=new URL(route.request().url()).searchParams;
+     if(params.get('mode')!=='recommended')throw Error('Broad query did not use relevance order');
+     const n=Number(params.get('page')||1);calls++;
+     const offer=(price,rank)=>({store:'yahoo',storeName:'Yahoo!ショッピング',shopName:'動作検証店',
+       title:'ロボット掃除機 候補'+n+'-'+rank,price,point:0,effectivePrice:price,sourceRank:rank,
+       url:'https://store.shopping.yahoo.co.jp/example/'+n+'-'+rank+'.html',sponsored:false,
+       image:'',reviewAverage:4.2,reviewCount:5,shippingStatus:'unknown',sameProduct:false,matchBasis:'unverified'});
+     return route.fulfill({status:200,contentType:'application/json',
+       body:JSON.stringify({sources:{rakuten:'skipped',yahoo:'ok'},mode:'recommended',page:n,pageCount:3,
+         fetchedAt:'2026-10-31T08:00:00Z',offers:[offer(42000,0),offer(20000,1)]})});
+   });
+   await page.goto(origin+'/compare/?q='+encodeURIComponent('ロボット掃除機'),{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-offer').first().waitFor({timeout:10000});
+   if((await page.locator('#cp-price-sort').inputValue())!=='recommended')throw Error('Expected recommendations for broad discovery');
+   if(!(await page.locator('.cp-offer').first().innerText()).includes('¥42,000'))throw Error('Source relevance ordering lost');
+   await page.getByRole('button',{name:'次の30件を探す'}).click();
+   await page.locator('.cp-offer').first().waitFor({timeout:10000});
+   await page.waitForFunction(()=>document.querySelector('.cp-offer-title')?.textContent?.includes('候補2-0'),null,{timeout:10000});
+   if(calls<2)throw Error('Next page did not fetch additional provider results');
+   if(!(await page.locator('.cp-google-links').innerText()).includes('Google'))throw Error('External search missing');
+   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+   if(overflow>3)throw Error('Compare pagination mobile overflow '+overflow+'px');
+ });
  await interaction('price-search',{width:1440,height:900},async page=>{
    await page.goto(origin+'/compare/',{waitUntil:'domcontentloaded'});
    await page.locator('#cp-q').fill('WH-1000XM5');

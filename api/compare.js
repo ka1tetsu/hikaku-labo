@@ -8,6 +8,7 @@ import { fetchRakutenSearch } from './search.js';
 import { normalizeRakutenOffer, normalizeYahooOffer, rankOffers, summarizeOffers } from '../src/shared/priceCompare.js';
 import { RAKUTEN_AFFILIATE_ID } from '../src/api.js';
 import { compareBudget, withinCompareBudget } from '../src/shared/compareBudget.js';
+import { rakutenPayload } from '../src/shared/rakutenPayload.js';
 
 const YAHOO_ENDPOINT = 'https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch';
 const YAHOO_CLIENT_ID = process.env.YAHOO_SHOPPING_CLIENT_ID || '';
@@ -39,11 +40,10 @@ export function compareParams(query = {}) {
 async function rakutenOffers(q, budget, mode = 'price', page = 1) {
   const result = await fetchRakutenSearch({ keyword: q, genreId: '', page, filters: { sort: mode === 'recommended' ? 'standard' : '+itemPrice', ...budget } });
   if (!result.ok) return { status: 'error', offers: [] };
-  const data = JSON.parse(result.text);
-  const items = (data.Items || []).map(entry => entry.Item ?? entry);
+  const { items, count, pageCount } = rakutenPayload(result.text);
   // The provider can omit affiliateUrl after its affiliate-parameter fallback.
   // Keep the same public-ID referral fallback used by product cards.
-  return { status: 'ok', offers: items.map((item, index) => ({ ...normalizeRakutenOffer(item, wrapRakuten), sourceRank: index })) };
+  return { status: 'ok', offers: items.map((item, index) => ({ ...normalizeRakutenOffer(item, wrapRakuten), sourceRank: index })), total: count, pageCount };
 }
 
 async function yahooOffers(q, jan, budget, mode = 'price', page = 1) {
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
   return res.status(200).json({
     query: q, reference: ref, jan,
     ...budget,
-    mode, page, pageCount: Math.max(1, Math.min(20, Math.ceil((yahoo.total || offers.length) / 30))),
+    mode, page, pageCount: Math.max(1, Math.min(20, yahoo.status === 'ok' ? Math.ceil((yahoo.total || offers.length) / 30) : (rakuten.pageCount || 1))),
     sources: { rakuten: rakuten.status, yahoo: yahoo.status },
     summary: summarizeOffers(offers),
     offers,

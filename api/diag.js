@@ -4,6 +4,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { detectPlatform } from '../server/rakutenCredentials.js';
 import { fetchRakutenSearch } from './search.js';
+import { rakutenPayload } from '../src/shared/rakutenPayload.js';
 
 export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');
@@ -29,11 +30,16 @@ export default async function handler(req, res) {
     let count = 0, affiliateReturned = false;
     if (result.ok) {
         try {
-            const items = JSON.parse(result.text).Items || [];
+            const items = rakutenPayload(result.text).items;
             count = items.length;
-            affiliateReturned = items.some(entry => Boolean((entry.Item || entry).affiliateUrl));
+            affiliateReturned = items.some(entry => Boolean(entry.affiliateUrl));
         } catch { /* malformed provider response is not exposed */ }
     }
-    const reason = /HTTP_REFERRER_NOT_ALLOWED/i.test(result.text) ? 'site_registration_rejected' : result.ok ? null : 'provider_rejected';
+    const reason = result.ok ? null
+      : /HTTP_REFERRER_NOT_ALLOWED/i.test(result.text) ? 'site_registration_rejected'
+      : result.status === 401 || result.status === 403 ? 'authentication_or_permission_rejected'
+      : result.status === 429 ? 'rate_limit'
+      : result.text === 'invalid_provider_format' ? 'response_format_unsupported'
+      : 'provider_rejected';
     return res.status(200).json({ config, configurationValid: true, probes: [{ ok: result.ok, httpStatus: result.status, itemCount: count, affiliateUrlReturned: affiliateReturned, reason }] });
 }

@@ -1,4 +1,5 @@
 import { searchResponse } from './shared/searchRequest.js';
+import { rakutenPayload } from './shared/rakutenPayload.js';
 
 const AMAZON_TAG = 'kuronekosanta-22';
 const YAHOO_SID = '3506307';
@@ -121,12 +122,13 @@ export async function searchRakutenItems(keyword, genreId = '', page = 1, option
     }
 
     const data = await res.json();
-    const rawItems = (data.Items || []).map(c => c.Item ?? c);
+    const parsed = rakutenPayload(data);
+    const rawItems = parsed.items;
 
     return {
         items: rawItems.map(normalizeRakutenItem),
-        pageCount: data.pageCount || 1,
-        count: data.count || rawItems.length,
+        pageCount: parsed.pageCount || 1,
+        count: parsed.count,
         // アフィリエイト計測が効いているかの目印（1件でも affiliateUrl があれば on）
         affiliateActive: rawItems.some(i => typeof i.affiliateUrl === 'string' && i.affiliateUrl.startsWith('http')),
     };
