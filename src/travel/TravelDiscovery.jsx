@@ -7,6 +7,7 @@ import { suggestDestinations, rankPlanStyles, makeItinerary, shareableTripUrl, S
 import { buildPlaceLinks } from './bookingLinks.js';
 import { LINK_CONFIG } from './linkConfig.js';
 import TravelSearchBox from './TravelSearchBox.jsx';
+import BookingStarter from './BookingStarter.jsx';
 import BookingHub, { AffiliateNote, BookingLinkList } from './BookingLinks.jsx';
 
 const getCity = id => DESTINATION_CATALOG.find(city=>city.id===id)||DESTINATION_CATALOG[0];
@@ -97,7 +98,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
           <h1 id="tvx-title">旅先を探し、<br/><em>旅費と宿を比べる。</em></h1>
           <p className="tvx-hero-lead">国内外の行き先を探して、航空券・ホテルなど{TRAVEL_PROVIDERS.length}の予約・比較サイトへ。出発日・人数・泊数を一度指定し、条件を引き継げるサイトから調べられます。実際の予約価格は各社で確認します。</p>
           <TravelSearchBox onDestination={goToDestination} onScope={applyScope} onExternal={setExternal}/>
-          <nav className="tv-booking-shortcuts" aria-label="旅行先が決まっている方へ"><a className="tv-cheapest-shortcut" href="#global-travel-compare">{TRAVEL_PROVIDERS.length}サイトの旅行検索先を比較 →</a><a href="#travel-total-cost">予約候補の支払総額を比較 →</a><a href="#stay-search">日程・人数から空室を探す →</a><a href="#booking">宿・航空券を探す →</a><a href="#planner">旅行予算を計算する →</a></nav>
+          <nav className="tv-booking-shortcuts" aria-label="旅行先が決まっている方へ"><a href="#stay-booking">日程を決めて宿を予約 →</a><a className="tv-cheapest-shortcut" href="#global-travel-compare">{TRAVEL_PROVIDERS.length}サイトの旅行検索先を比較 →</a><a href="#travel-total-cost">予約候補の支払総額を比較 →</a><a href="#stay-search">日程・人数から空室を探す →</a><a href="#booking">宿・航空券を探す →</a><a href="#planner">旅行予算を計算する →</a></nav>
           {external&&<div className="tvw-external" role="region" aria-label="掲載外の場所の検索">
             <div className="tvw-external-head"><strong>「{external}」を世界中の予約サイトで検索</strong><button type="button" onClick={()=>setExternal('')} aria-label="閉じる">×</button></div>
             <p>編集部のモデルコースは未掲載の場所です。情報を作り話で補わず、宿・航空券・地図を直接検索できるリンクを用意しました。</p>
@@ -115,6 +116,7 @@ export default function TravelDiscovery({ selectedId, onSelect, nights, setNight
       <div><b>03</b><span>航空券・宿を比較</span></div><div><b>04</b><span>旅の予算を計算</span></div>
     </div>
 
+    <BookingStarter/>
     {hotelSearch}
     {concierge}
 
