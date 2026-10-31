@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { recordFunnelEvent } from '../shared/outboundClient.js';
 import { WATCH_STORAGE_KEY, makePriceTarget, parsePriceTargets, savePriceTarget, priceTargetLink, watchQueryId, evaluatePriceTarget } from '../shared/priceTargets.js';
 const yen = n => '¥' + Number(n).toLocaleString('ja-JP');
 
@@ -32,6 +33,7 @@ export default function PriceTargetMemo({ query, data, loading }) {
       return;
     }
     if (persist(savePriceTarget(items, target))) {
+      recordFunnelEvent('product_target_saved');
       setMessage('この端末に検索条件と目標価格のみ保存しました。価格や商品情報は保存していません。');
       setTargetInput('');
     }
