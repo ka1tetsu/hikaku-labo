@@ -115,7 +115,7 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
                 </label>
 
                 <a href={bestUrl} target="_blank" rel={primaryRel} className="btn-primary-cta rakuten-first" onClick={() => recordMerchant('product-primary')}>
-                    {platformLabel}で価格・在庫を確認 ▶<br />
+                    {platformLabel}で価格・在庫を確認 ▶ {primarySponsored && <span className="product-pr-tag">PR</span>}<br />
                     <span className="dy-tooltip">
                         {item.sourceStore ? 'この出品の商品ページで送料・在庫・仕様を確認' : rakutenTracked ? '楽天市場の商品ページへ' : '別ショップの検索結果で条件を確認'}
                     </span>
@@ -127,10 +127,10 @@ export default function ProductCard({ item, viewMode, isSelected, onToggleCompar
 
                 <div className="sub-actions">
                     <a href={amazonUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-amazon-small" onClick={() => recordMerchant('product-secondary', 'amazon')}>
-                        Amazonで探す
+                        Amazonで探す <small className="product-pr-tag">PR</small>
                     </a>
                     <a href={yahooUrl} target="_blank" rel="noopener noreferrer sponsored" className="btn-yahoo-small" onClick={() => recordMerchant('product-secondary', 'yahoo-shopping')}>
-                        Yahoo!で探す
+                        Yahoo!で探す <small className="product-pr-tag">PR</small>
                     </a>
                 </div>
             </div>

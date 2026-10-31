@@ -18,6 +18,7 @@ import ComparisonTable from './components/ComparisonTable';
 import { buildAmazonAffiliateUrl, buildYahooAffiliateUrl, buildRakutenSearchAffiliateUrl } from './api';
 import { searchCatalogItems } from './shared/catalogSearch.js';
 import { isSpecificProductQuery } from './shared/productSearchIntent.js';
+import { CATALOG_FILTER_DEFAULTS, catalogFilterCount, filterCatalogResults } from './shared/catalogFilters.js';
 import './index.css';
 
 const CATEGORIES = [
@@ -44,6 +45,7 @@ export default function App() {
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortMode, setSortMode] = useState('popular');
+  const [catalogFilters, setCatalogFilters] = useState({ ...CATALOG_FILTER_DEFAULTS });
   const [compareList, setCompareList] = useState([]);
   // Natural-language search ("母の日のプレゼント 3000円くらい") → keyword + filters.
   const [smart, setSmart] = useState(null);
@@ -62,9 +64,11 @@ export default function App() {
     });
   }, []);
 
-  // 並び替えを実際に適用する（従来 sortMode は保持されるだけで未使用だった）
+  const visibleProducts = useMemo(() => filterCatalogResults(products, catalogFilters), [products, catalogFilters]);
+  const filterCount = catalogFilterCount(catalogFilters);
+  // Sort only the currently visible offers; source relevance is retained for broad queries.
   const sortedProducts = useMemo(() => {
-    const list = [...products];
+    const list = [...visibleProducts];
     switch (sortMode) {
       case 'price-asc': return list.sort((a, b) => a.itemPrice - b.itemPrice);
       case 'price-desc': return list.sort((a, b) => b.itemPrice - a.itemPrice);
@@ -72,15 +76,20 @@ export default function App() {
       case 'review': return list.sort((a, b) =>
         b.reviewAverage - a.reviewAverage || b.reviewCount - a.reviewCount);
       case 'review-count': return list.sort((a, b) => b.reviewCount - a.reviewCount);
-      default: return list; // 人気順 = 楽天APIの返却順
+      default: return list; // Yahoo! API's official recommendation/search relevance order
     }
-  }, [products, sortMode]);
+  }, [visibleProducts, sortMode]);
 
   // 実質価格が最安の商品（同額なら先頭）
   const cheapestCode = useMemo(() => {
-    if (products.length === 0 || !isSpecificProductQuery(query)) return null;
-    return products.reduce((min, p) => ((sortMode==='effective-asc'?p.effectivePrice:p.itemPrice) < (sortMode==='effective-asc'?min.effectivePrice:min.itemPrice) ? p : min)).itemCode;
-  }, [products,query,sortMode]);
+    if (!isSpecificProductQuery(query)) return null;
+    // Only a verified match can be advertised as a price comparison for one model.
+    const eligible = visibleProducts.filter(item => item.sameProduct);
+    if (!eligible.length) return null;
+    return eligible.reduce((min,p) =>
+      (sortMode==='effective-asc'?p.effectivePrice:p.itemPrice) <
+      (sortMode==='effective-asc'?min.effectivePrice:min.itemPrice) ? p : min).itemCode;
+  }, [visibleProducts,query,sortMode]);
 
   const doSearch = useCallback(async (kw, genre, pg = 1, options = {}) => {
     if (!kw && !genre) return;
@@ -90,7 +99,7 @@ export default function App() {
     setHasSearched(true);
     setLoading(true);
     setError(null);
-    document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (options.scroll === true) document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     try {
       const data = await searchCatalogItems(kw, genre, pg, { ...options, signal: controller.signal });
       if (controller.signal.aborted) return;
@@ -141,7 +150,8 @@ export default function App() {
       setActiveCategory(null);
       setSmart(null);
       setSortMode(isSpecificProductQuery(kw)?'price-asc':'popular');
-      doSearch(kw, '', 1);
+      setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS });
+      doSearch(kw, '', 1, { scroll: true });
       document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     window.addEventListener('hikaku:concierge-action', onAction);
@@ -157,7 +167,9 @@ export default function App() {
       setSmart(null);
       setQuery(text);
       setSortMode(isSpecificProductQuery(text)?'price-asc':'popular');
-      doSearch(text, '', 1);
+      setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS });
+      setCompareList([]);
+      doSearch(text, '', 1, { scroll: true });
       return;
     }
     const options = { minPrice: request.minPrice, maxPrice: request.maxPrice, sort: request.sort, freeShipping: request.freeShipping };
@@ -167,7 +179,9 @@ export default function App() {
     else if (request.sort !== '-reviewAverage') setSortMode('popular');
     if (request.sort === '-reviewAverage') setSortMode('review');
     setQuery(request.keyword);
-    doSearch(request.keyword, '', 1, options);
+    setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS });
+    setCompareList([]);
+    doSearch(request.keyword, '', 1, { ...options, scroll: true });
   };
 
   const handleSearch = (e) => {
@@ -180,7 +194,9 @@ export default function App() {
     setSmart(current => current && { ...current, keyword, alternatives: [current.keyword, ...current.alternatives.filter(k => k !== keyword)] });
     setQuery(keyword);
     setSortMode(isSpecificProductQuery(keyword)?'price-asc':'popular');
-    doSearch(keyword, '', 1, smart?.options || {});
+    setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS });
+    setCompareList([]);
+    doSearch(keyword, '', 1, { ...(smart?.options || {}), scroll: true });
   };
 
   const handleCategory = (cat) => {
@@ -189,11 +205,13 @@ export default function App() {
     setSortMode('popular');
     setQuery('');
     setInputValue('');
-    doSearch(cat.label, cat.genreId, 1);
+    setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS });
+    setCompareList([]);
+    doSearch(cat.label, cat.genreId, 1, { scroll: true });
   };
 
   const handlePage = (newPage) => {
-    doSearch(query, activeCategory?.genreId || '', newPage, smart?.options || {});
+    doSearch(query || activeCategory?.label || '', activeCategory?.genreId || '', newPage, { ...(smart?.options || {}), scroll: true });
   };
 
   const searchTitle = activeCategory
@@ -283,6 +301,29 @@ export default function App() {
         </div>
 
         {hasSearched && <ProductSearchLinks keyword={query || activeCategory?.label || ''} />}
+
+        {!loading && products.length > 0 && <section className="hl-catalog-filter-panel" aria-label="商品結果の絞り込み">
+          <div className="hl-catalog-filter-heading">
+            <strong>候補を自分の条件で絞る</strong>
+            <span role="status">{visibleProducts.length}件を表示 / このページで取得した{products.length}件</span>
+          </div>
+          <div className="hl-catalog-filters">
+            <label>販売サイト<select value={catalogFilters.store} onChange={e=>setCatalogFilters(v=>({...v,store:e.target.value}))}>
+              <option value="all">取得した全サイト</option><option value="yahoo">Yahoo!ショッピング</option><option value="rakuten">楽天市場</option>
+            </select></label>
+            <label>予算（商品価格）<select value={catalogFilters.maxPrice} onChange={e=>setCatalogFilters(v=>({...v,maxPrice:Number(e.target.value)}))}>
+              <option value="0">指定なし</option><option value="5000">5,000円以下</option><option value="10000">10,000円以下</option>
+              <option value="30000">30,000円以下</option><option value="50000">50,000円以下</option><option value="100000">100,000円以下</option>
+            </select></label>
+            <label>レビュー評価<select value={catalogFilters.minReview} onChange={e=>setCatalogFilters(v=>({...v,minReview:Number(e.target.value)}))}>
+              <option value="0">指定なし</option><option value="4">4.0以上（レビューあり）</option><option value="4.5">4.5以上（レビューあり）</option>
+            </select></label>
+            <label className="hl-shipping-checkbox"><input type="checkbox" checked={catalogFilters.freeShippingOnly} onChange={e=>setCatalogFilters(v=>({...v,freeShippingOnly:e.target.checked}))}/>送料無料の表示がある出品のみ</label>
+            {filterCount>0 && <button type="button" className="hl-reset-filters" onClick={()=>setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS })}>絞り込みを解除</button>}
+          </div>
+          <p>このページで取得できた候補だけを絞り込みます。送料込み総額ではなく、出品元の商品価格です。</p>
+          {visibleProducts.length===0 && <div className="hl-filter-empty" role="status">この条件に一致する候補はありません。予算や送料条件を変更してください。<button type="button" onClick={()=>setCatalogFilters({ ...CATALOG_FILTER_DEFAULTS })}>すべて表示</button></div>}
+        </section>}
 
         {smart && (
           <div className="hl-smart-search" role="status">
