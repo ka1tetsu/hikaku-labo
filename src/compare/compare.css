@@ -280,3 +280,48 @@ body{margin:0}
 
 .cp-research-jan{display:inline-flex;align-items:center;min-height:30px;margin:2px 0 5px;color:#14664f;font-size:11px;font-weight:750;text-decoration:underline;text-underline-offset:3px}
 .cp-research-jan:focus-visible{outline:3px solid #318467;outline-offset:3px}
+
+
+/* Research-first source audit: product reviews != seller reviews. */
+.cp-research-reviews{border-top:1px solid #b6cebb;border-bottom:1px solid #b6cebb;margin:17px 0 23px;padding:20px 0 19px;scroll-margin-top:24px}
+.cp-research-heading{display:flex;gap:14px;align-items:start;justify-content:space-between;flex-wrap:wrap}
+.cp-research-heading>div{flex:1 1 340px}
+.cp-research-heading>div>span{font-size:10px;font-weight:850;letter-spacing:.09em;color:#49725a}
+.cp-research-heading h3{font-size:21px;color:#1b4833;line-height:1.45;margin:5px 0 6px}
+.cp-research-heading p{font-size:12px;line-height:1.8;color:#47634f;margin:0}
+.cp-research-coverage{border:1px solid #ccded0;padding:10px 13px;font-size:11px!important;line-height:1.65;color:#3e5e48;max-width:275px;margin:0}
+.cp-research-coverage strong{font-variant-numeric:tabular-nums;color:#17583d}
+.cp-research-preset{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:15px 0 12px}
+.cp-research-preset>span{font-weight:800;font-size:12px;color:#264b37}
+.cp-research-preset button{cursor:pointer;min-height:44px;padding:9px 11px;border:1px solid #b9d1bf;background:#fff;color:#20543e;font-size:12px;font-weight:750}
+.cp-research-preset button[aria-pressed=true]{background:#155c41;color:#fff;border-color:#155c41}
+.cp-research-explainer{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 13px;margin:12px 0}
+.cp-research-explainer strong{font-size:13px;color:#1b593b}
+.cp-research-explainer small{flex:1 1 260px;font-size:11px;line-height:1.7;color:#57705c}
+.cp-research-list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cp-research-item{display:grid;grid-template-columns:minmax(0,1fr) 125px;gap:8px 12px;border:1px solid #cbdcd0;background:#fff;padding:13px;min-width:0}
+.cp-research-item-name{min-width:0}
+.cp-research-item-name strong{font-size:12px;color:#21563c}
+.cp-research-item-name>span{margin-left:8px;font-size:11px;color:#58735c}
+.cp-research-item-name p{font-size:12px;line-height:1.5;color:#234632;margin:6px 0 0;overflow-wrap:anywhere}
+.cp-research-item-score{display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.cp-research-item-score>span,.cp-research-item-seller>span{font-size:10px;color:#507057}
+.cp-research-item-score>strong{color:#b44d28;font-size:20px;line-height:1.4;font-variant-numeric:tabular-nums}
+.cp-research-item-score>strong small{font-size:11px;font-weight:500}
+.cp-research-item-score>small,.cp-research-item-seller small{font-size:11px;color:#577260}
+.cp-research-item-score em{font-size:10px;font-style:normal;color:#93602e}
+.cp-research-item-seller{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;border-top:1px solid #e3ece5;padding-top:7px}
+.cp-research-item-seller strong{font-size:13px;color:#326244;font-variant-numeric:tabular-nums}
+.cp-research-item-actions{display:flex;flex-direction:column;gap:3px;border-top:1px solid #e3ece5;padding-top:7px}
+.cp-research-item-actions>span{color:#3f614b;font-size:11px}
+.cp-research-item-actions a{font-size:11px;line-height:1.6;color:#145e42;text-decoration:underline;text-underline-offset:3px;min-height:26px;display:inline-flex;align-items:center}
+.cp-research-other{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:13px 15px;border:1px solid #cbdcd0}
+.cp-research-other>div{flex:1 1 300px}
+.cp-research-other strong{font-size:13px;color:#22533b}
+.cp-research-other p,.cp-research-note,.cp-research-empty{font-size:11px;line-height:1.8;color:#52705c;margin:5px 0}
+.cp-research-other>a{display:inline-flex;justify-content:center;align-items:center;min-height:44px;padding:9px 14px;background:#14664f;color:white!important;text-decoration:none;font-size:12px;font-weight:800}
+.cp-research-empty{padding:15px;background:#f6f8f6;border:1px solid #dbe7de}
+.cp-research-reviews :is(a,button):focus-visible{outline:3px solid #318467;outline-offset:3px}
+#cp-offer-list{scroll-margin-top:18px}
+@media(max-width:800px){.cp-research-list{grid-template-columns:1fr}.cp-research-coverage{max-width:none;width:100%}}
+@media(max-width:480px){.cp-research-item{grid-template-columns:minmax(0,1fr) 116px}.cp-research-other>a{width:100%}.cp-research-preset button{flex:1 1 100%}}
