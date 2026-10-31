@@ -4,11 +4,8 @@ import { japanToday } from './staySearch.js';
 import { LINK_CONFIG } from './linkConfig.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import YahooTravelAd from './YahooTravelAd.jsx';
+import { validBooking } from './bookingStarter.js';
 const start=()=>addDays(japanToday(),7);
-export function validBooking(f,today=japanToday()){
-  const n=(Date.parse(f.checkout)-Date.parse(f.checkin))/86400000;
-  return f.place.trim().length>=2&&f.checkin>=today&&Number.isInteger(n)&&n>=1&&n<=14?{...f,nights:n}:null;
-}
 export default function BookingStarter(){
   const [f,setF]=useState(()=>({place:'',checkin:start(),checkout:addDays(start(),2),adults:2,rooms:1}));
   const [result,setResult]=useState(null);
@@ -17,7 +14,7 @@ export default function BookingStarter(){
   return <section id="stay-booking" className="tv-wrap tvw-hub">
     <h2>ホテルの予約先を、日付と人数から比較</h2>
     <p>楽天トラベル・Booking.com・Expedia・Yahoo!トラベルを確認できます。価格は予約先で確認してください。</p>
-    <form className="tvw-hub-form" onSubmit={e=>{e.preventDefault();setResult(validBooking(f));}}>
+    <form className="tvw-hub-form" onSubmit={e=>{e.preventDefault();setResult(validBooking(f,japanToday()));}}>
       <label>泊まる場所<input type="search" required minLength={2} maxLength={80} value={f.place} placeholder="京都駅・箱根温泉など" onChange={e=>change('place',e.target.value)}/></label>
       <label>チェックイン<input type="date" required min={japanToday()} value={f.checkin} onChange={e=>change('checkin',e.target.value)}/></label>
       <label>チェックアウト<input type="date" required min={addDays(f.checkin,1)} max={addDays(f.checkin,14)} value={f.checkout} onChange={e=>change('checkout',e.target.value)}/></label>
