@@ -49,11 +49,13 @@ export default function ReviewResearchPanel({offers=[],stores=[],onApplyPreset,o
           {onChoose&&<button type="button" aria-pressed={selectedKeys.includes(offerKey(offer))}
             disabled={!selectedKeys.includes(offerKey(offer))&&selectedKeys.length>=4}
             onClick={()=>onChoose(offer)}>{selectedKeys.includes(offerKey(offer))?'比較対象から外す':'価格と条件の比較表に追加 →'}</button>}
-          {offer.reviewUrl?<a href={offer.reviewUrl} target="_blank" rel="noopener noreferrer">商品口コミの原文を読む ↗</a>:
+          {offer.reviewUrl?<a href={offer.reviewUrl} target="_blank" rel="noopener noreferrer"
+               onClick={()=>recordOutboundClick({section:'products',merchant:'yahoo-shopping',placement:'review-source',sponsored:false})}>商品口コミの原文を読む ↗</a>:
             <a href={offer.url} target="_blank" rel={offer.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
               onClick={()=>recordOutboundClick({section:'products',merchant:offer.store==='yahoo'?'yahoo-shopping':'rakuten',placement:'review-check',sponsored:offer.sponsored})}>
               販売ページで口コミを調べる ↗{offer.sponsored&&<small> PR</small>}</a>}
-          {offer.sellerReviewCount>0&&offer.storeUrl&&<a href={offer.storeUrl} target="_blank" rel="noopener noreferrer">販売店の情報を確認 ↗</a>}
+          {offer.sellerReviewCount>0&&offer.storeUrl&&<a href={offer.storeUrl} target="_blank" rel="noopener noreferrer"
+             onClick={()=>recordOutboundClick({section:'products',merchant:'yahoo-shopping',placement:'review-seller',sponsored:false})}>販売店の情報を確認 ↗</a>}
         </div>
       </article>)}</div>}
     <div className="cp-research-other">
