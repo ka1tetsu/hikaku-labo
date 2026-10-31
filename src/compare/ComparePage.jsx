@@ -6,7 +6,9 @@ import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { MERCHANTS, MERCHANT_KINDS, storeLinks } from '../shared/merchants.js';
 import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/compareBudget.js';
-import { PRICE_SORTS, displayValue, displayRange, sortDisplayedOffers } from '../shared/offerDisplay.js';
+import { displayValue, displayRange } from '../shared/offerDisplay.js';
+import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
+import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
 import { openConcierge } from '../shared/conciergeActions.js';
 import ManualStoreCompare from './ManualStoreCompare.jsx';
 import './compare.css';
@@ -21,19 +23,21 @@ function readParams() {
   return { q: params.get('q') || '', ref: params.get('ref') || '', jan: params.get('jan') || '', ...compareBudget(Object.fromEntries(params)) };
 }
 
-function OfferRow({ offer, rank, cheapest, sort }) {
+function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFull }) {
   const track = () => recordOutboundClick({ section: 'products', merchant: offer.store === 'yahoo' ? 'yahoo-shopping' : 'rakuten', placement: 'compare-offer', sponsored: offer.sponsored });
   return <li className={'cp-offer' + (cheapest ? ' is-cheapest' : '')}>
     <span className="cp-rank">{rank}</span>
     {offer.image ? <img src={offer.image} alt="" loading="lazy" width="64" height="64" /> : <span className="cp-noimg" aria-hidden="true">🛍️</span>}
     <div className="cp-offer-body">
-      <div className="cp-offer-store"><b className={'cp-store cp-store-' + offer.store}>{offer.storeName}</b><span>{offer.shopName}</span>{cheapest && <em className="cp-best">{sort === "cash" ? "掲載候補で最安" : "参考額が最小"}</em>}</div>
+      <div className="cp-offer-store"><b className={'cp-store cp-store-' + offer.store}>{offer.storeName}</b><span>{offer.shopName}</span>{cheapest && <em className="cp-best">{sort === 'points' ? '表示候補の参考額が最小' : '表示候補の価格が最小'}</em>}</div>
       <p className="cp-offer-title">{offer.title.length > 90 ? offer.title.slice(0, 90) + '…' : offer.title}</p>
-      <p className="cp-offer-meta">{offer.shippingFree ? '送料無料' : '送料別（店舗で確認）'}{offer.reviewCount > 0 ? `・★${offer.reviewAverage.toFixed(1)}（${offer.reviewCount.toLocaleString('ja-JP')}件）` : ''}</p>
+      <p className="cp-offer-meta">{shippingLabel(offer)}{offer.reviewCount > 0 ? `・★${offer.reviewAverage.toFixed(1)}（${offer.reviewCount.toLocaleString('ja-JP')}件）` : ''}</p>
+      <p className="cp-identity">{offer.matchBasis==='jan'?'JAN一致':offer.matchBasis==='model'?'型番一致・仕様は要確認':'商品名が類似・同一商品か未確認'}</p>
+      <label className="cp-pick"><input type="checkbox" checked={selected} disabled={!selected&&selectionFull} onChange={()=>onToggle(offer)}/>比較表に追加</label>
     </div>
     <div className="cp-offer-price">
       <strong>{yen(offer.price)}</strong>
-      <small>商品価格（送料は別途の場合あり）</small>
+      <small>商品価格・送料／割引条件は別に確認</small>
       {offer.point > 0 && <small>付与予定ポイント：{offer.point.toLocaleString("ja-JP")}pt</small>}
       {sort === "points" && <small className="cp-point-estimate">ポイント考慮後の参考額：{yen(displayValue(offer, "points"))}</small>}
       <a href={offer.url} target="_blank" rel={offer.sponsored ? 'sponsored noopener' : 'noopener noreferrer'} onClick={track}>ショップで見る ↗{offer.sponsored && <em className="cp-pr">PR</em>}</a>
@@ -49,6 +53,10 @@ export default function ComparePage() {
   const [showSimilar, setShowSimilar] = useState(false);
   const [freeOnly, setFreeOnly] = useState(false);
   const [priceSort, setPriceSort] = useState("cash");
+  const [filters,setFilters]=useState({store:'all',shipping:'all',reviewMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});
+  const [selectedKeys,setSelectedKeys]=useState([]);
+  const [displayLimit,setDisplayLimit]=useState(15);
+  const [shareStatus,setShareStatus]=useState('');
 
   useEffect(() => {
     if (!query.q && !query.jan) return undefined;
@@ -71,19 +79,35 @@ export default function ComparePage() {
     // "1万円以下のワイヤレスイヤホン" → search words; plain names stay as typed.
     const next = comparisonInput(text);
     setQuery(next);
-    setShowSimilar(false);
+    setShowSimilar(false);setSelectedKeys([]);setDisplayLimit(15);setShareStatus('');
     const url = new URL(window.location.href);
     url.search = new URLSearchParams(Object.entries(next).filter(([, v]) => v)).toString();
     window.history.replaceState({}, '', url.pathname + url.search);
   }
-  const pick = text => { setInput(text); setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
+  async function copyComparisonLink(){
+    if(typeof window==='undefined')return;
+    const url=new URL(window.location.href);
+    url.search=new URLSearchParams(Object.entries(query).filter(([k,v])=>['q','ref','jan','minPrice','maxPrice'].includes(k)&&v)).toString();
+    try{await navigator.clipboard.writeText(url.href);setShareStatus('比較条件のリンクをコピーしました。');}
+    catch{setShareStatus('アドレスバーのURLをコピーしてください。');}
+  }
+  const pick = text => { setInput(text); setSelectedKeys([]);setDisplayLimit(15);setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
 
-  const offers = sortDisplayedOffers((state.data?.offers || []).filter(o => (!freeOnly || o.shippingFree) && withinCompareBudget(o, query)), priceSort);
+  const rawOffers=(state.data?.offers||[]).filter(o=>withinCompareBudget(o,query));
+  const offers=filterOffers(rawOffers,{...filters,shipping:freeOnly?'free':filters.shipping,
+    includeUnverified:!filters.verifiedOnly,sort:priceSort});
+  const selectedOffers=rawOffers.filter(o=>selectedKeys.includes(offerKey(o))).slice(0,4);
+  const changeFilter=(key,value)=>{setFilters(current=>({...current,[key]:value}));setDisplayLimit(15);};
+  const toggleSelected=offer=>setSelectedKeys(current=>{
+    const id=offerKey(offer);
+    return current.includes(id)?current.filter(key=>key!==id):current.length<4?[...current,id]:current;
+  });
+  const visibleMetrics=offerSummary(offers,priceSort);
   const same = offers.filter(o => o.sameProduct);
   const similar = offers.filter(o => !o.sameProduct);
   const main = same.length ? same : similar;
   const rest = same.length ? similar : [];
-  const cheapest = main[0];
+  const cheapest = main.length? [...main].sort((a,b)=>displayValue(a,priceSort==='points'?'points':'cash')-displayValue(b,priceSort==='points'?'points':'cash'))[0]:null;
   const range = displayRange(main, priceSort);
   const searchTerm = query.q || query.jan || input.trim();
   const stores = storeLinks(searchTerm, { env: ENV, reference: query.ref });
@@ -111,7 +135,7 @@ export default function ComparePage() {
           <h2>比較のしくみ</h2>
           <ol>
             <li><b>実際の価格を取得</b>楽天市場・Yahoo!ショッピングの公式APIから、その時点の販売価格・ポイント・送料条件を取得します。</li>
-            <li><b>同じ商品を見分ける</b>型番やJANコードが一致する出品を「同じ商品」としてまとめ、商品価格が安い順を標準として並べます。</li>
+            <li><b>同じ商品を見分ける</b>型番・JANコードの一致を確認できた候補だけを先に表示し、名前が似ているだけの出品と分けます。色・容量の一致は別途確認が必要です。</li>
             <li><b>ほかのショップも一括確認</b>APIのないショップは、同じキーワードの検索結果へ直接リンクします（価格はリンク先で確認）。</li>
           </ol>
           <h2>比較できるショップ</h2>
@@ -121,32 +145,41 @@ export default function ComparePage() {
         {(query.q || query.jan) && <section className="cp-results" aria-live="polite">
           <div className="cp-results-head">
             <div><span className="cp-kicker">RESULTS</span><h2>「{query.ref || query.q || query.jan}」の価格比較</h2>
-              {state.data?.fetchedAt && <p>取得時刻：{new Date(state.data.fetchedAt).toLocaleString('ja-JP')}（価格・在庫は変動します）</p>}</div>
+              {state.data?.fetchedAt && <p>取得時刻：{new Date(state.data.fetchedAt).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})}（日本時間・価格は変動します）</p>}
+              <button className="cp-share" type="button" onClick={copyComparisonLink}>検索条件を共有する <span aria-hidden="true">↗</span></button>
+              {shareStatus&&<p role="status" className="cp-share-result">{shareStatus}</p>}</div>
             <div className="cp-result-controls">
               <label className="cp-sort-label" htmlFor="cp-price-sort">比較基準
                 <select id="cp-price-sort" value={priceSort} onChange={e => setPriceSort(e.target.value)}>
-                  {Object.entries(PRICE_SORTS).map(([value, option]) => <option value={value} key={value}>{option.label}</option>)}
+                  {Object.entries(OFFER_SORTS).map(([value,label]) => <option value={value} key={value}>{label}</option>)}
                 </select>
               </label>
               <label className="cp-toggle"><input type="checkbox" checked={freeOnly} onChange={e => setFreeOnly(e.target.checked)} />送料無料のみ</label>
             </div>
           </div>
           {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
-          <p className="cp-criteria-note">商品価格はポイント差引前・送料別の表示です。「送料無料」は取得元の送料区分で判定します。ポイント考慮後は参考値であり、購入時の支払額ではありません。</p>
+          <OfferFilters filters={filters} onChange={changeFilter}
+            storeOptions={[{id:'rakuten',name:'楽天市場'},{id:'yahoo',name:'Yahoo!ショッピング'}]}
+            visibleCount={offers.length} totalCount={rawOffers.length}
+            onReset={()=>{setFilters({store:'all',shipping:'all',reviewMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});setFreeOnly(false);setDisplayLimit(15);}}/>
+          <p className="cp-criteria-note">商品価格はポイント差引前で、送料が無料・別途・不明のいずれかです。「送料無料」は取得元の送料区分で判定します。ポイント考慮後は参考値であり、購入時の支払額ではありません。</p>
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
           {state.error && <p className="cp-error">{state.error} <a href="#cp-manual">3ショップの価格を手入力して比較する →</a></p>}
+          {visibleMetrics && <p className="cp-result-context" role="status">表示中：{visibleMetrics.count}件／{visibleMetrics.stores}モール、JAN一致{visibleMetrics.evidence}件。型番・JANが確認できない候補は同一商品と断定しません。</p>}
           {cheapest && <div className="cp-summary">
-            <div><span>{priceSort === "cash" ? (same.length ? "一致候補の最も低い商品価格" : "近い商品の最も低い商品価格") : "ポイント考慮後の最も低い参考額"}</span><strong>{yen(displayValue(cheapest, priceSort))}</strong><small>{priceSort === "points" ? "現金支払額ではありません · " : ""}{cheapest.storeName}・{cheapest.shopName}</small></div>
-            <div><span>{priceSort === "cash" ? "商品価格の幅" : "ポイント考慮後の参考額の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
+            <div><span>{priceSort === "points" ? "ポイント差引後の最も低い参考額" : (same.length ? "型番・JAN照合候補の最も低い商品価格" : "類似出品の最も低い商品価格")}</span><strong>{yen(displayValue(cheapest, priceSort))}</strong><small>{priceSort === "points" ? "現金支払額ではありません · " : ""}{cheapest.storeName}・{cheapest.shopName}</small></div>
+            <div><span>{priceSort === "points" ? "ポイント考慮後の参考額の幅" : "商品価格の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
             <div><span>比較したショップ</span><strong>{[sources.rakuten === 'ok' && '楽天', sources.yahoo === 'ok' && 'Yahoo!'].filter(Boolean).join('・') || '—'}</strong><small>{sources.yahoo === 'disabled' ? 'Yahoo!は価格自動取得の準備中' : 'APIで取得した実際の価格'}</small></div>
           </div>}
           {cheapest && <div className="cp-next-step"><strong>{cheapest.storeName}で販売条件を確認</strong><p>型番・JANによる照合は、色・容量・新品／中古・付属品の一致を保証しません。表示価格は送料や個別のクーポン適用後の総額ではありません。購入前に型番・送料・納期・返品条件を確認してください。</p><a className="vl-primary" href={cheapest.url} target="_blank" rel={cheapest.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'products', merchant: cheapest.store === 'yahoo' ? 'yahoo-shopping' : 'rakuten', placement: 'compare-top-offer', sponsored: cheapest.sponsored })}>この出品の価格・在庫を確認 ↗{cheapest.sponsored && <small>PR</small>}</a></div>}
-          {!state.loading && state.data && !same.length && main.length > 0 && <p className="cp-note">型番が一致する出品が見つからなかったため、近い商品を表示しています。型番やJANコードで検索すると精度が上がります。</p>}
-          {main.length > 0 && <ol className="cp-offers">{main.slice(0, 15).map((offer, index) => <OfferRow key={offer.store + offer.url} offer={offer} rank={index + 1} cheapest={index === 0} sort={priceSort} />)}</ol>}
+          {!state.loading && state.data && !same.length && main.length > 0 && <p className="cp-note">JAN・型番一致を確認できる出品はありません。商品名が似た候補を掲載していますが、同一商品の価格比較ではありません。型番やJANを入力すると比較対象を絞れます。</p>}
+          <OfferShortlist offers={selectedOffers} onRemove={id=>setSelectedKeys(keys=>keys.filter(key=>key!==id))} onClear={()=>setSelectedKeys([])}/>
+          {main.length > 0 && <ol className="cp-offers">{main.slice(0,displayLimit).map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={index === 0&&(priceSort==='cash'||priceSort==='points')} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
+          {main.length > displayLimit && <button type="button" className="cp-show-more" onClick={()=>setDisplayLimit(n=>n+15)}>さらに15件表示（残り{main.length-displayLimit}件）</button>}
           {!state.loading && state.data && offers.length === 0 && <p className="cp-muted">{Object.values(sources).some(status => status === 'ok') ? '今回の取得結果に表示できる出品がありません。下のショップでも確認できます。' : '現在はショップの価格を自動取得できません。各ショップの検索結果で価格・在庫を直接確認してください。'}</p>}
           {rest.length > 0 && <div className="cp-similar">
             <button type="button" onClick={() => setShowSimilar(v => !v)} aria-expanded={showSimilar}>{showSimilar ? '▲' : '▼'} 型番が異なる・近い商品（{rest.length}件）</button>
-            {showSimilar && <ol className="cp-offers">{rest.slice(0, 15).map((offer, index) => <OfferRow key={offer.store + offer.url} offer={offer} rank={index + 1} cheapest={false} sort={priceSort} />)}</ol>}
+            {showSimilar && <ol className="cp-offers">{rest.map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={false} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
           </div>}
           <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 条件を変えて候補を探す</button>
         </section>}
@@ -167,7 +200,7 @@ export default function ComparePage() {
 
         <section className="cp-disclosure">
           <h2>広告・データについて</h2>
-          <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で購入が成立すると、VivlicaがショップやASPから紹介料を受け取る場合があります。並び順は「商品価格が安い順」が標準です。希望した場合だけ、付与予定ポイントを差し引いた参考額でも並べられます。ポイントは購入時の現金値引きではなく、広告報酬額は順位計算に使っていません。</p>
+          <p>「PR」表示のリンクはアフィリエイト広告です。リンク経由で購入が成立すると、VivlicaがショップやASPから紹介料を受け取る場合があります。並び順は商品価格を安い順に並べるのが標準です。口コミ評価・件数やポイント差引後の参考額でも並び替えられます。ポイントは購入時の現金値引きではなく、広告報酬額は順位計算に使っていません。</p>
           <p>価格・ポイント・送料・在庫は各ショップの公式APIから取得した時点の情報です。購入前に販売ページで最新の条件を確認してください。APIのないショップの価格を自動収集（スクレイピング）することはしていません。</p>
         </section>
       </div>

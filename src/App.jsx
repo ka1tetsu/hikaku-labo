@@ -179,7 +179,7 @@ export default function App() {
   };
 
   const searchTitle = activeCategory
-    ? `「${activeCategory.label}」の人気商品・最安値`
+    ? `「${activeCategory.label}」の掲載商品・価格一覧`
     : query
       ? `「${query}」の検索結果`
       : '商品名・型番から価格を調べる';
@@ -200,7 +200,6 @@ export default function App() {
 
       <main id="main-content" className="main-content container">
         <SectionDirectory />
-        <SavingsPlanner />
 
         {/* Affiliate Quick search bar */}
         <div className="affiliate-bar">
@@ -346,6 +345,9 @@ export default function App() {
 
         {/* Ranking sidebar */}
         <RankingSection />
+
+        {/* Fixed-cost savings belong after the visitor's primary product-price task. */}
+        <SavingsPlanner />
       </main>
 
       <Footer />

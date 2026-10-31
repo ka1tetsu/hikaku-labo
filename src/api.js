@@ -91,6 +91,7 @@ export function normalizeRakutenItem(raw) {
         reviewCount: Number(raw.reviewCount) || 0,
         postageFlag: raw.postageFlag,
         isFreeShipping,
+        shippingStatus:raw.postageFlag === 0 ? 'free' : raw.postageFlag === 1 ? 'extra' : 'unknown',
         pointRate,
         pointBack,
         // 実質価格 = 商品価格 - ポイント還元額。

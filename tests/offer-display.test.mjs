@@ -35,8 +35,8 @@ test('user interface distinguishes cash checkout price from points and does not 
   assert.match(view,/現金値引きではなく/);
   assert.match(view,/ポイント考慮後は参考値/);
   assert.match(view,/商品価格はポイント差引前/);
-  assert.match(view,/sortDisplayedOffers/);
-  assert.match(view,/掲載候補で最安/);
+  assert.match(view,/filterOffers/);
+  assert.match(view,/表示候補の価格が最小/);
   assert.doesNotMatch(view,/実質価格（価格−付与ポイント）で決めており/);
   assert.match(api,/slice\(0, 80\)/);
 });
