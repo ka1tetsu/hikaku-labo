@@ -3,12 +3,14 @@ import SiteFooter from '../shared/SiteFooter.jsx';
 import { searchResponse } from '../shared/searchRequest.js';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
-import { recordOutboundClick } from '../shared/outboundClient.js';
+import { recordOutboundClick, recordFunnelEvent } from '../shared/outboundClient.js';
 import { MERCHANTS, MERCHANT_KINDS, storeLinks } from '../shared/merchants.js';
 import { compareBudget, comparisonInput, withinCompareBudget } from '../shared/compareBudget.js';
 import { displayValue, displayRange } from '../shared/offerDisplay.js';
 import { OFFER_SORTS, filterOffers, offerKey, shippingLabel, offerSummary } from '../shared/compareWorkbench.js';
 import { OfferFilters, OfferShortlist } from './OfferWorkbench.jsx';
+import BuyerChoices from './BuyerChoices.jsx';
+import { sourceNotice } from '../shared/buyerDecision.js';
 import PriceTargetMemo from './PriceTargetMemo.jsx';
 import { openConcierge } from '../shared/conciergeActions.js';
 import ManualStoreCompare from './ManualStoreCompare.jsx';
@@ -39,7 +41,7 @@ function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFu
     <div className="cp-offer-price">
       <strong>{yen(offer.price)}</strong>
       <small>商品価格・送料／割引条件は別に確認</small>
-      {offer.point > 0 && <small>付与予定ポイント：{offer.point.toLocaleString("ja-JP")}pt</small>}
+      {offer.point > 0 && <small>{offer.pointKind==='paypay-limited'?'PayPayポイント（期間限定・取得元表示）':'付与予定ポイント（取得元表示）'}：{offer.point.toLocaleString("ja-JP")}pt</small>}
       {sort === "points" && <small className="cp-point-estimate">ポイント考慮後の参考額：{yen(displayValue(offer, "points"))}</small>}
       <a href={offer.url} target="_blank" rel={offer.sponsored ? 'sponsored noopener' : 'noopener noreferrer'} onClick={track}>ショップで見る ↗{offer.sponsored && <em className="cp-pr">PR</em>}</a>
     </div>
@@ -68,7 +70,7 @@ export default function ComparePage() {
     setState({ loading: true, data: null, error: '' });
     searchResponse('/api/compare?' + params, { signal: controller.signal })
       .then(response => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
-      .then(data => { if (alive) setState({ loading: false, data, error: '' }); })
+      .then(data => { if (alive) { setState({ loading: false, data, error: '' }); if (Array.isArray(data.offers) && data.offers.length > 0) recordFunnelEvent('product_results_ready'); } })
       .catch(() => { if (alive) setState({ loading: false, data: null, error: '価格データを取得できませんでした。下のリンクから各ショップで確認できます。' }); });
     return () => { alive = false; controller.abort(); };
   }, [query]);
@@ -80,6 +82,7 @@ export default function ComparePage() {
     // "1万円以下のワイヤレスイヤホン" → search words; plain names stay as typed.
     const next = comparisonInput(text);
     setQuery(next);
+    recordFunnelEvent('product_search');
     setShowSimilar(false);setSelectedKeys([]);setDisplayLimit(15);setShareStatus('');
     const url = new URL(window.location.href);
     url.search = new URLSearchParams(Object.entries(next).filter(([, v]) => v)).toString();
@@ -92,17 +95,17 @@ export default function ComparePage() {
     try{await navigator.clipboard.writeText(url.href);setShareStatus('比較条件のリンクをコピーしました。');}
     catch{setShareStatus('アドレスバーのURLをコピーしてください。');}
   }
-  const pick = text => { setInput(text); setSelectedKeys([]);setDisplayLimit(15);setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
+  const pick = text => { recordFunnelEvent('product_search');setInput(text); setSelectedKeys([]);setDisplayLimit(15);setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
 
   const rawOffers=(state.data?.offers||[]).filter(o=>withinCompareBudget(o,query));
   const offers=filterOffers(rawOffers,{...filters,shipping:freeOnly?'free':filters.shipping,
     includeUnverified:!filters.verifiedOnly,sort:priceSort});
   const selectedOffers=rawOffers.filter(o=>selectedKeys.includes(offerKey(o))).slice(0,4);
   const changeFilter=(key,value)=>{setFilters(current=>({...current,[key]:value}));setDisplayLimit(15);};
-  const toggleSelected=offer=>setSelectedKeys(current=>{
+  const toggleSelected=offer=>{if(!selectedKeys.includes(offerKey(offer))&&selectedKeys.length<4)recordFunnelEvent('product_offer_selected');setSelectedKeys(current=>{
     const id=offerKey(offer);
     return current.includes(id)?current.filter(key=>key!==id):current.length<4?[...current,id]:current;
-  });
+  });};
   const visibleMetrics=offerSummary(offers,priceSort);
   const same = offers.filter(o => o.sameProduct);
   const similar = offers.filter(o => !o.sameProduct);
@@ -113,6 +116,7 @@ export default function ComparePage() {
   const searchTerm = query.q || query.jan || input.trim();
   const stores = storeLinks(searchTerm, { env: ENV, reference: query.ref });
   const sources = state.data?.sources || {};
+  const providerNotice = sourceNotice(sources);
 
   return <div className="cp-page">
     <SiteHeader active="products" />
@@ -163,6 +167,7 @@ export default function ComparePage() {
             storeOptions={[{id:'rakuten',name:'楽天市場'},{id:'yahoo',name:'Yahoo!ショッピング'}]}
             visibleCount={offers.length} totalCount={rawOffers.length}
             onReset={()=>{setFilters({store:'all',shipping:'all',reviewMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});setFreeOnly(false);setDisplayLimit(15);}}/>
+          {providerNotice&&<p className="cp-provider-notice" role="status">{providerNotice.message} 取得できないモールの価格は比較に含めていません。</p>}
           <p className="cp-criteria-note">商品価格はポイント差引前で、送料が無料・別途・不明のいずれかです。「送料無料」は取得元の送料区分で判定します。ポイント考慮後は参考値であり、購入時の支払額ではありません。</p>
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
           {state.error && <p className="cp-error">{state.error} <a href="#cp-manual">3ショップの価格を手入力して比較する →</a></p>}
@@ -172,7 +177,7 @@ export default function ComparePage() {
             <div><span>{priceSort === "points" ? "ポイント考慮後の参考額の幅" : "商品価格の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
             <div><span>比較したショップ</span><strong>{[sources.rakuten === 'ok' && '楽天', sources.yahoo === 'ok' && 'Yahoo!'].filter(Boolean).join('・') || '—'}</strong><small>{sources.yahoo === 'disabled' ? 'Yahoo!は価格自動取得の準備中' : 'APIで取得した実際の価格'}</small></div>
           </div>}
-          {cheapest && <div className="cp-next-step"><strong>{cheapest.storeName}で販売条件を確認</strong><p>型番・JANによる照合は、色・容量・新品／中古・付属品の一致を保証しません。表示価格は送料や個別のクーポン適用後の総額ではありません。購入前に型番・送料・納期・返品条件を確認してください。</p><a className="vl-primary" href={cheapest.url} target="_blank" rel={cheapest.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'products', merchant: cheapest.store === 'yahoo' ? 'yahoo-shopping' : 'rakuten', placement: 'compare-top-offer', sponsored: cheapest.sponsored })}>この出品の価格・在庫を確認 ↗{cheapest.sponsored && <small>PR</small>}</a></div>}
+          {cheapest && <BuyerChoices offers={main} searched={providerNotice?.unavailable.length>0}/>}
           {!state.loading && state.data && !same.length && main.length > 0 && <p className="cp-note">JAN・型番一致を確認できる出品はありません。商品名が似た候補を掲載していますが、同一商品の価格比較ではありません。型番やJANを入力すると比較対象を絞れます。</p>}
           <OfferShortlist offers={selectedOffers} onRemove={id=>setSelectedKeys(keys=>keys.filter(key=>key!==id))} onClear={()=>setSelectedKeys([])}/>
           {main.length > 0 && <ol className="cp-offers">{main.slice(0,displayLimit).map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={index === 0&&(priceSort==='cash'||priceSort==='points')} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
