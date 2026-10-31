@@ -14,7 +14,7 @@ export default function SiteHeader({ active = 'products', children }) {
           <span className="hl-brand-text">{active === 'travel' ? 'Vivlica Travel' : 'Vivlica'}<small>{active === 'travel' ? 'VIVLICA TRAVEL' : 'VIVLICA'}</small></span>
         </a>
         <nav className="hl-main-nav" aria-label="Vivlicaのサイト内ナビゲーション">
-          {SITE_SECTIONS.map(section => <a
+          {[...SITE_SECTIONS].sort((a,b)=>Number(b.id==='travel')-Number(a.id==='travel')).map(section => <a
             key={section.id}
             href={section.href}
             aria-current={section.id === active ? 'page' : undefined}
