@@ -107,7 +107,7 @@ export default function ComparePage() {
     setQuery(next);
     recordFunnelEvent('product_search');
     setManualRequested(false);setPage(1);setShowSimilar(false);setSelectedKeys([]);setDisplayLimit(15);setShareStatus('');
-    setFilters(v=>({...v,reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0'}));
+    resetSearchFilters();
     const url = new URL(window.location.href);
     url.search = new URLSearchParams(Object.entries(next).filter(([, v]) => v)).toString();
     window.history.replaceState({}, '', url.pathname + url.search);
@@ -119,7 +119,11 @@ export default function ComparePage() {
     try{await navigator.clipboard.writeText(url.href);setShareStatus('比較条件のリンクをコピーしました。');}
     catch{setShareStatus('アドレスバーのURLをコピーしてください。');}
   }
-  const pick = text => { recordFunnelEvent('product_search');setManualRequested(false);setPage(1);setInput(text); setSelectedKeys([]);setDisplayLimit(15);setFilters(v=>({...v,reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0'}));setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
+  function resetSearchFilters() {
+    setFilters({store:'all',shipping:'all',reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});
+    setFreeOnly(false);setShowSimilar(false);setShareStatus('');
+  }
+  const pick = text => { recordFunnelEvent('product_search');setManualRequested(false);setPage(1);setInput(text); setSelectedKeys([]);setDisplayLimit(15);resetSearchFilters();setQuery({ q: text, ref: '', jan: '' }); window.history.replaceState({}, '', '/compare/?q=' + encodeURIComponent(text)); };
 
   function changePage(next){
     if(next<1||next>20||state.loading)return;
