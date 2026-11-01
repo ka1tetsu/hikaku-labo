@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SIM_SERVICES } from '../src/services/catalog.js';
 import { serviceLink } from '../src/services/affiliate.js';
+import { PUBLIC_AFFILIATE_LINKS } from '../src/shared/publicAffiliateLinks.js';
 
 const rakuten = SIM_SERVICES.find(s => s.id === 'rakuten-mobile');
 const iij = SIM_SERVICES.find(s => s.id === 'iijmio');
@@ -26,7 +27,9 @@ test('non-https, look-alike or credentialed Rakuten hosts fall back to the offic
   ]) {
     assert.deepEqual(serviceLink(rakuten, { VITE_AFF_URL_RAKUTEN_MOBILE: value }), official, value);
   }
-  assert.deepEqual(serviceLink(rakuten, {}), official);
+  // Without environment values a reviewed repository link applies; otherwise the official URL.
+  const committed = PUBLIC_AFFILIATE_LINKS['rakuten-mobile'];
+  assert.deepEqual(serviceLink(rakuten, {}), committed ? { url: new URL(committed).href, sponsored: true } : official);
 });
 
 test('existing ASP behaviour is unchanged', () => {
