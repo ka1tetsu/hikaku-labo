@@ -2,7 +2,7 @@
 // It never prints API tokens, advertising URLs, or financial secrets.
 import { travelAffiliateEnabled } from '../src/travel/a8TravelAds.js';
 import { travelLinkConfig } from '../src/travel/bookingLinks.js';
-import { affiliateBundle } from '../src/shared/affiliateConfig.js';
+import { affiliateCandidate } from '../src/shared/affiliateConfig.js';
 import { SERVICE_IDS } from '../src/services/catalog.js';
 import { SERVICES } from '../src/tools/catalog.js';
 import { siteOrigin, SITE_ORIGIN } from '../src/shared/site.js';
@@ -13,13 +13,10 @@ export function monetizationChecklist(env = {}, origin = SITE_ORIGIN) {
   const canonical = siteOrigin(origin);
   const config = travelLinkConfig(env);
   const activeA8 = travelAffiliateEnabled({ ...env, VITE_SITE_ORIGIN: canonical });
-  const affiliate = affiliateBundle(env.VITE_AFFILIATE_LINKS);
   const serviceIds = new Set([...SERVICE_IDS, ...SERVICES.map(s=>s.id)]);
   const serviceKeys = [...serviceIds];
-  const configuredServiceIds = serviceKeys.filter(id => {
-    const key = 'VITE_AFF_URL_' + id.toUpperCase().replace(/[^A-Z0-9]/g, '_');
-    return Boolean(env[key] || affiliate.links[id]);
-  });
+  // Counts environment values and committed public links (src/shared/publicAffiliateLinks.js).
+  const configuredServiceIds = serviceKeys.filter(id => Boolean(affiliateCandidate(id, env)));
   const productionEnvironmentVerified = env.VIVLICA_PRODUCTION_ENV_VERIFIED === 'true';
   const blockers = [];
   if (!activeA8) blockers.push({
@@ -30,7 +27,7 @@ export function monetizationChecklist(env = {}, origin = SITE_ORIGIN) {
   if (configuredServiceIds.length === 0) blockers.push({
     priority: 1, code: 'service_affiliate_not_configured',
     message: productionEnvironmentVerified ? '通信・カード・保険・ITの紹介URLは未設定です。' : 'この監査環境では通信・カード・保険・ITの紹介URLを確認できません。Vercelの本番環境変数とは異なる場合があります。',
-    action: '各ASPで提携済みの正規広告素材・計測リンクを取得し、VITE_AFFILIATE_LINKS または VITE_AFF_URL_<ID> へ設定。A8が原文HTMLを要求する案件はHTMLのまま掲載。',
+    action: '各ASPで提携済みの正規広告素材・計測リンクを取得し、VITE_AFFILIATE_LINKS または VITE_AFF_URL_<ID> へ設定するか、src/shared/publicAffiliateLinks.js に追記してPRで反映。A8が原文HTMLを要求する案件はHTMLのまま掲載。',
   });
   if (!config.tripcom && !config.bookingAid && !config.skyscannerPrefix && !config.expediaPrefix) blockers.push({
     priority: 2, code: 'travel_partner_programs_not_configured',
