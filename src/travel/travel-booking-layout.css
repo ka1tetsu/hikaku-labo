@@ -1,0 +1,22 @@
+/* Independent Vivlica styling: task order follows familiar booking workflows. */
+.tv-booking-intro{padding-top:28px;padding-bottom:12px}
+.tv-booking-intro h1{font-size:clamp(26px,3vw,38px);line-height:1.5;margin:8px 0;color:#162b28}
+.tv-booking-intro p{line-height:1.8;color:#36574d}
+.tv-booking-intro nav{display:flex;flex-wrap:wrap;gap:8px;border-bottom:2px solid #14664f;padding:14px 0}
+.tv-booking-intro nav a{display:flex;align-items:center;min-height:44px;padding:8px 16px;color:#14664f;background:#f1f5f2;text-decoration:none;font-weight:700}
+.tv-booking-intro nav a:first-child{background:#14664f;color:white}
+.tv-page .tv-stay-search{padding-top:20px}
+.tv-page .hs-heading h2{font-size:24px;line-height:1.5}
+.tv-page .hs-search-form{border-radius:4px!important;box-shadow:none;border:1px solid #b8c9c0}
+.tv-page .hs-card-grid{grid-template-columns:1fr}
+.tv-page .hs-hotel-card{display:grid;grid-template-columns:220px minmax(0,1fr);border-radius:4px;box-shadow:none;transition:none}
+.tv-page .hs-hotel-card:hover{transform:none;box-shadow:none}
+.tv-page .hs-hotel-card>img,.tv-page .hs-photo-empty{width:100%;height:100%;min-height:200px;background:#eef3ef}
+.tv-page .hs-card-body{width:auto;display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:12px 24px}
+.tv-page .hs-card-body>*{grid-column:1}
+.tv-page .hs-price-row{grid-column:2;grid-row:1/4;align-self:center;border:0}
+.tv-page .hs-card-actions{grid-column:2;grid-row:4/7;align-self:end}
+.tv-page .hs-controls label,.tv-page .hs-card-body p,.tv-page .hs-source-note{font-size:14px}
+.tv-page .hs-card-actions>a,.tv-page .hs-compare-toggle{min-height:44px}
+.tv-page .tvx-hero h2{font-size:clamp(26px,3vw,38px);line-height:1.5}
+@media(max-width:760px){.tv-page .hs-hotel-card{grid-template-columns:1fr}.tv-page .hs-hotel-card>img,.tv-page .hs-photo-empty{height:190px;min-height:0}.tv-page .hs-card-body{display:flex;width:auto}.tv-booking-intro nav a{flex:1 1 40%;font-size:14px}.tv-page .hs-heading h2{font-size:22px}}
