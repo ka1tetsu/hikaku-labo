@@ -11,7 +11,7 @@ import './global-travel.css';
 const yen=n=>'¥'+n.toLocaleString('ja-JP');
 const LOCAL_IATA={tokyo:'TYO',osaka:'OSA',sapporo:'SPK',fukuoka:'FUK',naha:'OKA',niigata:'KIJ',nagoya:'NGO',sendai:'SDJ',hakodate:'HKD',hiroshima:'HIJ',nagasaki:'NGS'};
 
-export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, rooms, setRooms, departureDate, setDepartureDate, showHero = true }) {
+export default function GlobalTravelSearch({ onDomesticDestination, destination, setDestination, nights, setNights, travelers, setTravelers, rooms, setRooms, departureDate, setDepartureDate, showHero = true, showCostComparator = true }) {
   const [query,setQuery]=useState('');
   const [parsed,setParsed]=useState(null);
   const [origin,setOrigin]=useState('東京');
@@ -203,7 +203,7 @@ export default function GlobalTravelSearch({ onDomesticDestination, destination,
         {fares.fares?.length>0&&<div className="gx-fare-grid">{fares.fares.map((f,i)=><div key={i}><strong>{yen(f.amountJPY)}</strong><span>出発 {f.departureAt?.slice(0,10)}</span><small>{f.transfers===0?'直行便':f.transfers===null?'乗継情報なし':f.transfers+'回乗継'} / 過去検索の参考価格</small></div>)}</div>}
         <small>価格の有効性・税・手荷物・空席・変更/取消条件が確認できないため、最安値としては順位付けしません。購入前に公式予約画面の総額をご確認ください。</small>
       </section>}
-      <TotalCostComparator searchCriteria={{ stayLinks, originCode: fromIata, destination: location, departureDate, returnDate: effectiveCheckout, nights, travelers, rooms, config: LINK_CONFIG }} />
+      {showCostComparator && <TotalCostComparator searchCriteria={{ stayLinks, originCode: fromIata, destination: location, departureDate, returnDate: effectiveCheckout, nights, travelers, rooms, config: LINK_CONFIG }} />}
       <div className="gx-destination-note">
         <h3>{destination||'世界中の目的地'}のモデル観光プラン</h3>
         {location?<p>{location.country}・{location.tagline}。掲載済みスポットをもとに、無理のない候補を日ごとに整理しています。</p>

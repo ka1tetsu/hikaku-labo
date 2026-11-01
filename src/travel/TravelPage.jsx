@@ -53,7 +53,12 @@ function NumberSelect({ label, values, value, onChange, formatter = String }) {
 }
 
 const param = key => (typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get(key));
-const scrollToId = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+const scrollToId = id => {
+  const target = document.getElementById(id);
+  let parent = target?.parentElement;
+  while (parent) { if (parent.tagName === 'DETAILS') parent.open = true; parent = parent.parentElement; }
+  target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 export default function TravelPage() {
   const [destination, setDestination] = useState(() => {
@@ -106,19 +111,30 @@ export default function TravelPage() {
     window.addEventListener('hikaku:concierge-action', onAction);
     return () => window.removeEventListener('hikaku:concierge-action', onAction);
   });
+  useEffect(() => {
+    const reveal = () => { if (window.location.hash) scrollToId(window.location.hash.slice(1)); };
+    reveal();
+    window.addEventListener('hashchange', reveal);
+    return () => window.removeEventListener('hashchange', reveal);
+  }, []);
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
-      <header className="tv-booking-intro tv-wrap"><p>Vivlica トラベル</p><h1>ホテル・旅館を、条件から探す。</h1><p>宿泊地と日程で探し、料金・口コミ・客室条件を比較。予約とお支払いは各予約サイトで行います。</p>
-        <nav aria-label="旅行サービス"><a href="#stay-search">国内ホテル・旅館</a><a href="#booking">海外ホテル・航空券</a><a href="#destinations">旅行先・モデルコース</a><a href="#planner">旅費の計算</a></nav>
+      <header className="tv-booking-intro tv-wrap"><h1>ホテル・旅館を、条件から探す。</h1><p>宿を探し、同じ条件の予約サイトを比較。予約・支払いは各社で行います。</p>
+        <nav aria-label="旅行サービス"><a href="#stay-search">国内ホテル・旅館</a><a href="#global-travel-compare">海外ホテル・航空券</a><a href="#destinations">旅行先・モデルコース</a><a href="#planner">旅費の計算</a></nav>
       </header>
       <StaySearch />
+      <details className="tv-extra-tools" id="travel-inspiration"><summary>旅行先・モデルコースを探す</summary>
       <TravelDiscovery selectedId={destination} onSelect={chooseDomestic} nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} depart={depart} setDepart={setDepart} budget={budget}
         pace={pace} setPace={setPace} styleChoice={styleChoice} setStyleChoice={setStyleChoice}
         hotelSearch={null} concierge={<Concierge onShow={showFromConcierge}/>}/>
-      <GlobalTravelSearch showHero={false} onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName}
+      </details>
+      <details className="tv-extra-tools" id="travel-world-tools"><summary>海外ホテル・航空券・その他の予約サイト</summary>
+      <GlobalTravelSearch showHero={false} showCostComparator={false} onDomesticDestination={chooseDomestic} destination={selectedPlaceName} setDestination={setSelectedPlaceName}
         nights={nights} setNights={setNights} travelers={travelers} setTravelers={setTravelers} rooms={rooms} setRooms={setRooms} departureDate={depart} setDepartureDate={setDepart}/>
 
+      </details>
+      <details className="tv-extra-tools"><summary>旅行全体の予算を計算する</summary>
       <section className="tv-wrap tv-planner-section" id="planner">
         <div className="tv-section-heading"><div><span className="tv-eyebrow">YOUR TRAVEL BUDGET</span><h2>{place.name}の旅費を、<br/>まとめてシミュレーション。</h2><p>宿泊先の販売価格ではなく、あなたが入力した金額に基づく予算モデルです。</p></div><span className="tv-free-chip">FREE TOOL</span></div>
         <div className="tv-planner-grid">
@@ -154,14 +170,15 @@ export default function TravelPage() {
         </div>
       </section>
 
+      </details>
       <section className="tv-guide" id="guide"><div className="tv-wrap"><span className="tv-eyebrow">BEFORE YOU BOOK</span><h2>予約前に確かめたい、<br/>3つのチェックポイント。</h2><div className="tv-guide-cards">{ADVICE.map(item=><article key={item.number}><span>{item.number}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div></div></section>
       {nights > 0 && place.area === 'domestic' && <section className="tv-wrap tv-booking-cta"><div><span className="tv-eyebrow">FIND YOUR STAY</span><h2>実際の宿泊プランを、<br/>自分の条件で探そう。</h2><p>Yahoo!トラベルではエリア・宿泊日・人数などで探せます。表示価格やポイントの適用条件、キャンセル規定は予約前に公式サイトで確認してください。</p></div><BookingAd variant="banner300"/></section>}
       <div className="tv-wrap tv-editorial-link"><div><strong>予約前に失敗しないための比較ガイド</strong><p>宿泊費・交通費・食費に加えて、支払総額やキャンセル条件も確認。</p></div><a href="/guides/travel-budget/">宿泊予約のチェックリストを見る ↗</a></div>
       <section className="tv-wrap tv-faq"><span className="tv-eyebrow">Q & A</span><h2>宿泊予約について</h2>
-        <details><summary>表示された料金は最新の宿泊料金ですか？</summary><p>いいえ。入力した単価をもとに計算した予算の目安です。実際のプラン価格、空室、ポイント適用条件は予約サイトでご確認ください。</p></details>
+        <details><summary>表示された料金は最新の宿泊料金ですか？</summary><p>宿泊検索の料金は楽天トラベルから取得した初泊の参考額です。各社の総額比較は利用者が入力した金額、旅費計算は入力した予算に基づきます。最新の販売価格・空室は予約先でご確認ください。</p></details>
         <details><summary>ポイント即時利用・クーポンは計算されますか？</summary><p>自動反映されません。利用資格、支払方法、対象プラン等で条件が異なるため、予約確認画面の金額をご確認ください。</p></details>
         <details><summary>Vivlicaで直接予約できますか？</summary><p>できません。Vivlicaは旅行予算の計画を支援するサイトです。予約・支払・キャンセル手続きは旅行予約サイトでお願いします。</p></details>
-        <details><summary>航空券・ホテルのリンクの「PR」とは何ですか？</summary><p>アフィリエイト広告であることを示す表示です。リンク経由で予約が成立すると、当サイトが予約サイトから紹介料を受け取る場合があります。料金はお客様の負担にならず、並び順は報酬額ではなく固定です。PR表示のないリンクは通常のリンクです。</p></details>
+        <details><summary>航空券・ホテルのリンクの「PR」とは何ですか？</summary><p>アフィリエイト広告であることを示す表示です。リンク経由で予約が成立すると、当サイトが予約サイトから紹介料を受け取る場合があります。宿のおすすめ順は料金・口コミ、各社の比較順は入力した支払額・取消条件から計算します。広告報酬は順位に含めません。PR表示のないリンクは通常のリンクです。</p></details>
         <details><summary>旅行の条件検索はどんな仕組みですか？</summary><p>外部のAI APIを使わず、ブラウザ内で動くルールエンジンが文章から時期・日数・人数・予算・テーマなどを読み取り、編集部が整理した旅行データから提案します。入力内容はサーバーに送信・保存されません。移動時間・ベストシーズン・予算との相性は目安で、運賃・空室・入国条件は公式情報と予約サイトでご確認ください。</p></details>
         <details><summary>掲載されていない国や都市は探せますか？</summary><p>検索窓に入力すると、{DESTINATION_CATALOG.length}都市のモデルコースに加えて約200の国と地域を検索できます。掲載外の場所でも、宿・航空券・地図を各サイトで直接検索するリンクを表示します。</p></details>
       </section>

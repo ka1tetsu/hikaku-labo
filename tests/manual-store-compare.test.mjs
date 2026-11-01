@@ -51,7 +51,7 @@ test('browser-only calculator uses registered approved/ordinary store search lin
   assert.match(ui,/recordOutboundClick/);
   assert.match(ui,/sameProduct && comparison\.comparisonPossible/);
   assert.doesNotMatch(ui,/fetch\(|localStorage|sessionStorage/);
-  assert.match(travel,/stay-quick/);
+  assert.match(travel,/stay-search-fallback/);
   const refs=storeLinks('WH-1000XM5');
   assert.ok(refs.find(x=>x.id==='rakuten').url.startsWith('https://'));
   assert.ok(refs.find(x=>x.id==='amazon').url.startsWith('https://'));

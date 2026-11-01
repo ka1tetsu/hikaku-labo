@@ -84,7 +84,7 @@ test('travel search form is rendered on the actual travel page with required sea
   try {
     const { default: TravelPage } = await vite.ssrLoadModule('/src/travel/TravelPage.jsx');
     const html = renderToStaticMarkup(createElement(TravelPage));
-    for (const expected of ['id="stay-search"', 'チェックイン', 'チェックアウト', '大人の人数（1室）', '空室のある宿を探す', '朝食付き', '温泉あり']) assert.ok(html.includes(expected), expected);
+    for (const expected of ['id="stay-search"', 'チェックイン', 'チェックアウト', '大人の人数（1室）', 'この条件で検索', '朝食付き', '温泉あり']) assert.ok(html.includes(expected), expected);
     assert.ok(!html.includes('条件に合う宿泊プラン：'));
   } finally { await vite.close(); }
 });

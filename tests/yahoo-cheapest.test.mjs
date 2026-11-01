@@ -50,7 +50,7 @@ test('travel UI offers visible lowest-choice CTAs and original Yahoo A8 material
   const compare=source('src/travel/TotalCostComparator.jsx');
   const ad=source('src/travel/YahooTravelAd.jsx');
   const home=source('src/travel/TravelDiscovery.jsx');
-  assert.match(cheapest,/useState\('price'\)/);
+  assert.match(cheapest,/useState\('recommended'\)/);
   assert.match(cheapest,/cheapestFirstNight/);
   assert.match(cheapest,/全泊分の最終支払額・Yahoo!トラベルを含む他社最安値ではありません/);
   assert.match(compare,/blank\(1,'hotel','yahoo-travel'\)/);

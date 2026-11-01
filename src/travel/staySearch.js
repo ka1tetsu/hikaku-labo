@@ -15,8 +15,17 @@ export function parseStaySearch(query = {}, today = japanToday()) {
   if (![query.breakfast, query.onsen].every(value => value === undefined || value === '' || value === 'true' || value === 'false')) return null;
   return { place: place.trim(), checkin, checkout, adults, breakfast: query.breakfast === 'true', onsen: query.onsen === 'true', page };
 }
+export function stayRecommendation(offer, offers) {
+  const prices = offers.map(row => row.firstNightTotal).filter(value => Number.isFinite(value) && value > 0);
+  if (!Number.isFinite(offer.firstNightTotal) || offer.firstNightTotal <= 0 || !prices.length) return null;
+  const pricePart = Math.min(...prices) / offer.firstNightTotal;
+  const reviews = Number.isFinite(offer.reviewCount) ? Math.max(0, offer.reviewCount) : 0;
+  const ratingPart = Number.isFinite(offer.rating) && offer.rating > 0 && offer.rating <= 5 ? (offer.rating / 5) * (reviews / (reviews + 20)) : 0;
+  return { score: 100 * (0.6 * pricePart + 0.4 * ratingPart), pricePart, ratingPart };
+}
 export function sortStays(offers, order = 'rating') {
   const price = offer => offer.firstNightTotal ?? Infinity;
   const rating = offer => offer.rating ?? -1;
+  if (order === 'recommended') return [...offers].sort((a,b) => (stayRecommendation(b, offers)?.score ?? -1) - (stayRecommendation(a, offers)?.score ?? -1) || price(a) - price(b) || String(a.id).localeCompare(String(b.id)));
   return [...offers].sort((a, b) => order === 'price' ? price(a) - price(b) || rating(b) - rating(a) : rating(b) - rating(a) || price(a) - price(b));
 }
