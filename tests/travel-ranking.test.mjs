@@ -8,6 +8,7 @@ test('flexibility can outweigh a small price difference with an explained score'
  const result=rankEnteredQuotes(rows,{preference:'balanced',cancellationDate:'2026-12-01'});
  assert.equal(result.usesCancellation,true);
  assert.equal(result.recommended.quote.id,2);
+ assert.deepEqual(result.ranked.map(row=>row.rank),[1,2]);
  assert.ok(Math.abs(result.recommended.score-(80*10000/11000+20))<1e-8);
  assert.equal(rankEnteredQuotes(rows,{preference:'price'}).recommended.quote.id,1);
 });

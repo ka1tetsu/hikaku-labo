@@ -57,6 +57,6 @@ export function rankEnteredQuotes(quotes, { type = 'hotel', preference = 'balanc
     const flexibilityPart = usesCancellation ? (row.cost.cashPayable === 0 ? 1 : 1 - fees[i] / row.cost.cashPayable) : 0;
     const score = 100 * (priceWeight * pricePart + (1 - priceWeight) * flexibilityPart);
     return { ...row, score, cancellationFee: fees[i], pricePart, flexibilityPart };
-  }).sort((a,b) => b.score - a.score || a.cost.cashPayable - b.cost.cashPayable || a.index - b.index);
+  }).sort((a,b) => b.score - a.score || a.cost.cashPayable - b.cost.cashPayable || a.index - b.index).map((row,index)=>({...row,rank:result.comparisonPossible?index+1:null}));
   return { ...result, ranked, recommended: result.comparisonPossible ? ranked[0] : null, usesCancellation, priceWeight };
 }

@@ -479,6 +479,7 @@ try{
    if(!(await page.locator('.gx-cost-winner>strong').innerText()).includes('楽天'))throw Error('Balanced ranking should prefer flexible second quote');
    await page.getByLabel('大切にすること').selectOption('price');
    if(!(await page.locator('.gx-cost-winner>strong').innerText()).includes('Yahoo'))throw Error('Price ranking should prefer first quote');
+   await page.locator('.gx-cost-result').screenshot({path:path.join(out,'interaction-travel-recommendation.png')});
    const google=new URL(await page.locator('.gx-provider-google').first().getAttribute('href'));
    if(!google.searchParams.get('q').includes('テスト宿B'))throw Error('Google should look up selected hotel');
    await page.locator('.hs-search-form select').selectOption('4');
