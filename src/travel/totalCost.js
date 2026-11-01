@@ -41,3 +41,22 @@ export function compareEnteredQuotes(quotes,{type}={}){
     caveat:'利用者が入力した税込・追加料金込みの候補内だけを比較。料金の正確性、同等条件、空席・空室、最新価格はサイト側では確認していません。後日ポイントは実際の支払額から差し引きません。',
   };
 }
+
+// An explicit preference model, evaluated only over comparable entered quotes.
+// A missing cancellation fee changes the entire pool to price-only: it cannot
+// make an incompletely documented offer look more flexible than another one.
+export function rankEnteredQuotes(quotes, { type = 'hotel', preference = 'balanced', cancellationDate = '' } = {}) {
+  const result = compareEnteredQuotes(quotes, { type });
+  const dateValid = /^\d{4}-\d{2}-\d{2}$/.test(cancellationDate) && Number.isFinite(Date.parse(cancellationDate)) && new Date(cancellationDate).toISOString().slice(0,10) === cancellationDate;
+  const fees = result.ranked.map(row => safeYen(row.quote.cancellationFee));
+  const usesCancellation = preference !== 'price' && dateValid && result.comparisonPossible && fees.every((fee, i) => fee !== null && fee <= result.ranked[i].cost.cashPayable);
+  const priceWeight = usesCancellation ? (preference === 'flexible' ? 0.5 : 0.8) : 1;
+  const minimum = result.ranked[0]?.cost.cashPayable ?? 0;
+  const ranked = result.ranked.map((row, i) => {
+    const pricePart = row.cost.cashPayable === 0 ? 1 : minimum / row.cost.cashPayable;
+    const flexibilityPart = usesCancellation ? (row.cost.cashPayable === 0 ? 1 : 1 - fees[i] / row.cost.cashPayable) : 0;
+    const score = 100 * (priceWeight * pricePart + (1 - priceWeight) * flexibilityPart);
+    return { ...row, score, cancellationFee: fees[i], pricePart, flexibilityPart };
+  }).sort((a,b) => b.score - a.score || a.cost.cashPayable - b.cost.cashPayable || a.index - b.index);
+  return { ...result, ranked, recommended: result.comparisonPossible ? ranked[0] : null, usesCancellation, priceWeight };
+}

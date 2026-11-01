@@ -83,6 +83,7 @@ try{
  });
  await interaction('tokyo-itinerary-nearby-hotels-mobile',{width:375,height:812},async page=>{
    await page.goto(origin+'/travel/?destination=tokyo&nights=2&pace=standard&style=classic',{waitUntil:'domcontentloaded'});
+   await page.locator('#travel-inspiration > summary').click();
    const hotels=page.locator('.tvx-day-hotels');
    await hotels.first().waitFor({timeout:8000});
    if(await hotels.count()!==2)throw Error('A 2-night Tokyo trip must offer hotel areas only on nights 1 and 2');
@@ -106,6 +107,7 @@ try{
  });
  await interaction('travel-choose-destination',{width:375,height:812},async page=>{
    await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
+   await page.locator('#travel-inspiration > summary').click();
    await page.locator('.tvx-shortcuts button').filter({hasText:'京都'}).first().click();
    if(!page.url().includes('destination=kyoto'))throw Error('Choosing Kyoto did not update URL');
  });
@@ -452,8 +454,50 @@ try{
    if(!(await page.locator('.product-card').first().innerText()).includes('¥31,000'))throw Error('Price ascending lost');
    if(!(await page.locator('.hl-provider-status').innerText()).includes('楽天市場 取得できませんでした'))throw Error('Rakuten outage hidden');
  });
+ await interaction('travel-search-rank-compare-mobile',{width:375,height:812},async page=>{
+   await page.route('**/api/stays?**',route=>{
+     const query=new URL(route.request().url()).searchParams;
+     const offer=(id,name,reviewCount)=>({id,hotelNo:'1',name,address:'東京都',planName:'禁煙',roomName:'ツイン',rating:4.5,reviewCount,firstNightTotal:10000,breakfast:true,dinner:false,url:'https://travel.rakuten.co.jp/',sponsored:false,image:null});
+     return route.fulfill({json:{status:'ok',offers:[offer('few','テスト宿A',1),offer('many','テスト宿B',500)],pageCount:1,observedAt:new Date().toISOString(),search:Object.fromEntries(query)}});
+   });
+   await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
+   if(await page.locator('#travel-inspiration').getAttribute('open')!==null)throw Error('Optional itinerary should start collapsed');
+   await page.locator('.hs-search-form input[type=search]').fill('東京');
+   await page.locator('.hs-search-form button[type=submit]').click();
+   await page.locator('.hs-hotel-card').first().waitFor();
+   if(!(await page.locator('.hs-hotel-card').first().innerText()).includes('テスト宿B'))throw Error('Review sample confidence ranking lost');
+   await page.locator('.hs-site-compare').first().click();
+   if(await page.locator('.hs-hotel-name input').inputValue()!=='テスト宿B')throw Error('Chosen hotel not transferred');
+   const cards=page.locator('.gx-cost-card');
+   await page.getByLabel('取消料を比べる日（予約先の現地時間）').fill(await page.locator('.hs-search-form input[type=date]').first().inputValue());
+   await cards.nth(0).getByLabel('表示された価格の合計（円）',{exact:true}).fill('10000');
+   await cards.nth(1).getByLabel('表示された価格の合計（円）',{exact:true}).fill('11000');
+   await cards.nth(0).getByLabel('上で指定した同じ日時のキャンセル料（円）').fill('10000');
+   await cards.nth(1).getByLabel('上で指定した同じ日時のキャンセル料（円）').fill('0');
+   await cards.nth(0).locator('input[type=checkbox]').check();
+   await cards.nth(1).locator('input[type=checkbox]').check();
+   if(!(await page.locator('.gx-cost-winner>strong').innerText()).includes('楽天'))throw Error('Balanced ranking should prefer flexible second quote');
+   await page.getByLabel('大切にすること').selectOption('price');
+   if(!(await page.locator('.gx-cost-winner>strong').innerText()).includes('Yahoo'))throw Error('Price ranking should prefer first quote');
+   const google=new URL(await page.locator('.gx-provider-google').first().getAttribute('href'));
+   if(!google.searchParams.get('q').includes('テスト宿B'))throw Error('Google should look up selected hotel');
+   await page.locator('.hs-search-form select').selectOption('4');
+   if(await page.locator('.gx-cost-winner').count())throw Error('Changed trip conditions reused old quote');
+   if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Comparison workspace overflows mobile');
+ });
+ await interaction('travel-upstream-error-has-comparison',{width:375,height:812},async page=>{
+   await page.route('**/api/stays?**',route=>route.fulfill({status:503,json:{status:'site_registration_rejected',offers:[]}}));
+   await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
+   await page.locator('.hs-search-form input[type=search]').fill('草津');
+   await page.locator('.hs-search-form button[type=submit]').click();
+   await page.locator('.hs-error').waitFor();
+   await page.locator('#stay-site-comparison').waitFor();
+   if(await page.locator('#stay-site-comparison .tvw-links a').count()<2)throw Error('Upstream outage removed alternative searches');
+   if(await page.locator('.hs-hotel-card').count())throw Error('Outage invented hotel results');
+ });
  await interaction('travel-booking-hub-first',{width:375,height:812},async page=>{
    await page.goto(origin+'/travel/?destination=naha',{waitUntil:'domcontentloaded'});
+   await page.locator('#travel-inspiration > summary').click();
    await page.locator('#booking').waitFor({timeout:10000});
    if(!(await page.locator('#booking h3').innerText()).includes('那覇'))throw Error('Requested city not shown in booking hub');
    if(!(await page.locator('.tvw-google-discovery').innerText()).includes('Google'))throw Error('Google discovery links absent');
