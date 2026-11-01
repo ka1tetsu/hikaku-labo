@@ -48,3 +48,18 @@
 .tv-page .gx-cost-card,.tv-page .gx-cost-result{border-radius:4px;box-shadow:none}
 .gx-provider-google{font-size:14px;color:#14664f;min-height:44px;display:flex;align-items:center}
 @media(max-width:620px){.hs-provider-workspace>h3{font-size:21px}.gx-cost-preferences{display:block}.gx-cost-preferences label{margin-bottom:14px}.gx-cost-preferences select{width:100%}.tv-extra-tools>summary{padding:16px}.tv-page .gx-cost-card input,.tv-page .gx-cost-card select,.hs-hotel-name input{font-size:16px}.tv-page .hs-card-body{overflow-wrap:anywhere}}
+
+@media(max-width:620px){
+  .tv-page .hl-evidence-details:not([open]) summary>span{display:none}
+  .tv-page .tv-booking-intro{padding-top:12px;padding-bottom:0}
+  .tv-page .tv-booking-intro h1{font-size:23px;margin:8px 0;line-height:1.5}
+  .tv-page .tv-booking-intro>p{font-size:14px;line-height:1.7;margin:8px 0}
+  .tv-page .tv-booking-intro nav{flex-wrap:nowrap;overflow-x:auto;padding:8px 0;gap:4px}
+  .tv-page .tv-booking-intro nav a{flex:0 0 auto;font-size:14px;padding:8px 10px;white-space:nowrap}
+  .tv-page .tv-stay-search{padding:16px;margin-top:12px}
+  .tv-page .hs-heading{margin-bottom:8px;gap:8px}
+  .tv-page .hs-heading h2{font-size:19px;margin:0}
+  .tv-page .hs-search-form{margin-top:12px}
+  .tv-page .hs-search-form input,.tv-page .hs-search-form select{font-size:16px;min-height:44px}
+  .tv-page .hs-search-form input[type=checkbox]{min-height:20px}
+}

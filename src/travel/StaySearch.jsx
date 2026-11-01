@@ -94,9 +94,9 @@ export default function StaySearch(){
   const morePages=state.data?.pageCount>1;
   const booking=(offer,placement)=>recordOutboundClick({section:'travel',merchant:'rakuten-travel',placement,sponsored:offer.sponsored});
   return <section className="tv-wrap tv-stay-search" id="stay-search" aria-labelledby="stay-search-title">
-    <div className="hs-heading"><div><span className="hs-kicker">国内の宿泊検索</span>
+    <div className="hs-heading"><div>
       <h2 id="stay-search-title">日付と場所から探す</h2>
-      <p>宿の候補を探したあと、各予約サイトの支払総額と取消条件を比較できます。</p></div>
+      </div>
       {search&&<a href="#travel-total-cost" className="hs-to-compare">各社の総額を比較 →</a>}</div>
     <form onSubmit={submit} className="tv-stay-form hs-search-form">
       <label>場所・駅名・宿名<input type="search" required minLength="2" maxLength="80" placeholder="例：函館、草津温泉、京都駅" value={form.place} onChange={edit('place')} /></label>

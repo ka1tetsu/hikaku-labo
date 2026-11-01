@@ -120,7 +120,7 @@ export default function TravelPage() {
   return <div className="tv-page">
     <SiteHeader active="travel" />
     <main id="main-content">
-      <header className="tv-booking-intro tv-wrap"><p>Vivlica トラベル</p><h1>ホテル・旅館を、条件から探す。</h1><p>宿泊地と日程で探し、料金・口コミ・客室条件を比較。予約とお支払いは各予約サイトで行います。</p>
+      <header className="tv-booking-intro tv-wrap"><h1>ホテル・旅館を、条件から探す。</h1><p>宿を探し、同じ条件の予約サイトを比較。予約・支払いは各社で行います。</p>
         <nav aria-label="旅行サービス"><a href="#stay-search">国内ホテル・旅館</a><a href="#global-travel-compare">海外ホテル・航空券</a><a href="#destinations">旅行先・モデルコース</a><a href="#planner">旅費の計算</a></nav>
       </header>
       <StaySearch />

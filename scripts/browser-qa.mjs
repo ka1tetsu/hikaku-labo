@@ -461,6 +461,8 @@ try{
      return route.fulfill({json:{status:'ok',offers:[offer('few','テスト宿A',1),offer('many','テスト宿B',500)],pageCount:1,observedAt:new Date().toISOString(),search:Object.fromEntries(query)}});
    });
    await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
+   const searchBox=await page.locator('.hs-search-form input[type=search]').boundingBox();
+   if(!searchBox||searchBox.y+searchBox.height>812)throw Error('Main search input is below the initial mobile viewport');
    if(await page.locator('#travel-inspiration').getAttribute('open')!==null)throw Error('Optional itinerary should start collapsed');
    await page.locator('.hs-search-form input[type=search]').fill('東京');
    await page.locator('.hs-search-form button[type=submit]').click();
