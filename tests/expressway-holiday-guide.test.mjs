@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { pageId, validViewEvent } from '../src/shared/outboundSchema.js';
 
 // Place at tests/expressway-holiday-guide.test.mjs
 const content = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
@@ -20,6 +21,11 @@ test('expressway holiday guide is built, listed in the sitemap and linked with t
   assert.match(html, /<title>[^<]*高速道路の休日割引[^<]*<\/title>/);
   for (const slug of LINKS_TO) assert.ok(html.includes(`href="/guides/${slug}/"`), `expressway-holiday -> ${slug}`);
   for (const slug of LINKED_FROM) assert.ok(content(`guides/${slug}/index.html`).includes('href="/guides/expressway-holiday/"'), `${slug} -> expressway-holiday`);
+});
+
+test('expressway holiday guide has its own page ID so views are measured', () => {
+  assert.equal(pageId('/guides/expressway-holiday/'), 'guide-expressway-holiday');
+  assert.equal(validViewEvent({ event: 'view', page: 'guide-expressway-holiday' }), true);
 });
 
 test('expressway holiday guide has Article structured data that matches the visible page', () => {
