@@ -18,3 +18,7 @@ Google is used through explicit external search/map links containing the selecte
 ## Verification
 
 Unit tests cover score arithmetic, review sample confidence, absent data, invalid fees/dates, zero totals, provider diversity, confirmed conditions, and commission/points independence. Browser QA exercises mobile recommendation, provider comparison, chosen-hotel Google search, trip reset, optional tools and the upstream error fallback with controlled fixtures. Mocked hotel names/prices are test-only, never production fallbacks.
+
+## Integrated quote workspace
+
+The selected hotel, dates and party are shared with one hotel-only quote workspace. Provider search actions and entered amounts appear together per provider, rather than repeating a separate provider-link directory and a flight/hotel category selector. Additional charges/discounts/points open on demand, and one common equivalent-conditions confirmation applies to the listed quotes. The compact flow initially sorts by payable price; choosing a cancellation-aware preference reveals its date and fees. Changing a provider clears that row's previous provider's amounts and confirmation. Incomplete rows remain excluded and their count is displayed. Google discovery and score details remain expandable, with no new live pricing claims.

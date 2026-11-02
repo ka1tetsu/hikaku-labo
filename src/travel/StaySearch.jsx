@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { japanToday, parseStaySearch, sortStays, stayRecommendation } from './staySearch.js';
 import { hotelPagePath } from './hotelDetails.js';
 import { addDays, buildStayLinks } from './bookingLinks.js';
-import { BookingLinkList } from './BookingLinks.jsx';
 import { LINK_CONFIG } from './linkConfig.js';
 import { searchResponse } from '../shared/searchRequest.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
@@ -77,9 +76,7 @@ export default function StaySearch(){
   const selectedRows=selected.map(id=>filteredOffers.find(offer=>offer.id===id)).filter(Boolean);
   const toggleSelected=id=>setSelected(prev=>prev.includes(id)?prev.filter(item=>item!==id):prev.length<3?[...prev,id]:prev);
   const nights=search?(Date.parse(search.checkout)-Date.parse(search.checkin))/86400000:0;
-  const links=search?buildStayLinks({destination:{name:search.place,area:'domestic'},query:search.place,checkin:search.checkin,checkout:search.checkout,nights,adults:search.adults,rooms:1,config:LINK_CONFIG}):[];
   const quickSearch=useMemo(()=>parseStaySearch({...form,page:1},today),[form,today]);
-  const quickLinks=useMemo(()=>quickSearch?buildStayLinks({query:quickSearch.place,checkin:quickSearch.checkin,checkout:quickSearch.checkout,nights:(Date.parse(quickSearch.checkout)-Date.parse(quickSearch.checkin))/86400000,adults:quickSearch.adults,rooms:1,config:LINK_CONFIG}).filter(link=>['rakuten','booking','expedia'].includes(link.provider)):[],[quickSearch]);
   const comparisonSearch=search||quickSearch;
   const comparisonCriteria=comparisonSearch?{
     hotelName:comparisonHotel, departureDate:comparisonSearch.checkin,returnDate:comparisonSearch.checkout,travelers:comparisonSearch.adults,rooms:1,
@@ -174,13 +171,12 @@ export default function StaySearch(){
     </div>
     {!search&&<p id="travel-total-cost" className="tv-stay-note">検索後に、同じ宿の予約サイト別比較を利用できます。</p>}
     {search&&comparisonSearch&&<div className="hs-provider-workspace" id="stay-site-comparison">
-      <h3>同じ宿を、複数の予約サイトで比較</h3>
+      <h3>宿を選んで、予約サイトの料金を比較</h3>
       <p>{comparisonSearch.place} · {comparisonSearch.checkin}〜{comparisonSearch.checkout} · 大人{comparisonSearch.adults}名 · 1室</p>
       <label className="hs-hotel-name">比較する宿の名前<input type="search" value={comparisonHotel} maxLength={100} placeholder="候補の宿名を入れると各社で探しやすくなります" onChange={e=>setComparisonHotel(e.target.value)}/></label>
-      <BookingLinkList links={comparisonHotel?comparisonCriteria.stayLinks:quickLinks.length?quickLinks:links} placement="stay-search-fallback"/>
       <details className="hs-google-tools"><summary>Googleで宿・公式情報・地図を探す</summary>
         <p>Googleで候補を探し、最新料金・日程・人数は予約先で確認してください。検索結果はこの画面のおすすめ順位に自動反映されません。</p>
-        <div>{discover.map(link=><a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}
+        <div>{discover.slice(0,2).map(link=><a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}
         {comparisonHotel&&<><a href={googleWebSearch(`"${comparisonHotel.replaceAll('"','')}" 公式 客室 キャンセル`)} target="_blank" rel="noopener noreferrer">宿の公式情報を探す ↗</a>
         <a href={'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(comparisonHotel+' '+comparisonSearch.place)} target="_blank" rel="noopener noreferrer">地図で立地を確認 ↗</a></>}</div>
       </details>

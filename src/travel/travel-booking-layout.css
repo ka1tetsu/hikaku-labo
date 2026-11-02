@@ -63,3 +63,22 @@
   .tv-page .hs-search-form input,.tv-page .hs-search-form select{font-size:16px;min-height:44px}
   .tv-page .hs-search-form input[type=checkbox]{min-height:20px}
 }
+/* Each reservation site owns its quote and search action in the same row. */
+.hs-provider-workspace .gx-cost-integrated{border-top:0;margin-top:12px;padding-top:8px}
+.gx-cost-integrated .gx-heading h4{font-size:20px;margin:0 0 8px;color:#162b28}
+.gx-cost-integrated .gx-heading p{margin:0;font-size:14px;line-height:1.8;color:#36574d}
+.gx-cost-integrated .gx-cost-grid{grid-template-columns:1fr}
+.gx-cost-integrated .gx-cost-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;border-radius:4px;padding:16px 20px}
+.gx-cost-integrated .gx-cost-card legend{font-size:15px;padding:0 8px}
+.gx-cost-adjustments{min-width:0;font-size:14px;line-height:1.8;color:#36574d}
+.gx-cost-adjustments>summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:700;color:#14664f}
+.gx-cost-adjustments>p{font-size:14px;line-height:1.8}
+.gx-cost-adjustments .gx-cost-details{padding-top:12px}
+.gx-cost-integrated .gx-cost-buttons{align-self:start;margin:0}
+.gx-cost-integrated .gx-cost-buttons a{font-size:14px}
+.gx-transfer-note{display:block;flex-basis:100%;font-size:14px;line-height:1.8;color:#36574d}
+.gx-cost-shared-confirm{display:flex;align-items:start;gap:12px;border-top:1px solid #b8c9c0;padding:18px 0;margin:12px 0;font-size:14px;line-height:1.8;color:#162b28}
+.gx-cost-shared-confirm input{flex-shrink:0;margin-top:4px}
+.gx-cost-integrated .gx-provider-google{margin:0;font-size:14px}
+.gx-cost-integrated .gx-cost-result{border-radius:4px}
+@media(max-width:620px){.gx-cost-integrated .gx-cost-card{grid-template-columns:1fr;padding:14px}.gx-cost-integrated .gx-cost-details{grid-template-columns:1fr}.gx-cost-integrated .gx-cost-buttons a{width:100%}.gx-cost-shared-confirm{padding:16px 0}.gx-cost-integrated .gx-cost-result h3{font-size:18px}}
