@@ -68,7 +68,7 @@ export default function TotalCostComparator({ searchCriteria = {}, compact = fal
       const entry=result.ranked.find(x=>x.quote.id===offer.id);
       return <fieldset className="gx-cost-card" key={offer.id}>
         <legend>{compact?provider?.name||`候補 ${index+1}`:`候補 ${index+1}`}</legend>
-        <label>予約サイト<select value={offer.providerId} onChange={e=>edit(offer.id,'providerId',e.target.value)}>
+        <label>予約サイト<select aria-label="予約サイト" value={offer.providerId} onChange={e=>edit(offer.id,'providerId',e.target.value)}>
           <option value="">サイトを選択</option>{providers.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
         </select></label>
         <label>{compact?'全員・全泊の表示料金（円）':'表示された価格の合計（円）'}<input type="number" min="0" max="999999999" inputMode="numeric"
