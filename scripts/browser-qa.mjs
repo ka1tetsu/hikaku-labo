@@ -471,6 +471,8 @@ try{
    await page.locator('.hs-site-compare').first().click();
    if(await page.locator('.hs-hotel-name input').inputValue()!=='テスト宿B')throw Error('Chosen hotel not transferred');
    const cards=page.locator('.gx-cost-card');
+   if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Integrated quote rows overflow mobile');
+   await cards.first().screenshot({path:path.join(out,'interaction-travel-provider.png')});
    const bookingTarget=new URL(await cards.nth(2).locator('.gx-cost-buttons a').getAttribute('href'));
    if(!bookingTarget.searchParams.get('ss')?.includes('テスト宿B')||bookingTarget.searchParams.get('checkin')!==await page.locator('.hs-search-form input[type=date]').first().inputValue())throw Error('Integrated provider search lost selected hotel or dates');
    await page.getByLabel('大切にすること').selectOption('balanced');
