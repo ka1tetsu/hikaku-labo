@@ -26,6 +26,7 @@ export default defineConfig({
         'guide-hotel-cancellation': fileURLToPath(new URL('./guides/hotel-cancellation/index.html', import.meta.url)),
         'guide-lodging-tax': fileURLToPath(new URL('./guides/lodging-tax/index.html', import.meta.url)),
         'guide-long-weekends': fileURLToPath(new URL('./guides/long-weekends/index.html', import.meta.url)),
+        'guide-expressway-holiday': fileURLToPath(new URL('./guides/expressway-holiday/index.html', import.meta.url)),
       },
     },
   },
