@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { japanToday, parseStaySearch, sortStays, stayRecommendation } from './staySearch.js';
+import { initialStaySearchContext, staySearchUrl } from './staySearchContext.js';
 import { hotelPagePath } from './hotelDetails.js';
 import { addDays, buildStayLinks } from './bookingLinks.js';
 import { LINK_CONFIG } from './linkConfig.js';
@@ -19,7 +20,10 @@ const number=value=>Number.isSafeInteger(value)&&value>0?value:null;
 
 export default function StaySearch(){
   const today=japanToday();
-  const [form,setForm]=useState({place:'',checkin:addDays(today,1),checkout:addDays(today,2),adults:'2',breakfast:'false',onsen:'false'});
+  const [initialContext]=useState(()=>initialStaySearchContext(typeof window==='undefined'?'':window.location.search,today));
+  const [form,setForm]=useState(initialContext.form);
+  const [contextNotice,setContextNotice]=useState(initialContext.notice);
+  const [linkNotice,setLinkNotice]=useState('');
   const [comparisonHotel,setComparisonHotel]=useState('');
   const [search,setSearch]=useState(null);
   const [state,setState]=useState({loading:false,data:null,error:''});
@@ -48,6 +52,11 @@ export default function StaySearch(){
     active.current?.abort();
     const next=parseStaySearch({...form,page});
     if(!next){setState({loading:false,data:null,error:'場所は2文字以上、日程は今日以降の1〜30泊、大人は1室1〜10名で指定してください。'});return;}
+    if(page===1){
+      const url=staySearchUrl(next,window.location.origin,today);
+      try{if(url)window.history.replaceState(window.history.state,'',url);}catch{/* URL restrictions must not block searching. */}
+      setLinkNotice('');setContextNotice('');
+    }
     if(page===1){setMaxPrice('');setMinRating('0');setNameFilter('');setShowBreakfast(false);setOrder('recommended');}
     setSearch(next);setState({loading:true,data:null,error:''});setSelected([]);
     const controller=new AbortController();active.current=controller;
@@ -62,6 +71,12 @@ export default function StaySearch(){
       if(active.current!==controller)return;
       setState({loading:false,data:null,error:error.name==='TimeoutError'?'検索に時間がかかっています。再検索するか予約サイトで確認してください。':Object.hasOwn(messages,error.message)?messages[error.message]:'宿泊情報を取得できませんでした。予約サイトで直接確認できます。'});
     }
+  }
+  async function copyConditions(){
+    const url=search&&staySearchUrl(search,window.location.origin,today);
+    if(!url)return;
+    try{await navigator.clipboard.writeText(url);setLinkNotice('検索条件のリンクをコピーしました。料金・比較メモは含みません。');}
+    catch{setLinkNotice('コピーできませんでした。アドレスバーのURLから検索条件を開き直せます。');}
   }
   const submit=event=>{event.preventDefault();runSearch(1);};
   const offers=useMemo(()=>sortStays(state.data?.offers||[],order),[state.data,order]);
@@ -95,15 +110,18 @@ export default function StaySearch(){
       <h2 id="stay-search-title">日付と場所から探す</h2>
       </div>
       {search&&<a href="#travel-total-cost" className="hs-to-compare">各社の総額を比較 →</a>}</div>
+    {contextNotice&&<p className="hs-context-note" role="status">{contextNotice}</p>}
     <form onSubmit={submit} className="tv-stay-form hs-search-form">
       <label>場所・駅名・宿名<input type="search" required minLength="2" maxLength="80" placeholder="例：函館、草津温泉、京都駅" value={form.place} onChange={edit('place')} /></label>
       <label>チェックイン<input type="date" required min={today} value={form.checkin} onChange={edit('checkin')} /></label>
       <label>チェックアウト<input type="date" required min={addDays(form.checkin||today,1)} value={form.checkout} onChange={edit('checkout')} /></label>
-      <label>大人の人数（1室）<select value={form.adults} onChange={edit('adults')}>{Array.from({length:10},(_,i)=><option key={i+1} value={i+1}>{i+1}名</option>)}</select></label>
+      <label>大人の人数（1室）<select required value={form.adults} onChange={edit('adults')}><option value="" disabled>人数を選択</option>{Array.from({length:10},(_,i)=><option key={i+1} value={i+1}>{i+1}名</option>)}</select></label>
       <label className="tv-stay-check"><input type="checkbox" checked={form.breakfast==='true'} onChange={edit('breakfast')}/>朝食付き希望</label>
       <label className="tv-stay-check"><input type="checkbox" checked={form.onsen==='true'} onChange={edit('onsen')}/>温泉あり希望</label>
       <button className="vl-primary" disabled={state.loading} type="submit">{state.loading?'空室を確認中…':'この条件で検索'}</button>
     </form>
+    {search&&<div className="hs-share-conditions"><button type="button" onClick={copyConditions}>検索条件のリンクをコピー</button><span>行き先・日程・人数を引き継げます。料金は保存しません。</span></div>}
+    {linkNotice&&<p role="status" className="hs-context-note">{linkNotice}</p>}
     <p className="tv-stay-note">国内・大人のみ・1室の検索です。複数室・お子様の人数は予約先で指定してください。すべての宿泊施設の網羅は保証しません。</p>
     <div aria-live="polite" aria-busy={state.loading}>
       {state.error&&<p className="hs-error" role="alert">{state.error}</p>}
