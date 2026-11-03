@@ -27,7 +27,7 @@
 .cp-selection-tray{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;background:#f1f5f2;border-top:2px solid #14664f;color:#162b28;padding:12px 20px;font-size:14px}
 .cp-selection-tray button{min-height:44px;padding:10px 18px;border:1px solid #14664f;background:#14664f;color:#fff;border-radius:4px;font:inherit;font-weight:700;cursor:pointer}
 .cp-selection-tray button:last-child{background:#fff;color:#14664f}
-.cp-page.has-selection{padding-bottom:100px}.cp-page.has-selection .hcl-launcher{bottom:108px}
+.cp-page.has-selection{padding-bottom:100px}.cp-page.has-selection .hcl-root{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 @media(max-width:760px){
  .cp-page .hl-evidence-details:not([open]) summary>span{display:none}
  .cp-page .cp-hero{padding:16px 0}.cp-page .cp-hero h1{font-size:25px}.cp-page .cp-search input{font-size:16px}
@@ -38,7 +38,12 @@
  .cp-price-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
  .cp-price-table .cp-offer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;border-bottom:1px solid #b8c9c0;padding:14px 0}
  .cp-price-table .cp-offer td{display:block;border:0;padding:0;min-width:0}
- .cp-price-table .cp-offer .cp-price-pick,.cp-price-table .cp-offer .cp-price-product{grid-column:1/-1}
+ .cp-price-table .cp-offer .cp-price-product{grid-column:1;grid-row:1}
+ .cp-price-table .cp-offer .cp-offer-price{grid-column:2;grid-row:1;text-align:right}
+ .cp-price-table .cp-offer .cp-price-conditions{grid-column:1;grid-row:2}
+ .cp-price-table .cp-offer .cp-price-reviews{grid-column:2;grid-row:2}
+ .cp-price-table .cp-offer .cp-price-pick{grid-column:1;grid-row:3}
+ .cp-price-table .cp-offer .cp-price-action{grid-column:2;grid-row:3}
  .cp-price-table .cp-pick{flex-direction:row;align-items:center;font-size:14px;gap:10px}
  .cp-price-table .cp-offer-price>strong{font-size:24px}
  .cp-price-table .cp-offer small,.cp-price-table .cp-review-evidence,.cp-price-table .cp-research-jan{font-size:14px}

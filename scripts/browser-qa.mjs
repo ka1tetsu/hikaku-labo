@@ -165,6 +165,8 @@ try{
    for(let i=0;i<4;i++)await picks.nth(i).check();
    if(!await picks.nth(4).isDisabled())throw Error('More than four offers can be selected');
    if(!(await page.locator('.cp-selection-tray').innerText()).includes('4 / 4件'))throw Error('Selection tray count missing');
+   const trayBox=await page.locator('.cp-selection-tray').boundingBox(),chatBox=await page.locator('.hcl-launcher').boundingBox();
+   if(trayBox&&chatBox&&chatBox.y+chatBox.height>trayBox.y)throw Error('Concierge covers comparison-tray actions');
    await page.locator('.cp-price-table-wrap').screenshot({path:path.join(out,'interaction-product-price-table-mobile.png')});
    if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Seller table overflows mobile');
    await page.getByRole('button',{name:'詳しい出品一覧',exact:true}).click();
