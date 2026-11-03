@@ -188,6 +188,7 @@ try{
    if(links.length!==2||links.some(link=>new URL(link.href).hostname!=='store.shopping.yahoo.co.jp'||link.rel.includes('sponsored')||!link.text.includes('Yahoo!')))throw Error('Home comparison redirected or misattributed Yahoo offer');
    if(!(await page.locator('.comparison-table').innerText()).includes('送料条件未取得'))throw Error('Unknown home-comparison shipping was mislabelled');
    if(!(await page.locator('.comparison-note').innerText()).includes('現金支払額ではなく'))throw Error('Home comparison confuses rewards with payment');
+   await page.locator('.comparison-panel').screenshot({path:path.join(out,'interaction-home-source-comparison.png')});
    if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Home selection comparison overflows mobile');
  });
  await interaction('checkout-and-private-price-target',{width:375,height:812},async page=>{
@@ -319,6 +320,7 @@ try{
    await page.getByRole('button',{name:'★4.5以上・50件以上'}).click();
    await page.waitForFunction(()=>document.querySelectorAll('.cp-offers > .cp-offer').length===1,null,{timeout:5000});
    if(!(await page.locator('.cp-offers > .cp-offer').first().innerText()).includes('多数レビュー店舗'))throw Error('Preset review filter did not keep source-backed item');
+   await page.locator('.cp-filter-tools > summary').click();
    await page.getByLabel('口コミの最低件数').selectOption('100');
    await page.getByRole('button',{name:'絞り込みを解除してすべて表示'}).click();
    await page.waitForFunction(()=>document.querySelectorAll('.cp-offers > .cp-offer').length===3,null,{timeout:5000});
