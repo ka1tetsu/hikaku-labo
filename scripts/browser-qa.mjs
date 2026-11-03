@@ -521,7 +521,7 @@ try{
      if(new URL(request.url()).pathname!=='/api/track')return false;
      try{const body=request.postDataJSON();return body.event==='outbound'&&body.merchant==='yahoo-travel'&&body.sponsored===true;}catch{return false;}
    });
-   await page.locator('.gx-cost-result .yt-ad-creative a').click();
+   await page.locator('.gx-cost-result .yt-ad-creative a').click({noWaitAfter:true});
    const event=(await tracked).postDataJSON();
    if(event.placement!=='user-quote'||Object.keys(event).some(key=>!['event','section','merchant','placement','sponsored','page'].includes(key)))throw Error('Approved quote handoff lost enum-only sponsored attribution');
  });
