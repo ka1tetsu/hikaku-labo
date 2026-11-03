@@ -38,7 +38,12 @@
  .cp-price-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
  .cp-price-table .cp-offer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;border-bottom:1px solid #b8c9c0;padding:14px 0}
  .cp-price-table .cp-offer td{display:block;border:0;padding:0;min-width:0}
- .cp-price-table .cp-offer .cp-price-pick,.cp-price-table .cp-offer .cp-price-product{grid-column:1/-1}
+ .cp-price-table .cp-offer .cp-price-product{grid-column:1;grid-row:1}
+ .cp-price-table .cp-offer .cp-offer-price{grid-column:2;grid-row:1;text-align:right}
+ .cp-price-table .cp-offer .cp-price-conditions{grid-column:1;grid-row:2}
+ .cp-price-table .cp-offer .cp-price-reviews{grid-column:2;grid-row:2}
+ .cp-price-table .cp-offer .cp-price-pick{grid-column:1;grid-row:3}
+ .cp-price-table .cp-offer .cp-price-action{grid-column:2;grid-row:3}
  .cp-price-table .cp-pick{flex-direction:row;align-items:center;font-size:14px;gap:10px}
  .cp-price-table .cp-offer-price>strong{font-size:24px}
  .cp-price-table .cp-offer small,.cp-price-table .cp-review-evidence,.cp-price-table .cp-research-jan{font-size:14px}
