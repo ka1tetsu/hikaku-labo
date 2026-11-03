@@ -71,11 +71,12 @@ test('unknown source status and disabled provider are never called fetched',()=>
  assert.equal(a.find(x=>x.id==='rakuten').state,'failed');
  assert.equal(sitePriceRows([],[],{}).length,0);
 });
-test('comparison page shows site-by-site prices above review filters, and source action links',()=>{
+test('comparison page prioritizes seller price table, then site coverage and review tools',()=>{
  const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
  const page=read('src/compare/ComparePage.jsx');
  const panel=read('src/compare/SitePriceOverview.jsx');
- assert.ok(page.indexOf('<SitePriceOverview')<page.indexOf('<OfferFilters'));
+ assert.ok(page.indexOf('<PriceOfferTable offers=')<page.indexOf('<SitePriceOverview offers='));
+ assert.ok(page.indexOf('<SitePriceOverview offers=')<page.indexOf('<ReviewResearchPanel offers='));
  assert.match(page,/site-prices/);
  assert.match(panel,/どの通販サイトで、いくら？/);
  assert.match(panel,/送料込み確認額/);

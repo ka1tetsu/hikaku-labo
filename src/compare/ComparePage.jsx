@@ -18,10 +18,12 @@ import ShopPriceBoard from './ShopPriceBoard.jsx';
 import SitePriceOverview from './SitePriceOverview.jsx';
 import { sourceNotice } from '../shared/buyerDecision.js';
 import { searchModeFor } from '../shared/productSearchIntent.js';
+import PriceOfferTable from './PriceOfferTable.jsx';
 import PriceTargetMemo from './PriceTargetMemo.jsx';
 import { openConcierge } from '../shared/conciergeActions.js';
 import ManualStoreCompare from './ManualStoreCompare.jsx';
 import './compare.css';
+import './comparison-desk.css';
 
 const yen = n => '¥' + Math.round(n).toLocaleString('ja-JP');
 const EXAMPLES = ['ソニー WH-1000XM5', 'AirPods Pro', 'ロボット掃除機', '電気ケトル', 'Nintendo Switch', '加湿器'];
@@ -61,6 +63,13 @@ function OfferRow({ offer, rank, cheapest, sort, selected, onToggle, selectionFu
   </li>;
 }
 
+function revealComparisonSection(id){
+  const target=document.getElementById(id);
+  let parent=target?.parentElement;
+  while(parent){if(parent.tagName==='DETAILS')parent.open=true;parent=parent.parentElement;}
+  target?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 export default function ComparePage() {
   const initial = useMemo(readParams, []);
   const [input, setInput] = useState(initial.q);
@@ -79,8 +88,11 @@ export default function ComparePage() {
   const [displayLimit,setDisplayLimit]=useState(15);
   const [shareStatus,setShareStatus]=useState('');
   const [manualRequested,setManualRequested]=useState(false);
+  const [resultView,setResultView]=useState('');
 
-  const queryMode=searchModeFor(query.q || query.jan);
+  const queryMode=searchModeFor(query.jan || query.q);
+  const activeView=resultView||(queryMode==='price'?'table':'list');
+  useEffect(()=>{const reveal=()=>{if(window.location.hash)revealComparisonSection(window.location.hash.slice(1));};reveal();window.addEventListener('hashchange',reveal);return()=>window.removeEventListener('hashchange',reveal);},[]);
   useEffect(()=>{ setPriceSort(queryMode==='recommended'?'recommended':'cash'); },[queryMode,query.q,query.jan]);
   useEffect(() => {
     if (!query.q && !query.jan) return undefined;
@@ -120,6 +132,7 @@ export default function ComparePage() {
     catch{setShareStatus('アドレスバーのURLをコピーしてください。');}
   }
   function resetSearchFilters() {
+    setResultView('');
     setFilters({store:'all',shipping:'all',reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});
     setFreeOnly(false);setShowSimilar(false);setShareStatus('');
   }
@@ -170,7 +183,7 @@ export default function ComparePage() {
     requestAnimationFrame(()=>document.getElementById('cp-manual')?.scrollIntoView({behavior:'smooth',block:'start'}));
   };
 
-  return <div className="cp-page">
+  return <div className={'cp-page'+(selectedOffers.length?' has-selection':'')}>
     <SiteHeader active="products" />
     <main id="main-content">
       <section className="cp-hero">
@@ -216,40 +229,33 @@ export default function ComparePage() {
           </div>
           {(query.minPrice > 0 || query.maxPrice > 0) && <p className="cp-note">商品価格の条件：{query.minPrice > 0 ? yen(query.minPrice) + '以上' : ''}{query.minPrice > 0 && query.maxPrice > 0 ? '・' : ''}{query.maxPrice > 0 ? yen(query.maxPrice) + '以下' : ''}（ポイント差引前・送料別）。ショップへの検索リンクにはこの価格条件は引き継がれません。</p>}
           <nav className="cp-quick-nav" aria-label="商品比較の目次">
-            <a href="#site-prices">サイト別の価格を一覧で見る</a>
-            <a href="#cp-research-title">商品・販売店の口コミを調べる</a>
-            <a href="#cp-score-title">口コミ・価格の参考指数を計算</a>
-            <a href="#cp-allshops-title">送料込みの最安候補を確認</a>
-            <a href="#cp-manual-heading">18ショップの確認済み価格を比較</a>
+            <a href="#cp-offer-list">販売店別の価格</a>
+            <a href="#site-prices">サイト別の取得状況</a>
+            <a href="#cp-allshops-title">送料込みの確認額</a>
+            <a href="#cp-research-title" onClick={()=>revealComparisonSection('cp-research-title')}>口コミ</a>
+            <a href="#cp-score-title" onClick={()=>revealComparisonSection('cp-score-title')}>参考指数・選び方</a>
+            <a href="#cp-manual-heading">他ショップの確認済み価格</a>
           </nav>
-          <SitePriceOverview offers={rawOffers} stores={stores} sources={sources} fetchedAt={state.data?.fetchedAt||''}
-            queryMode={queryMode} loading={state.loading}/>
+          <details className="cp-desk-tools cp-filter-tools"><summary>絞り込み：販売店・送料・評価・予算（表示 {offers.length} / {rawOffers.length}件）</summary>
           <OfferFilters filters={filters} onChange={changeFilter}
             storeOptions={[{id:'rakuten',name:'楽天市場'},{id:'yahoo',name:'Yahoo!ショッピング'}]}
             visibleCount={offers.length} totalCount={rawOffers.length}
             onReset={()=>{setFilters({store:'all',shipping:'all',reviewMin:'0',minReviewCount:'0',sellerRatingMin:'0',maxPrice:'',keyword:'',verifiedOnly:false});setFreeOnly(false);setDisplayLimit(15);}}/>
+          </details>
           {providerNotice&&<p className="cp-provider-notice" role="status">{providerNotice.message} 取得できないモールの価格は比較に含めていません。</p>}
           <p className="cp-criteria-note">{queryMode==='recommended'?'一般キーワードでは取得元の商品関連度に基づくおすすめ順が標準です。掲載商品を独自にテスト・評価したランキングではありません。型番・JANで検索すると商品価格順になります。':''}商品価格はポイント差引前で、送料が無料・別途・不明のいずれかです。「送料無料」は取得元の送料区分で判定します。ポイント考慮後は参考値であり、購入時の支払額ではありません。</p>
           {state.loading && <p className="cp-muted">各ショップの価格を取得しています…</p>}
           {state.error && <p className="cp-error">{state.error} <a href="#cp-manual">3ショップの価格を手入力して比較する →</a></p>}
           {visibleMetrics && <p className="cp-result-context" role="status">表示中：{visibleMetrics.count}件／{visibleMetrics.stores}モール、JAN一致{visibleMetrics.evidence}件。型番・JANが確認できない候補は同一商品と断定しません。</p>}
-          {!state.loading && <ReviewResearchPanel offers={rawOffers} stores={stores}
-            activeReviewMin={filters.reviewMin} activeReviewCount={filters.minReviewCount}
-            onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}
-            onChoose={chooseFromReview} selectedKeys={selectedKeys}/>}
-          {!state.loading && <ConsumerScorePanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
-          {!state.loading && <PurchaseReasonPanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
-          {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>} 
-          {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
           {cheapest && <div className="cp-summary">
             <div><span>{priceSort === "points" ? "ポイント差引後の最も低い参考額" : (same.length ? "型番・JAN照合候補の最も低い商品価格" : "類似出品の最も低い商品価格")}</span><strong>{yen(displayValue(cheapest, priceSort))}</strong><small>{priceSort === "points" ? "現金支払額ではありません · " : ""}{cheapest.storeName}・{cheapest.shopName}</small></div>
             <div><span>{priceSort === "points" ? "ポイント考慮後の参考額の幅" : "商品価格の幅"}</span><strong>{yen(range.low)}〜{yen(range.high)}</strong><small>{main.length}件の表示候補のみ・送料別</small></div>
             <div><span>比較したショップ</span><strong>{[sources.rakuten === 'ok' && '楽天', sources.yahoo === 'ok' && 'Yahoo!'].filter(Boolean).join('・') || '—'}</strong><small>{sources.yahoo === 'disabled' ? 'Yahoo!は価格自動取得の準備中' : 'APIで取得した実際の価格'}</small></div>
           </div>}
-          {cheapest && <BuyerChoices offers={main} searched={providerNotice?.unavailable.length>0}/>}
           {!state.loading && state.data && !same.length && main.length > 0 && <p className="cp-note">JAN・型番一致を確認できる出品はありません。商品名が似た候補を掲載していますが、同一商品の価格比較ではありません。型番やJANを入力すると比較対象を絞れます。</p>}
-          <OfferShortlist offers={selectedOffers} onRemove={id=>setSelectedKeys(keys=>keys.filter(key=>key!==id))} onClear={()=>setSelectedKeys([])}/>
-          {main.length > 0 && <ol id="cp-offer-list" className="cp-offers">{main.slice(0,displayLimit).map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={index === 0&&(priceSort==='cash'||priceSort==='points')} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
+          {main.length>0&&<div className="cp-result-view" role="group" aria-label="販売店の表示方法"><button type="button" aria-pressed={activeView==='table'} onClick={()=>setResultView('table')}>販売店の価格表</button><button type="button" aria-pressed={activeView==='list'} onClick={()=>setResultView('list')}>詳しい出品一覧</button></div>}
+          {main.length>0&&activeView==='table'&&<PriceOfferTable offers={main.slice(0,displayLimit)} sort={priceSort} selectedKeys={selectedKeys} onToggle={toggleSelected}/>}
+          {main.length > 0 && activeView==='list' && <ol id="cp-offer-list" className="cp-offers">{main.slice(0,displayLimit).map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={index === 0&&(priceSort==='cash'||priceSort==='points')} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
           {main.length > displayLimit && <button type="button" className="cp-show-more" onClick={()=>setDisplayLimit(n=>n+15)}>さらに15件表示（残り{main.length-displayLimit}件）</button>}
           {!state.loading && state.data && Number(state.data.pageCount)>1 && <nav className="cp-pagination" aria-label="商品検索結果のページ移動">
             <button type="button" disabled={page<=1} onClick={()=>changePage(page-1)}>前の候補</button>
@@ -265,6 +271,22 @@ export default function ComparePage() {
             {showSimilar && <ol className="cp-offers">{rest.map((offer, index) => <OfferRow key={offerKey(offer)} offer={offer} rank={index + 1} cheapest={false} sort={priceSort} selected={selectedKeys.includes(offerKey(offer))} selectionFull={selectedKeys.length>=4} onToggle={toggleSelected} />)}</ol>}
           </div>}
           <button type="button" className="cp-ask" onClick={() => openConcierge(`${query.ref || query.q}を探してる`)}>✳ 条件を変えて候補を探す</button>
+          {cheapest && <BuyerChoices offers={main} searched={providerNotice?.unavailable.length>0}/>}
+          <OfferShortlist offers={selectedOffers} onRemove={id=>setSelectedKeys(keys=>keys.filter(key=>key!==id))} onClear={()=>setSelectedKeys([])}/>
+          <SitePriceOverview offers={rawOffers} stores={stores} sources={sources} fetchedAt={state.data?.fetchedAt||''}
+            queryMode={queryMode} loading={state.loading}/>
+          <details className="cp-desk-tools" id="cp-review-tools"><summary>商品・販売店の口コミを調べる</summary>
+          {!state.loading && <ReviewResearchPanel offers={rawOffers} stores={stores}
+            activeReviewMin={filters.reviewMin} activeReviewCount={filters.minReviewCount}
+            onApplyPreset={applyReviewPreset} onClearPreset={clearReviewPreset}
+            onChoose={chooseFromReview} selectedKeys={selectedKeys}/>}
+          </details>
+          <details className="cp-desk-tools" id="cp-analysis-tools"><summary>価格・評価の参考指数と選び方を見る</summary>
+          {!state.loading && <ConsumerScorePanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
+          {!state.loading && <PurchaseReasonPanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
+          </details>
+          {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>} 
+          {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
         </section>}
 
         <PriceTargetMemo query={query} data={state.data} loading={state.loading}/>
@@ -297,6 +319,7 @@ export default function ComparePage() {
         </section>
       </div>
     </main>
+    {selectedOffers.length>0&&<aside className="cp-selection-tray" aria-label="選択した出品"><span><strong>{selectedOffers.length} / 4件</strong> を比較候補に選択中</span><button type="button" onClick={()=>revealComparisonSection('cp-shortlist-title')}>比較表を見る</button><button type="button" onClick={()=>setSelectedKeys([])}>解除</button></aside>}
     <SiteFooter />
     <SiteConcierge section="products" />
   </div>;
