@@ -9,7 +9,7 @@ export default function PriceOfferTable({offers,sort,selectedKeys,onToggle}){
     <tbody className="cp-offers">{offers.map((offer,index)=>{
       const key=offerKey(offer), selected=selectedKeys.includes(key);
       return <tr className="cp-offer" key={key}>
-        <td className="cp-price-pick"><label className="cp-pick"><input type="checkbox" checked={selected} disabled={!selected&&selectedKeys.length>=4} onChange={()=>onToggle(offer)}/><span>比較表に追加</span></label></td>
+        <td className="cp-price-pick"><label className="cp-pick"><input type="checkbox" aria-label={`${offer.shopName||offer.storeName}の${offer.title}を比較表に追加`} checked={selected} disabled={!selected&&selectedKeys.length>=4} onChange={()=>onToggle(offer)}/><span>比較表に追加</span></label></td>
         <td className="cp-price-product"><p className="cp-offer-title">{offer.title}</p><strong>{offer.shopName||'販売店名未取得'}</strong><small>{offer.storeName}</small>
           <small className="cp-identity">{offer.matchBasis==='jan'?'JAN一致':offer.matchBasis==='model'?'型番一致・仕様は要確認':'同一商品か未確認'}</small>
           {/^\d{8}$|^\d{13}$/.test(offer.jan||'')&&<a className="cp-research-jan" href={'/compare/?q='+encodeURIComponent(offer.title.slice(0,80))+'&jan='+offer.jan}>JAN {offer.jan}で比較 →</a>}

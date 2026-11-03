@@ -285,7 +285,7 @@ export default function ComparePage() {
           {!state.loading && <ConsumerScorePanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
           {!state.loading && <PurchaseReasonPanel offers={rawOffers} selectedKeys={selectedKeys} onChoose={chooseFromReview}/>}
           </details>
-          {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>} 
+          {!state.loading && <AmazonComparePanel offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/>}
           {!state.loading && <ShopPriceBoard offers={rawOffers} stores={stores} onOpenManual={openManualCompare}/> }
         </section>}
 
