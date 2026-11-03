@@ -155,6 +155,42 @@ try{
    if(!(await page.locator('.cp-criteria-note').innerText()).includes('購入時の支払額ではありません'))throw Error('Missing points disclaimer');
    await page.locator('.cp-results').screenshot({path:path.join(out,'interaction-cash-vs-points.png'),animations:'disabled'});
  });
+ await interaction('product-price-table-and-selection-tray',{width:375,height:812},async page=>{
+   await page.route('**/api/compare?**',route=>route.fulfill({json:{sources:{yahoo:'ok',rakuten:'error'},mode:'price',pageCount:1,fetchedAt:new Date().toISOString(),offers:Array.from({length:6},(_,i)=>({store:'yahoo',storeName:'Yahoo!ショッピング',shopName:'検証販売店'+i,title:'WH-1000XM5 検証商品 '+i,price:30000+i*1000,point:100,effectivePrice:29900+i*1000,url:'https://store.shopping.yahoo.co.jp/qa/'+i+'.html',image:'',shippingStatus:i===0?'unknown':'free',shippingFree:i>0,reviewCount:30,reviewAverage:4.4,sellerReviewCount:40,sellerReviewAverage:4.6,sameProduct:true,matchBasis:'model',inStock:true,sponsored:false}))}}));
+   await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('.cp-price-table .cp-offer').first().waitFor();
+   if(await page.locator('#cp-review-tools').getAttribute('open')!==null||await page.locator('#cp-analysis-tools').getAttribute('open')!==null)throw Error('Optional research should start collapsed');
+   if(!(await page.locator('.cp-price-table .cp-offer').first().innerText()).includes('送料条件未取得'))throw Error('Unknown shipping became free in table');
+   const picks=page.locator('.cp-price-table .cp-pick input');
+   for(let i=0;i<4;i++)await picks.nth(i).check();
+   if(!await picks.nth(4).isDisabled())throw Error('More than four offers can be selected');
+   if(!(await page.locator('.cp-selection-tray').innerText()).includes('4 / 4件'))throw Error('Selection tray count missing');
+   await page.locator('.cp-price-table-wrap').screenshot({path:path.join(out,'interaction-product-price-table-mobile.png')});
+   if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Seller table overflows mobile');
+   await page.getByRole('button',{name:'詳しい出品一覧',exact:true}).click();
+   if(await page.locator('.cp-price-table').count())throw Error('Table did not switch to listing view');
+   if(await page.locator('.cp-offers .cp-pick input:checked').count()!==4)throw Error('View switch lost selected offers');
+   await page.locator('.cp-selection-tray').getByRole('button',{name:'比較表を見る',exact:true}).click();
+   if(await page.locator('.cp-shortlist thead th').count()!==5)throw Error('Four selected offers did not reach comparison');
+   await page.locator('.cp-quick-nav').getByRole('link',{name:'口コミ',exact:true}).click();
+   if(await page.locator('#cp-review-tools').getAttribute('open')===null)throw Error('Research navigation did not reveal content');
+   await page.getByRole('button',{name:'販売店の価格表',exact:true}).click();
+   await page.setViewportSize({width:1440,height:900});
+   await page.locator('.cp-price-table-wrap').screenshot({path:path.join(out,'interaction-product-price-table-desktop.png')});
+   if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Seller table overflows desktop');
+ });
+ await interaction('home-comparison-keeps-yahoo-source',{width:375,height:812},async page=>{
+   await page.route('**/api/compare?**',route=>route.fulfill({json:{sources:{yahoo:'ok',rakuten:'error'},mode:'price',pageCount:1,offers:[0,1].map(i=>({store:'yahoo',storeName:'Yahoo!ショッピング',shopName:'検証店'+i,title:'WH-1000XM5 '+i,price:30000+i*1000,point:100,effectivePrice:29900+i*1000,url:'https://store.shopping.yahoo.co.jp/qa/'+i+'.html',image:'',shippingStatus:i===0?'unknown':'free',reviewCount:10,reviewAverage:4.2,sameProduct:true,matchBasis:'model',sponsored:false}))}}));
+   await page.goto(origin+'/?keyword=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   const picks=page.locator('.product-card .compare-check input');
+   await picks.first().waitFor();await picks.nth(0).check();await picks.nth(1).check();
+   const links=await page.locator('.comparison-cta').evaluateAll(nodes=>nodes.map(node=>({href:node.href,rel:node.rel,text:node.textContent})));
+   if(links.length!==2||links.some(link=>new URL(link.href).hostname!=='store.shopping.yahoo.co.jp'||link.rel.includes('sponsored')||!link.text.includes('Yahoo!')))throw Error('Home comparison redirected or misattributed Yahoo offer');
+   if(!(await page.locator('.comparison-table').innerText()).includes('送料条件未取得'))throw Error('Unknown home-comparison shipping was mislabelled');
+   if(!(await page.locator('.comparison-note').innerText()).includes('現金支払額ではなく'))throw Error('Home comparison confuses rewards with payment');
+   await page.locator('.comparison-panel').screenshot({path:path.join(out,'interaction-home-source-comparison.png')});
+   if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Home selection comparison overflows mobile');
+ });
  await interaction('checkout-and-private-price-target',{width:375,height:812},async page=>{
    const makeOffer=(name,price,shippingStatus,url)=>({
      store:'rakuten',storeName:'楽天市場',shopName:name,title:'WH-1000XM5 ヘッドホン '+name,
@@ -274,6 +310,7 @@ try{
        ]})
    }));
    await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('#cp-review-tools > summary').click();
    await page.locator('.cp-research-reviews').waitFor({timeout:10000});
    const text=await page.locator('.cp-research-reviews').innerText();
    if(!text.includes('商品評価あり 2件')||!text.includes('店舗評価あり 2件'))throw Error('Review and seller coverage not disclosed');
@@ -283,6 +320,7 @@ try{
    await page.getByRole('button',{name:'★4.5以上・50件以上'}).click();
    await page.waitForFunction(()=>document.querySelectorAll('.cp-offers > .cp-offer').length===1,null,{timeout:5000});
    if(!(await page.locator('.cp-offers > .cp-offer').first().innerText()).includes('多数レビュー店舗'))throw Error('Preset review filter did not keep source-backed item');
+   await page.locator('.cp-filter-tools > summary').click();
    await page.getByLabel('口コミの最低件数').selectOption('100');
    await page.getByRole('button',{name:'絞り込みを解除してすべて表示'}).click();
    await page.waitForFunction(()=>document.querySelectorAll('.cp-offers > .cp-offer').length===3,null,{timeout:5000});
@@ -303,6 +341,7 @@ try{
        offers:[offer(19000,0,0,0,0),offer(25000,4.7,280,4.8,160)],
        fetchedAt:'2026-10-31T10:00:00Z'})}));
    await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('#cp-analysis-tools > summary').click();
    await page.locator('.cp-consumer-score').waitFor({timeout:10000});
    const formula=await page.locator('.cp-score-formula').innerText();
    if(!formula.includes('B = (n × R + 15 × 3.8)'))throw Error('Bayesian formula missing');
@@ -335,6 +374,8 @@ try{
        offers:[offer(23000,1,5,'星5が1件の店',4.2),offer(26000,220,4.6,'レビューが多い店',4.9)]})
    }));
    await page.goto(origin+'/compare/?q=WH-1000XM5',{waitUntil:'domcontentloaded'});
+   await page.locator('#cp-review-tools > summary').click();
+   await page.locator('#cp-analysis-tools > summary').click();
    await page.locator('.cp-research-item').first().waitFor({timeout:10000});
    if(!(await page.locator('.cp-research-item').first().innerText()).includes('レビューが多い店'))throw Error('Tiny five-star rating dominated evidence ranking');
    if(!(await page.locator('.cp-reasons').innerText()).includes('商品口コミを重視'))throw Error('Independent buyer criteria missing');

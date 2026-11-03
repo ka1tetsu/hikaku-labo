@@ -1,5 +1,6 @@
 import { recordOutboundClick } from '../shared/outboundClient.js';
-import { buildRakutenAffiliateUrl } from '../api';
+import { catalogPurchaseTarget } from '../shared/catalogPurchase.js';
+import { shippingLabel } from '../shared/compareWorkbench.js';
 
 const yen = (n) => `¥${Math.round(n).toLocaleString()}`;
 
@@ -15,18 +16,18 @@ const ROWS = [
     {
         key: 'shipping',
         label: '送料',
-        value: (it) => (it.isFreeShipping ? '送料無料' : '送料別（店舗により変動）'),
+        value: (it) => shippingLabel({shippingStatus:it.shippingStatus,shippingFree:it.isFreeShipping}),
         score: (it) => (it.isFreeShipping ? 1 : 0),
     },
     {
         key: 'point',
         label: 'ポイント',
-        value: (it) => `${it.pointRate}倍（約 ${yen(it.pointBack)} 相当）`,
+        value: (it) => Number.isFinite(it.pointBack)?`${it.pointBack.toLocaleString('ja-JP')}pt（取得元の表示）`:'未取得',
         score: (it) => it.pointBack,
     },
     {
         key: 'effectivePrice',
-        label: '実質価格（ポイント還元後）',
+        label: 'ポイント考慮後の参考額（支払額とは別）',
         value: (it) => yen(it.effectivePrice),
         score: (it) => -it.effectivePrice,
         emphasis: true,
@@ -57,8 +58,8 @@ const ROWS = [
     },
     {
         key: 'asuraku',
-        label: 'あす楽',
-        value: (it) => (it.asurakuFlag === 1 ? '対応' : '非対応'),
+        label: '配送サービスの表示',
+        value: (it) => (it.asurakuFlag === 1 ? '取得元に対応表示あり・地域等は要確認' : '対応状況未取得'),
         score: (it) => (it.asurakuFlag === 1 ? 1 : 0),
     },
 ];
@@ -128,27 +129,22 @@ export default function ComparisonTable({ items, onRemove, onClear }) {
                         ))}
                         <tr>
                             <th className="comparison-rowhead">購入</th>
-                            {items.map((it) => (
-                                <td key={it.itemCode}>
-                                    <a
-                                        href={buildRakutenAffiliateUrl(it, it.itemName)}
-                                        target="_blank"
-                                        rel="noopener noreferrer sponsored"
-                                        className="comparison-cta"
-                                        onClick={() => recordOutboundClick({ section: 'products', merchant: 'rakuten', placement: 'comparison-table', sponsored: true })}
-                                    >楽天市場で見る ▶</a>
-                                </td>
-                            ))}
+                            {items.map((it) => {
+                                const target=catalogPurchaseTarget(it);
+                                return <td key={it.itemCode}>{target?<a href={target.url} target="_blank" rel={target.sponsored?'noopener noreferrer sponsored':'noopener noreferrer'} className="comparison-cta"
+                                    onClick={()=>recordOutboundClick({section:'products',merchant:target.merchant,placement:'comparison-table',sponsored:target.sponsored})}>
+                                    {target.label}で見る ↗{target.sponsored?'（PR）':''}</a>:<span>購入先未取得</span>}</td>;
+                            })}
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <p className="comparison-note">
-                価格・ポイント・レビューは楽天市場APIの取得時点の値です。
-                実質価格は「商品価格 − ポイント還元相当額」で算出しています。
-                {hasShippingCaveat && ' 送料別の商品は送料を含んでいません。'}
-                最新の価格・在庫は楽天市場の商品ページでご確認ください。
+                価格・ポイント・レビューは各取得元APIの値です。
+                ポイント考慮後の参考額は現金支払額ではなく、送料・割引条件も別に確認してください。
+                {hasShippingCaveat && ' 送料が不明・別途の出品は送料込み総額を確認できていません。'}
+                最新の価格・在庫・色・容量・状態は、それぞれの販売ページでご確認ください。
             </p>
         </section>
     );
