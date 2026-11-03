@@ -19,3 +19,10 @@ test('QA fulfills ad images locally and never forwards tracking or referral requ
  assert.equal(completed[0].contentType,'image/svg+xml');assert.match(completed[0].body,/検証用/);
  assert.equal(completed[1].status,204);assert.equal(completed[2].status,204);
 });
+
+test('QA isolation covers the shared context including new-tab referrals, installed once',async()=>{
+ let registered=0;const context={route:async()=>{registered++;}};
+ const page={context:()=>context,route:()=>{throw Error('Page-only interception misses popups');}};
+ await isolateQaNetwork(page,{origin});await isolateQaNetwork(page,{origin});
+ assert.equal(registered,1);
+});
