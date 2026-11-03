@@ -3,6 +3,7 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { isolateQaNetwork } from './qa-network-isolation.mjs';
 
 const origin=process.env.BROWSER_QA_ORIGIN || 'http://127.0.0.1:4173';
 const out=process.env.BROWSER_QA_OUT || 'artifacts/browser-qa';
@@ -10,11 +11,13 @@ const routes=['/','/compare/','/sim/','/hikari/','/card/','/hoken/','/life/','/t
 const viewports=[{name:'mobile',width:375,height:812},{name:'tablet',width:768,height:1024},{name:'desktop',width:1440,height:900}];
 const snapshots=new Set(['/','/compare/','/sim/','/tools/','/travel/','/guides/hotel-cancellation/']);
 const failures=[];
-const report={origin,startedAt:new Date().toISOString(),pages:[],interactions:[],failures};
+const report={origin,startedAt:new Date().toISOString(),pages:[],interactions:[],failures,qaIsolation:{analytics:0,affiliate:0}};
+const isolate=page=>isolateQaNetwork(page,{origin,onBlocked:kind=>report.qaIsolation[kind]++});
 await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage','--no-sandbox']});
 function fail(where,msg){failures.push({where,msg});console.error('FAIL',where,msg)}
 async function audit(page,route,viewport){
+ await isolate(page);
  const where=viewport.name+':'+route,errors=[];
  page.on('pageerror',err=>errors.push(err.message));
  try{
@@ -46,7 +49,7 @@ async function audit(page,route,viewport){
 }
 async function interaction(name,viewport,action){
  const page=await browser.newPage({viewport,deviceScaleFactor:1,reducedMotion:'reduce'});
- try{await action(page);report.interactions.push({name,result:'passed'});console.log('PASS',name)}
+ try{await isolate(page);await action(page);report.interactions.push({name,result:'passed'});console.log('PASS',name)}
  catch(e){fail(name,e.message);report.interactions.push({name,result:'failed',error:e.message})}
  finally{await page.close()}
 }
@@ -496,6 +499,31 @@ try{
    await page.locator('.hs-search-form select').selectOption('4');
    if(await page.locator('.gx-cost-winner').count())throw Error('Changed trip conditions reused old quote');
    if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Comparison workspace overflows mobile');
+ });
+ await interaction('travel-approved-ad-handoff-mobile',{width:375,height:812},async page=>{
+   await page.route('**/api/stays?**',route=>route.fulfill({status:503,json:{status:'site_registration_rejected',offers:[]}}));
+   await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
+   await page.locator('.hs-search-form input[type=search]').fill('新潟市');
+   await page.locator('.hs-search-form button[type=submit]').click();
+   await page.locator('.hs-error').waitFor();
+   const ads=page.locator('#travel-total-cost .yt-ad-creative');
+   if(await ads.count()!==1)throw Error('Quote workspace must show one approved Yahoo creative');
+   if(await page.locator('.gx-cost-card').first().locator('a[href="https://travel.yahoo.co.jp/"]').count())throw Error('Primary Yahoo quote action bypasses approved referral');
+   const cards=page.locator('.gx-cost-card');
+   await cards.nth(0).getByLabel('全員・全泊の表示料金（円）',{exact:true}).fill('10000');
+   await cards.nth(1).getByLabel('全員・全泊の表示料金（円）',{exact:true}).fill('11000');
+   await page.locator('.gx-cost-shared-confirm input').check();
+   await page.locator('.gx-cost-result .yt-ad-creative').waitFor();
+   if(await ads.count()!==1)throw Error('Recommendation duplicated the approved creative');
+   // The global QA network isolation fulfills this referral locally. No real
+   // affiliate click or advertiser request is sent by this test.
+   const tracked=page.waitForRequest(request=>{
+     if(new URL(request.url()).pathname!=='/api/track')return false;
+     try{const body=request.postDataJSON();return body.event==='outbound'&&body.merchant==='yahoo-travel'&&body.sponsored===true;}catch{return false;}
+   });
+   await page.locator('.gx-cost-result .yt-ad-creative a').click({noWaitAfter:true});
+   const event=(await tracked).postDataJSON();
+   if(event.placement!=='user-quote'||Object.keys(event).some(key=>!['event','section','merchant','placement','sponsored','page'].includes(key)))throw Error('Approved quote handoff lost enum-only sponsored attribution');
  });
  await interaction('travel-upstream-error-has-comparison',{width:375,height:812},async page=>{
    await page.route('**/api/stays?**',route=>route.fulfill({status:503,json:{status:'site_registration_rejected',offers:[]}}));

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { rankEnteredQuotes } from './totalCost.js';
 import { TRAVEL_PROVIDERS } from './providers.js';
 import { globalProviderTarget } from './searchLinkAdapter.js';
+import { travelAffiliateEnabled } from './a8TravelAds.js';
 import YahooTravelAd from './YahooTravelAd.jsx';
 import { googleWebSearch } from './googleDiscovery.js';
 import CancellationDecision from './CancellationDecision.jsx';
@@ -38,6 +39,8 @@ export default function TotalCostComparator({ searchCriteria = {}, compact = fal
   const handleClick=(id,sponsored)=>recordOutboundClick({section:'travel',merchant:id,placement:'user-quote',sponsored});
   const bestQuote = result.recommended?.quote || null;
   const bestTarget = bestQuote ? visit(bestQuote.providerId) : null;
+  const yahooAdReady=travelAffiliateEnabled(import.meta.env);
+  const yahooAdInResult=yahooAdReady&&bestQuote?.providerId==='yahoo-travel';
   const copy=async()=>{
     const lines=['旅行予約の総支払額比較（手入力・予約時の実価格未検証）'].concat(
       result.ranked.map((row,i)=>(i+1)+'. '+displayProvider(row.quote.providerId)+'：スコア '+row.score.toFixed(1)+'、支払総額 '+yen(row.cost.cashPayable)+'、後日ポイント '+yen(row.cost.nonCashPoints)),
@@ -65,6 +68,8 @@ export default function TotalCostComparator({ searchCriteria = {}, compact = fal
     <div className="gx-cost-grid">{offers.map((offer,index)=>{
       const provider=providers.find(p=>p.id===offer.providerId);
       const target=provider?visit(provider.id):null;
+      const usesYahooAd=yahooAdReady&&provider?.id==='yahoo-travel';
+      const showYahooHere=usesYahooAd&&!yahooAdInResult&&offers.find(row=>row.providerId==='yahoo-travel')?.id===offer.id;
       const entry=result.ranked.find(x=>x.quote.id===offer.id);
       return <fieldset className="gx-cost-card" key={offer.id}>
         <legend>{compact?provider?.name||`候補 ${index+1}`:`候補 ${index+1}`}</legend>
@@ -85,10 +90,12 @@ export default function TotalCostComparator({ searchCriteria = {}, compact = fal
           <span>日付・人数・{kind==='flight'?'片道/往復・荷物条件':'泊数・宿・部屋/食事条件'}が同じで、必要な追加費用も確認済み</span></label>}
         {entry&&<p className="gx-cost-preview">計算した支払総額 <strong>{yen(entry.cost.cashPayable)}</strong></p>}
         {kind==='hotel'&&provider&&searchCriteria.hotelName&&<a className="gx-provider-google" href={googleWebSearch(`site:${new URL(provider.url).hostname} "${searchCriteria.hotelName.replaceAll('"','')}" ${searchCriteria.departureDate||''} ${searchCriteria.returnDate||''} ${searchCriteria.travelers||2}名`)} target="_blank" rel="noopener noreferrer">Googleでこのサイトの同じ宿を探す ↗</a>}
-        <div className="gx-cost-buttons">{target&&<a href={target.url} rel={target.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
+        <div className="gx-cost-buttons">{target&&!usesYahooAd&&<a href={target.url} rel={target.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
           target="_blank" onClick={()=>handleClick(provider.id,target.sponsored)}>
           {provider.name}で確認 ↗{target.sponsored?'（PR）':''}</a>}
-          {compact&&target&&<small className="gx-transfer-note">{target.carriesSearch?target.note:'宿名・日程・人数は予約先で指定'}</small>}
+          {showYahooHere&&<div id="travel-yahoo-booking"><YahooTravelAd variant="banner234" placement="user-quote"/></div>}
+          {usesYahooAd&&!showYahooHere&&<a href="#travel-yahoo-booking">Yahoo!トラベルの予約先を確認 →</a>}
+          {compact&&target&&!usesYahooAd&&<small className="gx-transfer-note">{target.carriesSearch?target.note:'宿名・日程・人数は予約先で指定'}</small>}
           {offers.length>2&&<button type="button" onClick={()=>setOffers(rows=>rows.filter(x=>x.id!==offer.id))}>この候補を削除</button>}</div>
       </fieldset>;
     })}</div>
@@ -102,11 +109,12 @@ export default function TotalCostComparator({ searchCriteria = {}, compact = fal
             <b>{yen(result.recommended.cost.cashPayable)}</b>
             <p>おすすめスコア：{result.recommended.score.toFixed(1)} / 100</p>
             {!result.usesCancellation&&preference!=='price'&&<p>取消料の比較が未完成のため、現在は料金だけで並べています。</p>}
-            {bestTarget && <a className="gx-cost-winning-cta" href={bestTarget.url} target="_blank"
+            {bestTarget && !yahooAdInResult && <a className="gx-cost-winning-cta" href={bestTarget.url} target="_blank"
               rel={bestTarget.sponsored?'sponsored noopener noreferrer':'noopener noreferrer'}
               onClick={() => handleClick(bestQuote.providerId,bestTarget.sponsored)}>
               {displayProvider(bestQuote.providerId)}で最新の金額・空室を確認 ↗{bestTarget.sponsored?'（PR）':''}
             </a>}
+            {yahooAdInResult&&<div id="travel-yahoo-booking"><YahooTravelAd variant="banner234" placement="user-quote"/></div>}
             <small>予約サイト側で最終支払額が変わる場合があります。広告料は順位に影響しません。</small>
           </div>
         <ol>{result.ranked.map(row=><li key={row.quote.id}><span>{displayProvider(row.quote.providerId)}</span><strong>{yen(row.cost.cashPayable)} · {row.score.toFixed(1)}点</strong>
@@ -117,7 +125,6 @@ export default function TotalCostComparator({ searchCriteria = {}, compact = fal
       {!compact&&<p className="gx-cost-caveat">{result.caveat}</p>}
       {!compact&&<p className="gx-cost-caveat">後日ポイントは現金支払額から差し引きません。返金可否、現地徴収、価格の通貨、換算レート、最新の空席/空室は予約先で再確認してください。</p>}
     </div>
-    {kind==='hotel'&&<YahooTravelAd variant="banner234" placement="cost-yahoo-ad"/>}
     {!compact&&<CancellationDecision />}
   </section>;
 }
