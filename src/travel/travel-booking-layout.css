@@ -82,3 +82,6 @@
 .gx-cost-integrated .gx-provider-google{margin:0;font-size:14px}
 .gx-cost-integrated .gx-cost-result{border-radius:4px}
 @media(max-width:620px){.gx-cost-integrated .gx-cost-card{grid-template-columns:1fr;padding:14px}.gx-cost-integrated .gx-cost-details{grid-template-columns:1fr}.gx-cost-integrated .gx-cost-buttons a{width:100%}.gx-cost-shared-confirm{padding:16px 0}.gx-cost-integrated .gx-cost-result h3{font-size:18px}}
+.hs-share-conditions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:16px 0;font-size:14px;color:#36574d}
+.hs-share-conditions button{min-height:44px;border:1px solid #14664f;border-radius:4px;padding:10px 14px;background:white;color:#14664f;font:inherit;font-weight:700;cursor:pointer}
+.hs-context-note{font-size:14px;line-height:1.8;color:#36574d;background:#f1f5f2;padding:12px;border-bottom:1px solid #b8c9c0}

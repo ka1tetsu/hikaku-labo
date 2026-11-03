@@ -500,6 +500,27 @@ try{
    if(await page.locator('.gx-cost-winner').count())throw Error('Changed trip conditions reused old quote');
    if(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)>3)throw Error('Comparison workspace overflows mobile');
  });
+ await interaction('travel-shared-search-context-mobile',{width:375,height:812},async page=>{
+   let calls=0;
+   await page.route('**/api/stays?**',route=>{calls++;return route.fulfill({status:503,json:{status:'site_registration_rejected',offers:[]}});});
+   await page.goto(origin+'/travel/?destination=tokyo&nights=3',{waitUntil:'domcontentloaded'});
+   const form=page.locator('.hs-search-form');
+   if(await form.locator('input[type=search]').inputValue()!=='東京')throw Error('Domestic itinerary link did not prefill lodging place');
+   const dates=await form.locator('input[type=date]').evaluateAll(nodes=>nodes.map(node=>node.value));
+   if((Date.parse(dates[1])-Date.parse(dates[0]))/86400000!==3)throw Error('Domestic itinerary nights lost');
+   await form.locator('input[type=search]').fill('新潟市');
+   await form.locator('select').selectOption('4');
+   await form.locator('button[type=submit]').click();
+   await page.locator('.hs-error').waitFor();
+   const shared=page.url();
+   if(!shared.includes('stay_place=')||!shared.includes('stay_adults=4')||shared.includes('destination=tokyo'))throw Error('Stay search URL did not reflect submitted conditions');
+   await page.reload({waitUntil:'domcontentloaded'});
+   if(await form.locator('input[type=search]').inputValue()!=='新潟市'||await form.locator('select').inputValue()!=='4')throw Error('Reload lost stay search conditions');
+   if(calls!==1)throw Error('Reload should not launch an unsolicited upstream search');
+   await page.goto(origin+'/travel/?stay_place=新潟市&stay_checkin=2020-01-01',{waitUntil:'domcontentloaded'});
+   if(await form.locator('input[type=date]').first().inputValue()!=='')throw Error('Expired shared dates silently replaced');
+   if(!(await page.locator('.hs-context-note').innerText()).includes('選び直して'))throw Error('Expired-date guidance missing');
+ });
  await interaction('travel-approved-ad-handoff-mobile',{width:375,height:812},async page=>{
    await page.route('**/api/stays?**',route=>route.fulfill({status:503,json:{status:'site_registration_rejected',offers:[]}}));
    await page.goto(origin+'/travel/',{waitUntil:'domcontentloaded'});
