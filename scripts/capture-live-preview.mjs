@@ -3,6 +3,7 @@
 import {mkdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { isolateQaNetwork } from './qa-network-isolation.mjs';
 import {inspectRelease,ORIGIN} from './release-recovery.mjs';
 
 const ROUTES=Object.freeze([
@@ -25,7 +26,7 @@ export async function capture({commit,origin=ORIGIN,folder='artifacts/live-relea
     for(const shot of screenshotPlan()){
       const context=await browser.newContext({viewport:shot.viewport,locale:'ja-JP',timezoneId:'Asia/Tokyo',reducedMotion:'reduce'});
       const page=await context.newPage();
-      await page.route('**/api/track',route=>route.abort('blockedbyclient'));
+      await isolateQaNetwork(page,{origin});
       try {
         const response=await page.goto(origin+shot.route,{waitUntil:'domcontentloaded',timeout:22000});
         if(!response || response.status()!==200 || new URL(page.url()).origin!==origin || new URL(page.url()).pathname!==shot.route)

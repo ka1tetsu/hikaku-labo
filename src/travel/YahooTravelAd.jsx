@@ -18,7 +18,7 @@ export default function YahooTravelAd({ variant = 'banner234', placement = 'yaho
   if (!html) return null;
   return <div className="yt-ad-placement" aria-label="Yahoo!トラベル PR広告">
     <p className="yt-ad-label">PR・広告｜Yahoo!トラベル</p>
-    <p>宿泊条件を揃えて料金を確認。比較結果は広告によって変更されません。</p>
+    <p>宿名・日程・人数は広告先で指定してください。広告報酬は比較の順位に含めません。</p>
     <div className="yt-ad-creative" onClick={event => {
       if (event.target.closest('a[href^="https://px.a8.net/"]')) record(true);
     }} dangerouslySetInnerHTML={{ __html: html }} />
