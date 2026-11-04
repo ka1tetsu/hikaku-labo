@@ -28,7 +28,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
   const pages = new Map(), placements = new Map(), merchants = new Map();
   let unattributedClicks = 0, ignoredRecords = 0, includedRecords = 0;
   const rowFor = page => {
-    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0, travelQuotesReady: 0, travelQuoteBookingClicks: 0, travelCancellationReviews: 0, productManualReady: 0, productManualResearchClicks: 0, productManualResultClicks: 0, travelDirectSearchClicks: 0, productSearches: 0, productResultsReady: 0, productOffersSelected: 0, productTargetsSaved: 0 });
+    if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, guideComparisons: 0, decisionBarShown: 0, travelQuotesReady: 0, travelQuoteBookingClicks: 0, travelCancellationReviews: 0, productManualReady: 0, productManualResearchClicks: 0, productManualResultClicks: 0, travelDirectSearchClicks: 0, productSearches: 0, productResultsReady: 0, productOffersSelected: 0, productTargetsSaved: 0 });
     return pages.get(page);
   };
   for (const record of events) {
@@ -56,7 +56,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
       placements.get(key).clicks++;
     } else if (type === 'hikaku_funnel' && validFunnelEvent({ event: 'funnel', ...fields })) {
       const row = rowFor(fields.page);
-      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons', travel_quote_ready: 'travelQuotesReady', travel_cancellation_review: 'travelCancellationReviews', product_manual_ready: 'productManualReady', product_search: 'productSearches', product_results_ready: 'productResultsReady', product_offer_selected: 'productOffersSelected', product_target_saved: 'productTargetsSaved' }[fields.action];
+      const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', guide_compare: 'guideComparisons', decision_bar_shown: 'decisionBarShown', travel_quote_ready: 'travelQuotesReady', travel_cancellation_review: 'travelCancellationReviews', product_manual_ready: 'productManualReady', product_search: 'productSearches', product_results_ready: 'productResultsReady', product_offer_selected: 'productOffersSelected', product_target_saved: 'productTargetsSaved' }[fields.action];
       if (counter) row[counter]++;
        else { ignoredRecords++; continue; }
     } else { ignoredRecords++; continue; }

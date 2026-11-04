@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { recordOutboundClick } from './outboundClient.js';
+import { recordOutboundClick, recordFunnelEvent } from './outboundClient.js';
 import './decision-bar.css';
 
 // Appears only after a visitor has reached and scrolled past the recommendation.
@@ -7,6 +7,15 @@ import './decision-bar.css';
 export default function DecisionBar({ anchorRef, name, detail, section, merchant, link, placement, caution }) {
   const [visible, setVisible] = useState(false);
   const barRef = useRef(null);
+  const shownRecorded = useRef(false);
+  // Record the first actual display once per mount so the bar's CTR can be measured.
+  // Re-renders, re-displays and candidate/link updates must not count as new impressions.
+  useEffect(() => {
+    if (visible && link && !shownRecorded.current) {
+      shownRecorded.current = true;
+      recordFunnelEvent('decision_bar_shown');
+    }
+  }, [visible, link]);
   useEffect(() => {
     const target = anchorRef.current;
     if (!target || typeof IntersectionObserver === 'undefined') return undefined;
