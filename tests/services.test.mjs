@@ -55,6 +55,17 @@ test('insurance page compares no insurance products and lists services without r
   assert.match(page, /特定の保険商品の比較・推奨・募集は行いません/);
   assert.match(page, /五十音順/);
   assert.ok(!HOKEN_SERVICES.some(s => 'score' in s || 'rate' in s));
+  // 事実情報の整理表は五十音順の並びを維持し、Related から /life/ ハブへ導線を持つ
+  assert.deepEqual(HOKEN_SERVICES.map(s => s.id), ['hoken-clinic', 'hokennomadoguchi', 'hoken-minaoshi-lab']);
+  assert.match(page, /sv-hoken-table/);
+  assert.match(page, /hoken: \[\['\/life\/'/);
+  // 表の事実項目は summary の記載範囲だけを使う（未確認の項目はフィールドを持たない）
+  const clinic = HOKEN_SERVICES.find(s => s.id === 'hoken-clinic');
+  assert.equal(clinic.feature, '複数の保険会社の商品を取り扱う');
+  assert.ok(!('consultMethods' in clinic) && !('storeNetwork' in clinic));
+  const lab = HOKEN_SERVICES.find(s => s.id === 'hoken-minaoshi-lab');
+  assert.equal(lab.consultMethods, '訪問・オンライン');
+  assert.ok(HOKEN_SERVICES.every(s => s.fee === '無料'));
 });
 
 test('long-tail pages cover every SIM pair and every region once', async () => {
