@@ -30,9 +30,35 @@ test('SIM ranking uses the cheapest plan that actually covers the data need', ()
 
 test('fiber ranking respects set discounts and service areas', () => {
   const kansaiAu = rankHikari({ housing: 'house', carrier: 'au', area: 'kansai' });
-  assert.equal(kansaiAu[0].service.id, 'eo-hikari');
+  // K3 で BIGLOBE光（関西で提供・auセット割・月額確認済み）を追加したため、料金未確認の
+  // eo光より上位になる。eo光も関西で利用可能な候補として残ること
+  assert.equal(kansaiAu[0].service.id, 'biglobe-hikari');
+  assert.ok(kansaiAu.find(r => r.service.id === 'eo-hikari').available);
   assert.ok(kansaiAu.find(r => r.service.id === 'au-hikari').score < 30);
   assert.equal(rankHikari({ carrier: 'docomo', area: 'kanto' })[0].service.id, 'docomo-hikari');
+});
+
+test('K3 provider-type hikari entries carry official sources and honest null prices', () => {
+  const added = ['biglobe-hikari', 'nifty-hikari', 'sonet-hikari', 'gmo-hikari']
+    .map(id => HIKARI_SERVICES.find(s => s.id === id));
+  assert.ok(added.every(Boolean));
+  for (const s of added) {
+    // フレッツ系コラボは全国（フレッツ光エリア）で、2026-11-04 に公式で確認した出典を持つ
+    assert.equal(s.areas, 'all', s.id);
+    assert.equal(s.checkedAt, '2026-11-04', s.id);
+    assert.ok(s.sourceUrl.startsWith('https://'), s.id);
+  }
+  // 公式で単一の金額を確認できた2社だけ月額を持つ
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'biglobe-hikari').house, 5478);
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'biglobe-hikari').mansion, 4378);
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'nifty-hikari').house, 5720);
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'nifty-hikari').mansion, 4378);
+  // 金額が定まらない2社は null のまま「公式で確認」に倒す
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'sonet-hikari').house, null);
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'gmo-hikari').mansion, null);
+  // セット割の有無も公式確認どおり（BIGLOBE・@nifty は au、So-net・GMO はなし）
+  assert.deepEqual(HIKARI_SERVICES.find(s => s.id === 'biglobe-hikari').bundle, ['au']);
+  assert.deepEqual(HIKARI_SERVICES.find(s => s.id === 'gmo-hikari').bundle, []);
 });
 
 test('card ranking applies age limits and ecosystems', () => {
@@ -136,12 +162,12 @@ test('insurance page compares no insurance products and lists services without r
 
 test('per-service detail pages cover only services with enough catalog facts (K1)', async () => {
   const { SIM_DETAIL_PAGES, HIKARI_DETAIL_PAGES, CARD_DETAIL_PAGES, SIM_PAIRS, AREA_PAGES } = await import('../src/services/pages.js');
-  // SIM・カードは全サービスに個別ページ。光は料金が確認できる5社だけ
+  // SIM・カードは全サービスに個別ページ。光は料金が確認できる7社だけ（K3でBIGLOBE光・@nifty光を追加）
   assert.equal(SIM_DETAIL_PAGES.length, SIM_SERVICES.length);
   assert.equal(CARD_DETAIL_PAGES.length, CARD_SERVICES.length);
-  assert.deepEqual(HIKARI_DETAIL_PAGES.map(p => p.id), ['docomo-hikari', 'softbank-hikari', 'au-hikari', 'nuro-hikari', 'rakuten-hikari']);
-  // 料金が null の eo光・コミュファ光は薄いページになるため作らず、地域ページに統合したままにする
-  assert.ok(!HIKARI_DETAIL_PAGES.some(p => p.id === 'eo-hikari' || p.id === 'commufa-hikari'));
+  assert.deepEqual(HIKARI_DETAIL_PAGES.map(p => p.id), ['docomo-hikari', 'softbank-hikari', 'au-hikari', 'nuro-hikari', 'rakuten-hikari', 'biglobe-hikari', 'nifty-hikari']);
+  // 料金が null の eo光・コミュファ光・So-net光・GMOとくとくBB光は薄いページになるため作らず、地域ページに統合したままにする
+  assert.ok(!HIKARI_DETAIL_PAGES.some(p => p.id === 'eo-hikari' || p.id === 'commufa-hikari' || p.id === 'sonet-hikari' || p.id === 'gmo-hikari'));
   const all = [...SIM_DETAIL_PAGES, ...HIKARI_DETAIL_PAGES, ...CARD_DETAIL_PAGES];
   assert.equal(new Set(all.map(p => p.path)).size, all.length);
   assert.ok(all.every(p => /^\/(sim|hikari|card)\/[a-z0-9-]+\/$/.test(p.path)));
