@@ -137,12 +137,13 @@ export const CARD_SERVICES = [
 ];
 
 // 保険：商品の比較・推奨は保険募集に当たるおそれがあるため行わない。無料相談サービスの紹介のみ（順位なし・五十音順）。
-// consultMethods / storeNetwork / feature / fee は、各 summary に記載がある事実だけを表表示用に切り出したもの。
-// summary に記載がない項目はフィールド自体を持たせない（推測で埋めない）。
+// consultMethods / storeNetwork / feature / fee は、2026-11-04 に各社の公式サイトで確認した事実だけを載せる。
+// 公式で確認できなかった項目はフィールド自体を持たせない（推測で埋めない）。数値の時点・条件の注記は公式表記に合わせ、確認先は sourceUrl に残す。
+// ほけんの窓口の総店舗数は、時点の異なる数値しか公式に確認できなかったため定性表記のままにしている（オンライン相談は企業サイトのプレスリリースと公式店舗ページで確認）。
 export const HOKEN_SERVICES = [
-  { id: 'hoken-clinic', name: '保険クリニック', summary: '複数の保険会社の商品を扱う無料相談サービス。', feature: '複数の保険会社の商品を取り扱う', fee: '無料', officialUrl: 'https://www.hoken-clinic.com/' },
-  { id: 'hokennomadoguchi', name: 'ほけんの窓口', summary: '全国に店舗がある無料保険相談サービス。', consultMethods: '店舗', storeNetwork: '全国に店舗がある', fee: '無料', officialUrl: 'https://www.hokennomadoguchi.com/' },
-  { id: 'hoken-minaoshi-lab', name: '保険見直しラボ', summary: '訪問・オンラインで相談できる無料保険相談サービス。', consultMethods: '訪問・オンライン', fee: '無料', officialUrl: 'https://www.hoken-minaoshi-lab.jp/' },
+  { id: 'hoken-clinic', name: '保険クリニック', summary: '複数の保険会社の商品を扱う無料相談サービス。', consultMethods: '店舗・オンライン', storeNetwork: '全国309店舗', feature: '取扱保険会社は約50社（店舗により異なる）', fee: '無料', officialUrl: 'https://www.hoken-clinic.com/', sourceUrl: 'https://www.hoken-clinic.com/' },
+  { id: 'hokennomadoguchi', name: 'ほけんの窓口', summary: '全国に店舗がある無料保険相談サービス。', consultMethods: '店舗・オンライン', storeNetwork: '全国に店舗がある', feature: '取扱保険会社は40社以上、300商品以上', fee: '無料', officialUrl: 'https://www.hokennomadoguchi.com/', sourceUrl: 'https://www.hokennomadoguchi.com/' },
+  { id: 'hoken-minaoshi-lab', name: '保険見直しラボ', summary: '訪問・オンラインで相談できる無料保険相談サービス。', consultMethods: '訪問・オンライン', storeNetwork: '全国に約60拠点（2025年4月時点）', feature: '取扱保険会社は42社（2026年9月時点）', fee: '無料', officialUrl: 'https://www.hoken-minaoshi-lab.jp/', sourceUrl: 'https://www.hoken-minaoshi-lab.jp/' },
 ];
 
 export const SERVICE_IDS = Object.freeze([...SIM_SERVICES, ...HIKARI_SERVICES, ...CARD_SERVICES, ...HOKEN_SERVICES].map(s => s.id));
