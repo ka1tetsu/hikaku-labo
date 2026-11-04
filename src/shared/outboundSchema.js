@@ -1,6 +1,6 @@
 import { SERVICE_IDS } from '../services/catalog.js';
 import { TRAVEL_PROVIDERS } from '../travel/providers.js';
-import { AREA_PAGES, SIM_PAIRS } from '../services/pages.js';
+import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS } from '../services/pages.js';
 
 // First-party, cookie-free event logger for deliberate outbound clicks.
 // No IP, user agent, session IDs, search terms, destination URLs or query strings.
@@ -33,6 +33,9 @@ export const PAGE_IDS = Object.freeze({
   '/guides/sim-guide/': 'guide-sim-guide', '/guides/hikari-guide/': 'guide-hikari-guide', '/guides/card-guide/': 'guide-card-guide',
   ...Object.fromEntries(SIM_PAIRS.map(pair => [pair.path, 'sim-vs-' + pair.slug])),
   ...Object.fromEntries(AREA_PAGES.map(page => [page.path, 'hikari-area-' + page.area])),
+  ...Object.fromEntries(SIM_DETAIL_PAGES.map(page => [page.path, 'sim-service-' + page.id])),
+  ...Object.fromEntries(HIKARI_DETAIL_PAGES.map(page => [page.path, 'hikari-service-' + page.id])),
+  ...Object.fromEntries(CARD_DETAIL_PAGES.map(page => [page.path, 'card-service-' + page.id])),
 });
 // Keep historical aggregate IDs readable; new events use registered page IDs.
 const VALID_PAGE_IDS = new Set([...Object.values(PAGE_IDS), 'sim-vs', 'hikari-area']);

@@ -134,6 +134,30 @@ test('insurance page compares no insurance products and lists services without r
   assert.ok(HOKEN_SERVICES.every(s => s.fee === '無料'));
 });
 
+test('per-service detail pages cover only services with enough catalog facts (K1)', async () => {
+  const { SIM_DETAIL_PAGES, HIKARI_DETAIL_PAGES, CARD_DETAIL_PAGES, SIM_PAIRS, AREA_PAGES } = await import('../src/services/pages.js');
+  // SIM・カードは全サービスに個別ページ。光は料金が確認できる5社だけ
+  assert.equal(SIM_DETAIL_PAGES.length, SIM_SERVICES.length);
+  assert.equal(CARD_DETAIL_PAGES.length, CARD_SERVICES.length);
+  assert.deepEqual(HIKARI_DETAIL_PAGES.map(p => p.id), ['docomo-hikari', 'softbank-hikari', 'au-hikari', 'nuro-hikari', 'rakuten-hikari']);
+  // 料金が null の eo光・コミュファ光は薄いページになるため作らず、地域ページに統合したままにする
+  assert.ok(!HIKARI_DETAIL_PAGES.some(p => p.id === 'eo-hikari' || p.id === 'commufa-hikari'));
+  const all = [...SIM_DETAIL_PAGES, ...HIKARI_DETAIL_PAGES, ...CARD_DETAIL_PAGES];
+  assert.equal(new Set(all.map(p => p.path)).size, all.length);
+  assert.ok(all.every(p => /^\/(sim|hikari|card)\/[a-z0-9-]+\/$/.test(p.path)));
+  // 既存の静的ページ（vs・地域）とパスが衝突しない
+  const taken = new Set([...SIM_PAIRS.map(p => p.path), ...AREA_PAGES.map(p => p.path)]);
+  assert.ok(all.every(p => !taken.has(p.path)));
+  // ssr に静的ページとして登録され、計測のページIDも引ける
+  const ssr = readFileSync(new URL('../src/ssr.jsx', import.meta.url), 'utf8');
+  for (const name of ['SIM_DETAIL_PAGES', 'HIKARI_DETAIL_PAGES', 'CARD_DETAIL_PAGES', 'SimServicePage', 'HikariServicePage', 'CardServicePage']) assert.match(ssr, new RegExp(name));
+  const { pageId } = await import('../src/shared/outboundSchema.js');
+  assert.equal(pageId('/sim/ahamo/'), 'sim-service-ahamo');
+  assert.equal(pageId('/hikari/au-hikari/'), 'hikari-service-au-hikari');
+  assert.equal(pageId('/card/rakuten-card/'), 'card-service-rakuten-card');
+  assert.equal(pageId('/hikari/eo-hikari/'), null);
+});
+
 test('long-tail pages cover every SIM pair and every region once', async () => {
   const { SIM_PAIRS, AREA_PAGES, AREAS } = await import('../src/services/pages.js');
   assert.equal(SIM_PAIRS.length, SIM_SERVICES.length * (SIM_SERVICES.length - 1) / 2);

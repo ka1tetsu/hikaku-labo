@@ -8,9 +8,9 @@ import TravelPage from './travel/TravelPage.jsx';
 import HotelDetailPage from './travel/HotelDetailPage.jsx';
 import ComparePage from './compare/ComparePage.jsx';
 import ServicesPage from './services/ServicesPage.jsx';
-import { HikariAreaPage, SimPairPage } from './services/StaticPages.jsx';
-import { AREA_PAGES, SIM_PAIRS, areaLabel } from './services/pages.js';
-import { SIM_SERVICES } from './services/catalog.js';
+import { CardServicePage, HikariAreaPage, HikariServicePage, SimPairPage, SimServicePage } from './services/StaticPages.jsx';
+import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS, areaLabel } from './services/pages.js';
+import { CARD_SERVICES, HIKARI_SERVICES, SIM_SERVICES } from './services/catalog.js';
 
 // Built HTML file → page element. Used only by scripts/prerender.mjs.
 export const PAGES = {
@@ -32,6 +32,8 @@ export function render(file) {
 
 // Long-tail pages that exist only as static HTML (no React hydration).
 const simName = id => SIM_SERVICES.find(s => s.id === id).name;
+const hikariName = id => HIKARI_SERVICES.find(s => s.id === id).name;
+const cardName = id => CARD_SERVICES.find(s => s.id === id).name;
 export const STATIC_PAGES = [
   ...INFO_PAGES.map(page => ({ ...page, title: page.title + '｜Vivlica', og: 'default', crumbs: [['/', 'Vivlica'], [page.path, page.title]], element: () => <InfoPage page={page} /> })),
   ...SIM_PAIRS.map(pair => ({
@@ -49,6 +51,30 @@ export const STATIC_PAGES = [
     og: 'hikari',
     crumbs: [['/life/', '通信・お金の比較'], ['/hikari/', '光回線比較'], [page.path, page.title]],
     element: () => <HikariAreaPage area={page.area} env={import.meta.env} />,
+  })),
+  ...SIM_DETAIL_PAGES.map(page => ({
+    path: page.path,
+    title: `${simName(page.id)}の料金プラン【2026年11月】全プランの月額・通話・注意点｜Vivlica`,
+    description: `${simName(page.id)}の全料金プランを月額つきで掲載。回線・通話・店舗サポートの特徴と注意点を、公式確認の情報で整理しました。`,
+    og: 'sim',
+    crumbs: [['/life/', '通信・お金の比較'], ['/sim/', '格安SIM比較'], [page.path, simName(page.id)]],
+    element: () => <SimServicePage id={page.id} env={import.meta.env} />,
+  })),
+  ...HIKARI_DETAIL_PAGES.map(page => ({
+    path: page.path,
+    title: `${hikariName(page.id)}の料金・提供エリア【2026年11月】月額目安とセット割｜Vivlica`,
+    description: `${hikariName(page.id)}の戸建て・マンションの月額目安、提供エリア、スマホとのセット割、注意点を公式確認の情報で整理しました。`,
+    og: 'hikari',
+    crumbs: [['/life/', '通信・お金の比較'], ['/hikari/', '光回線比較'], [page.path, hikariName(page.id)]],
+    element: () => <HikariServicePage id={page.id} env={import.meta.env} />,
+  })),
+  ...CARD_DETAIL_PAGES.map(page => ({
+    path: page.path,
+    title: `${cardName(page.id)}の年会費・還元率・申込条件【2026年11月】｜Vivlica`,
+    description: `${cardName(page.id)}の年会費、基本還元率、申込条件などの詳細を公式確認の情報で整理しました。条件つきの上乗せ還元は含みません。`,
+    og: 'card',
+    crumbs: [['/life/', '通信・お金の比較'], ['/card/', 'クレジットカード比較'], [page.path, cardName(page.id)]],
+    element: () => <CardServicePage id={page.id} env={import.meta.env} />,
   })),
 ];
 
