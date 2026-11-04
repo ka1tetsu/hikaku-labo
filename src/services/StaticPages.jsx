@@ -82,6 +82,7 @@ export function SimPairPage({ a, b, env = {} }) {
           {row('出典', s => <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">公式情報 ↗</a>)}
         </tbody>
       </table></div>
+      <div className="sv-cta-row"><Cta service={A} env={env} placement="sim-vs" /><Cta service={B} env={env} placement="sim-vs" /></div>
     </section>
     <section className="sv-wrap sv-related">
       <h2>ほかの比較</h2>
@@ -102,6 +103,12 @@ export function HikariAreaPage({ area, env = {} }) {
     const mansion = rankHikari({ housing: 'mansion', carrier, area })[0];
     return { carrier, carrierLabel, house, mansion };
   });
+  const availableIds = new Set(available.map(s => s.id));
+  const candidates = [...new Map(picks.flatMap(p => [p.house.service, p.mansion.service])
+    .filter(s => availableIds.has(s.id)).map(s => [s.id, s])).values()];
+  const pickName = r => availableIds.has(r.service.id)
+    ? <a className="sv-service-link" href={`#service-${r.service.id}`}><b>{r.service.name}</b></a>
+    : <b>{r.service.name}</b>;
   return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/hikari/', '光回線比較'], [`/hikari/area/${area}/`, `${label}の光回線`]]}
     kicker="HOME INTERNET BY AREA" title={`${label}で選べる光回線｜スマホ別のおすすめとセット割`}
     lead={`${label}で申し込める主な光回線を、使っているスマホとのセット割と提供エリアから整理しました。`}>
@@ -110,14 +117,16 @@ export function HikariAreaPage({ area, env = {} }) {
       <div className="sv-table-scroll"><table className="sv-table">
         <thead><tr><th scope="col">使っているスマホ</th><th scope="col">戸建て</th><th scope="col">マンション</th></tr></thead>
         <tbody>{picks.map(p => <tr key={p.carrier}><th scope="row">{p.carrierLabel}</th>
-          <td><b>{p.house.service.name}</b><br /><small>{p.house.reasons.join('・')}</small></td>
-          <td><b>{p.mansion.service.name}</b><br /><small>{p.mansion.reasons.join('・')}</small></td></tr>)}</tbody>
+          <td>{pickName(p.house)}<br /><small>{p.house.reasons.join('・')}</small></td>
+          <td>{pickName(p.mansion)}<br /><small>{p.mansion.reasons.join('・')}</small></td></tr>)}</tbody>
       </table></div>
+      <p className="sv-note">候補の公式サイトで、住所・建物ごとの提供状況を確認できます。</p>
+      <div className="sv-cta-row">{candidates.map(s => <Cta key={s.id} service={s} env={env} placement="hikari-area-table" />)}</div>
       <p className="sv-note">セット割と提供エリア、標準プランの月額目安から出した結果です。実際に申し込めるかは住所・建物で変わるため、各社の公式サイトで提供状況を確認してください。</p>
     </section>
     <section className="sv-wrap sv-guide">
       <h2>{label}で申し込める主な光回線</h2>
-      <ul className="sv-area-list">{available.map(s => <li key={s.id}>
+      <ul className="sv-area-list">{available.map(s => <li key={s.id} id={`service-${s.id}`}>
         <strong>{s.name}</strong><span>{s.summary}</span>
         <small>戸建て：{s.house ? yen(s.house) + '（目安）' : '公式で確認'} ／ マンション：{s.mansion ? yen(s.mansion) + '（目安）' : '公式で確認'}</small>
         <small>セット割：{s.bundle.map(c => CARRIERS.find(([id]) => id === c)?.[1]).join('、')}</small>
