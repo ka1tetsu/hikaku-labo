@@ -69,6 +69,28 @@ test('comparison handoff validates each parameter against the selector enums', (
   assert.deepEqual(selectorAnswers(questions,'sim','?usage=<script>&support=other'), {usage:'3',support:'online'});
 });
 
+test('hikari selector defaults are neutral: carrier falls back to none, not the first carrier', () => {
+  // Mirrors the hikari questions in ServicesPage.jsx (ids and option order).
+  const questions = [
+    {id:'housing',options:[['house','戸建て'],['mansion','マンション・アパート']]},
+    {id:'carrier',options:[['docomo','ドコモ・ahamo'],['au','au・UQモバイル'],['softbank','ソフトバンク・ワイモバイル'],['rakuten','楽天モバイル'],['none','その他・格安SIM']]},
+    {id:'area',options:[['hokkaido','北海道'],['tohoku','東北'],['kanto','関東'],['hokuriku','北陸・甲信越'],['tokai','東海'],['kansai','関西'],['chugoku','中国'],['shikoku','四国'],['kyushu','九州'],['okinawa','沖縄']]},
+  ];
+  // No URL params: housing stays first option, area keeps its 関東 special case,
+  // and carrier must be 'none' so the initial ranking presumes no carrier bundle.
+  assert.deepEqual(selectorAnswers(questions,'hikari',''), {housing:'house',carrier:'none',area:'kanto'});
+  // An explicit carrier in the URL still wins over the neutral fallback.
+  assert.deepEqual(selectorAnswers(questions,'hikari','?carrier=au'), {housing:'house',carrier:'au',area:'kanto'});
+  // An unknown carrier value falls back to neutral 'none', never to 'docomo'.
+  assert.deepEqual(selectorAnswers(questions,'hikari','?carrier=bogus'), {housing:'house',carrier:'none',area:'kanto'});
+  // The special case is hikari-only: a sim question also named 'carrier' keeps
+  // the plain first-option fallback.
+  const simQuestions = [{id:'carrier',options:[['none','なし・わからない'],['au','au系'],['softbank','ソフトバンク系']]}];
+  assert.deepEqual(selectorAnswers(simQuestions,'sim',''), {carrier:'none'});
+  const simQuestionsDocomoFirst = [{id:'carrier',options:[['docomo','ドコモ'],['none','なし']]}];
+  assert.deepEqual(selectorAnswers(simQuestionsDocomoFirst,'sim',''), {carrier:'docomo'});
+});
+
 test('page attribution and funnel schema reject identifiers and financial inputs', () => {
   assert.equal(pageId('/compare/'),'compare');
   assert.equal(pageId('/hikari/area/kansai/'),'hikari-area-kansai');
