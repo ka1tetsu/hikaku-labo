@@ -302,7 +302,7 @@ export default function App() {
           )}
         </div>
 
-        {hasSearched && <ProductSearchLinks keyword={query || activeCategory?.label || ''} />}
+        {hasSearched && !error && <ProductSearchLinks keyword={query || activeCategory?.label || ''} />}
 
         {!loading && products.length > 0 && <section className="hl-catalog-filter-panel" aria-label="商品結果の絞り込み">
           <div className="hl-catalog-filter-heading">
@@ -347,7 +347,8 @@ export default function App() {
           <div className="error-box">
             <strong>今回、公式APIの商品情報を取得できませんでした。</strong>
             <p>楽天が停止していてもYahoo!の出品を表示できるように修正しました。両方取得できない場合は下のGoogle検索またはショップの検索結果で探せます。</p>
-            <a href={'https://www.google.com/search?q='+encodeURIComponent((query||activeCategory?.label||'商品')+' 価格 比較')} target="_blank" rel="noopener noreferrer">Googleでショップを横断検索 ↗</a>
+            <ProductSearchLinks keyword={query || activeCategory?.label || ''} />
+            <a href={'https://www.google.com/search?q='+encodeURIComponent((query||activeCategory?.label||'商品')+' 価格 比較')} target="_blank" rel="noopener noreferrer" onClick={() => recordOutboundClick({ section: 'products', merchant: 'google', placement: 'search-fallback', sponsored: false })}>Googleでショップを横断検索 ↗</a>
             <a href={'/compare/?q='+encodeURIComponent(query||activeCategory?.label||'')} >商品価格比較ページで探す →</a>
             <button type="button" className="page-btn" onClick={() => doSearch(query || activeCategory?.label || 'おすすめ 人気', activeCategory?.genreId || '', page, smart?.options || {})}>もう一度読み込む</button>
           </div>

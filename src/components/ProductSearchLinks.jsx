@@ -15,8 +15,10 @@ export default function ProductSearchLinks({ keyword }) {
     <p>商品データの取得を待たずに検索できます。価格・送料・在庫は各ショップで確認してください。</p>
     <div>{links.map(([merchant, label, href]) => <a key={merchant} href={href} target="_blank" rel="sponsored noopener noreferrer"
       onClick={() => recordOutboundClick({ section: 'products', merchant, placement: 'search-direct', sponsored: true })}>{label} ↗ <small>PR</small></a>)}
-      <a href={google} target="_blank" rel="noopener noreferrer">Googleで他の販売サイトも探す ↗</a>
-      <a href={googleYahoo} target="_blank" rel="noopener noreferrer">GoogleでYahoo!掲載商品を絞り込む ↗</a>
+      <a href={google} target="_blank" rel="noopener noreferrer"
+      onClick={() => recordOutboundClick({ section: 'products', merchant: 'google', placement: 'search-fallback', sponsored: false })}>Googleで他の販売サイトも探す ↗</a>
+      <a href={googleYahoo} target="_blank" rel="noopener noreferrer"
+      onClick={() => recordOutboundClick({ section: 'products', merchant: 'google', placement: 'search-fallback', sponsored: false })}>GoogleでYahoo!掲載商品を絞り込む ↗</a>
     </div>
   </section>;
 }
