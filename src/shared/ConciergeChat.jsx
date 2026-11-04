@@ -94,6 +94,7 @@ function AssistantMessage({ message, onSend, onAction }) {
       </div>}
       {message.productQuery && <ProductPicks query={message.productQuery} />}
       {message.toolCards && <ToolPicks cards={message.toolCards} selectorUrl={message.selectorUrl} />}
+      {message.domain === 'life' && message.selectorUrl && <button type="button" className="hcx-wide" onClick={() => onAction({ type: 'life', url: message.selectorUrl })}>比較ページで詳しく比べる →</button>}
       {message.action?.type === 'planner' && <button type="button" className="hcx-wide" onClick={() => onAction(message.action)}>予算シミュレーターを開く →</button>}
       {message.chips?.length > 0 && <div className="hcx-chips">{message.chips.map(chip => <button type="button" key={chip} onClick={() => onSend(chip)}>{chip}</button>)}</div>}
     </div>
