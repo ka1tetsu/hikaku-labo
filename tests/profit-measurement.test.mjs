@@ -19,6 +19,7 @@ test('every accepted funnel action survives reporting, including all shopping mi
   assert.equal(report.includedRecords, events.length);
   const row = report.pages.find(r => r.page === 'compare');
   for (const key of ['productSearches', 'productResultsReady', 'productOffersSelected', 'productTargetsSaved', 'productManualReady']) assert.equal(row[key], 1);
+  assert.equal(report.pages.find(r => r.page === 'home').decisionBarShown, 1);
   assert.equal(report.financials, null);
   assert.ok(report.nextActions.some(r => r.action === 'connect_settlement_totals'));
 });

@@ -13,7 +13,7 @@ document.addEventListener('click', event => {
   const internalLink = event.target.closest('a[href]');
   if (internalLink && pageId(window.location.pathname)?.startsWith('guide-')) {
     const target = new URL(internalLink.href, window.location.href);
-    if (target.origin === window.location.origin && ['/travel/', '/tools/', '/sim/', '/hikari/', '/compare/'].includes(target.pathname)) recordFunnelEvent('guide_compare');
+    if (target.origin === window.location.origin && ['/travel/', '/tools/', '/sim/', '/hikari/', '/card/', '/compare/'].includes(target.pathname)) recordFunnelEvent('guide_compare');
   }
   const link = event.target.closest('a[data-track="outbound"]');
   if (link) recordOutboundClick({ section: link.dataset.section, merchant: link.dataset.merchant, placement: link.dataset.placement, sponsored: link.dataset.sponsored === 'true' });
