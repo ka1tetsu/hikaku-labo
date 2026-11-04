@@ -15,7 +15,6 @@ export default function SavingsPlanner() {
   const [switchingCost, setSwitchingCost] = useState('0');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const destination = result ? serviceLink(result.service, import.meta.env) : null;
   function submit(event) {
     event.preventDefault();
     const estimate = savingsEstimate({ current, lines, usage, support, switchingCost });
@@ -43,13 +42,22 @@ export default function SavingsPlanner() {
       </form>
       {error && <p role="alert">{error}</p>}
       <div aria-live="polite" aria-atomic="true">{result && <div className="vl-savings-result">
-        <span>入力条件に合う掲載プランのうち、基本料金が最も安い候補</span>
+        <span>入力条件に合う掲載プランのうち、基本料金が安い順に最大3件の候補</span>
         <h3>{result.service.name}<small>1回線 月額 {yen(result.target)}</small></h3>
         <p>{result.firstYear > 0 ? '初年度の支出が' : result.firstYear < 0 ? '初年度の支出は' : '初年度の差額は'} <strong>{yen(result.firstYear)}</strong> {result.firstYear > 0 ? '少なくなる計算です' : result.firstYear < 0 ? '増える計算です' : 'です'}</p>
         <small>{result.lines}回線・毎月の基本料金差 {result.monthly < 0 ? '増加 ' : ''}{yen(result.monthly)} × 12か月 − 一時費用 {yen(result.switchingCost)}{result.paybackMonths !== null && result.switchingCost > 0 ? `。費用回収の目安 ${result.paybackMonths}か月` : ''}</small>
-        {result.firstYear > 0 && <a className="vl-primary vl-savings-official" href={destination.url} target="_blank" rel={destination.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'life', merchant: result.service.id, placement: 'savings-result', sponsored: destination.sponsored })}>{result.service.name}の料金・条件を確認 ↗{destination.sponsored && <small>PR</small>}</a>}
+        <ul className="vl-savings-candidates">
+          {result.candidates.map((candidate, index) => {
+            const link = serviceLink(candidate.service, import.meta.env);
+            return <li key={candidate.service.id} className="vl-savings-candidate">
+              <div className="vl-savings-candidate-head"><strong>{candidate.service.name}</strong><span>1回線 月額 {yen(candidate.target)}</span></div>
+              <p>{candidate.firstYear > 0 ? '初年度の支出が' : candidate.firstYear < 0 ? '初年度の支出は' : '初年度の差額は'} <b>{yen(candidate.firstYear)}</b> {candidate.firstYear > 0 ? '少なくなる計算です' : candidate.firstYear < 0 ? '増える計算です' : 'です'}<small>{result.lines}回線・毎月の基本料金差 {candidate.monthly < 0 ? '増加 ' : ''}{yen(candidate.monthly)} × 12か月 − 一時費用 {yen(result.switchingCost)}</small></p>
+              <a className={index === 0 && candidate.firstYear > 0 ? 'vl-primary vl-savings-official' : 'vl-savings-official vl-savings-official-alt'} href={link.url} target="_blank" rel={link.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'} onClick={() => recordOutboundClick({ section: 'life', merchant: candidate.service.id, placement: 'savings-result', sponsored: link.sponsored })}>{candidate.service.name}の料金・条件を確認 ↗{link.sponsored && <small>PR</small>}</a>
+              <a href={candidate.service.sourceUrl} target="_blank" rel="noopener noreferrer">計算に使った料金の出典（公式） ↗</a>
+            </li>;
+          })}
+        </ul>
         <a className={result.firstYear > 0 ? 'vl-savings-compare' : 'vl-primary'} href={result.comparisonUrl} onClick={() => recordFunnelEvent('savings_compare')}>この使い方で各社を比較する →</a>
-        <a href={result.service.sourceUrl} target="_blank" rel="noopener noreferrer">計算に使った料金の出典（公式） ↗</a>
       </div>}</div>
       <p className="vl-savings-note">税込・割引前の掲載基本料金による試算です。通話料・端末代・家族割・セット割・通信品質は含みません。各回線が同じ料金と使い方の場合の計算です。初期費用は入力した金額だけを反映します。削減額を保証するものではありません。</p>
     </div>

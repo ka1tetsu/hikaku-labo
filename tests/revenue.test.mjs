@@ -33,6 +33,36 @@ test('savings never recommends a plan lacking required data or store support', (
   for (const options of [{current:''}, {current:Infinity}, {current:-1}, {current:3.5}, {current:1000001}, {current:null}, {current:6000,lines:0}, {current:6000,lines:7}, {current:6000,usage:'bad'}, {current:6000,switchingCost:-1}]) assert.equal(savingsEstimate(options),null);
 });
 
+test('savings returns the top three candidates in price order only', () => {
+  const result = savingsEstimate({ current: 6000, lines: 2, usage: '10', switchingCost: 6000 });
+  assert.equal(result.candidates.length, 3);
+  // Price order only: none of the three carries a configured referral link,
+  // while Rakuten Mobile — which does — stays outside the top three at ¥2,178.
+  assert.deepEqual(result.candidates.map(c => c.service.id), ['nihontsushin', 'iijmio', 'mineo']);
+  assert.ok(!result.candidates.some(c => c.service.id === 'rakuten-mobile'));
+  assert.deepEqual(result.candidates.map(c => c.target), [1390, 1400, 1958]);
+  // The top-level fields still describe the cheapest candidate.
+  assert.equal(result.candidates[0].service, result.service);
+  assert.equal(result.candidates[0].target, result.target);
+  assert.equal(result.candidates[0].monthly, result.monthly);
+  assert.equal(result.candidates[0].firstYear, result.firstYear);
+  // Each candidate carries its own monthly difference and annual difference.
+  assert.equal(result.candidates[1].monthly, 9200);
+  assert.equal(result.candidates[1].firstYear, 104400);
+  assert.equal(result.candidates[2].monthly, 8084);
+  assert.equal(result.candidates[2].firstYear, 91008);
+  // Candidates remain available when no listed plan beats the current price.
+  const loss = savingsEstimate({ current: 500, usage: '10' });
+  assert.equal(loss.candidates.length, 3);
+  assert.deepEqual(loss.candidates.map(c => c.target), [1390, 1400, 1958]);
+  assert.ok(loss.candidates.every(c => c.firstYear < 0));
+  // The store-support filter applies to every candidate, not just the first.
+  const store = savingsEstimate({ current: '6000', usage: '30', support: 'store' });
+  assert.equal(store.candidates.length, 3);
+  assert.ok(store.candidates.every(c => c.service.store));
+  assert.deepEqual(store.candidates.map(c => c.target), [2178, 3278, 3828]);
+});
+
 test('comparison handoff validates each parameter against the selector enums', () => {
   const questions = [{id:'usage',options:[['3','3GB'],['10','10GB']]},{id:'support',options:[['online','online'],['store','store']]}];
   assert.deepEqual(selectorAnswers(questions,'sim','?usage=10&support=store'), {usage:'10',support:'store'});
