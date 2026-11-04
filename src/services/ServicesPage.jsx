@@ -7,7 +7,7 @@ import { recordOutboundClick } from '../shared/outboundClient.js';
 import { CHECKED_AT, HOKEN_SERVICES } from './catalog.js';
 import { rankCards, rankHikari, rankSim, sortByMonthlyPrice, sortCardsByFee, sortCardsByRate } from './score.js';
 import { serviceLink } from './affiliate.js';
-import { AREA_PAGES, SIM_PAIRS } from './pages.js';
+import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS } from './pages.js';
 import SavingsPlanner from './SavingsPlanner.jsx';
 import { selectorAnswers } from './selectorState.js';
 import { recordFunnelEvent } from '../shared/outboundClient.js';
@@ -66,6 +66,12 @@ const CATEGORY_PAGES = {
   },
 };
 
+// Per-service detail pages (K1). Services without a detail page (料金が未確認の
+// eo光・コミュファ光) simply get no link here.
+const DETAIL_PAGES = { sim: SIM_DETAIL_PAGES, hikari: HIKARI_DETAIL_PAGES, card: CARD_DETAIL_PAGES };
+const DETAIL_LABELS = { sim: '全プランと注意点', hikari: '料金目安と提供エリア', card: '申込条件などの詳細' };
+const detailPath = (category, id) => (DETAIL_PAGES[category] || []).find(p => p.id === id)?.path;
+
 function ServiceLink({ service, placement, label = '公式サイトで確認' }) {
   const link = serviceLink(service, ENV);
   return <a className="sv-cta" href={link.url} target="_blank" rel={link.sponsored ? 'sponsored noopener' : 'noopener noreferrer'}
@@ -116,6 +122,7 @@ function Selector({ category }) {
             <div className="sv-price"><b>{config.priceLabel(row)}</b><span>適合度 {row.score}</span></div>
           </div>
           <p className="sv-summary">{row.service.summary}</p>
+          {detailPath(category, row.service.id) && <p className="sv-detail"><a href={detailPath(category, row.service.id)}>{row.service.name}の詳細（{DETAIL_LABELS[category]}）を見る →</a></p>}
           <div className="sv-cols">
             <ul className="sv-good">{[...row.reasons, ...(row.service.facts || [])].slice(0, 4).map(text => <li key={text}>{text}</li>)}</ul>
             <ul className="sv-caution">{row.cautions.slice(0, 3).map(text => <li key={text}>{text}</li>)}</ul>
@@ -141,7 +148,8 @@ const RELATED = {
 function Related({ category }) {
   const list = [...(RELATED[category] || []), ['/compare/', '日用品・家電は全ショップで最安比較', '楽天・Yahoo!の実売価格を同じ商品で比較']];
   const deep = category === 'sim' ? ['2社を比べる', SIM_PAIRS.map(p => [p.path, p.title])]
-    : category === 'hikari' ? ['地域別に見る', AREA_PAGES.map(p => [p.path, p.title])] : null;
+    : category === 'hikari' ? ['地域別に見る', AREA_PAGES.map(p => [p.path, p.title])]
+    : category === 'card' ? ['各カードの詳細', CARD_DETAIL_PAGES.map(p => [p.path, p.title])] : null;
   return <section className="sv-wrap sv-related" aria-label="あわせて見直す">
     {deep && <><h2>{deep[0]}</h2><div className="sv-link-list">{deep[1].map(([href, title]) => <a key={href} href={href}>{title}</a>)}</div><br /></>}
     <h2>あわせて見直す</h2>

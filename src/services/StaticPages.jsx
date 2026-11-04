@@ -2,10 +2,10 @@ import SiteFooter from '../shared/SiteFooter.jsx';
 // Server-rendered long-tail pages (no hydration). Interactive bits — the concierge,
 // the header "AIに相談" button and click tracking — come from conciergeMount.jsx.
 import SiteHeader from '../shared/SiteHeader.jsx';
-import { CHECKED_AT, HIKARI_SERVICES, SIM_SERVICES } from './catalog.js';
+import { CARD_SERVICES, CHECKED_AT, HIKARI_SERVICES, SIM_SERVICES } from './catalog.js';
 import { rankHikari, simPlanFor } from './score.js';
 import { serviceLink } from './affiliate.js';
-import { AREA_PAGES, SIM_PAIRS, areaLabel } from './pages.js';
+import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS, areaLabel } from './pages.js';
 
 const yen = n => n.toLocaleString('ja-JP') + '円';
 const USAGES = [['3', '〜3GB'], ['10', '〜10GB'], ['30', '〜30GB'], ['unlimited', '無制限・大容量']];
@@ -138,6 +138,133 @@ export function HikariAreaPage({ area, env = {} }) {
       <h2>ほかの地域・比較</h2>
       <div><a href="/hikari/"><strong>条件を入れて光回線を比べる →</strong><span>住まい・地域・スマホから順位を出す無料ツール</span></a>
         {AREA_PAGES.filter(p => p.area !== area).map(p => <a key={p.area} href={p.path}><strong>{p.title} →</strong><span>スマホ別のおすすめとセット割</span></a>)}</div>
+    </section>
+  </Shell>;
+}
+
+// Per-service detail pages (K1). Content is limited to what the catalog entry
+// itself carries (plan tables, facts, cautions, details, sources) — nothing is
+// added beyond the checked catalog data.
+export function SimServicePage({ id, env = {} }) {
+  const s = SIM_SERVICES.find(x => x.id === id);
+  const pairs = SIM_PAIRS.filter(p => p.a === id || p.b === id);
+  const others = SIM_DETAIL_PAGES.filter(p => p.id !== id);
+  return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/sim/', '格安SIM比較'], [`/sim/${id}/`, s.name]]}
+    kicker="MOBILE PLAN" title={`${s.name}の料金プラン・特徴・注意点`}
+    lead={s.summary}>
+    <section className="sv-wrap sv-guide">
+      <h2>{s.name}の料金プラン（全プラン）</h2>
+      <div className="sv-table-scroll"><table className="sv-table">
+        <thead><tr><th scope="col">プラン</th><th scope="col">月額（税込）</th></tr></thead>
+        <tbody>{s.plans.map(p => <tr key={p.gb + '-' + p.price}><th scope="row">{p.label || (Number.isFinite(p.gb) ? p.gb + 'GB' : '無制限')}</th><td>{yen(p.price)}</td></tr>)}</tbody>
+      </table></div>
+      <p className="sv-note">税込・割引前の基本料金です（通話料・オプション・端末代は含みません）。キャンペーン・割引は条件つきで、内容は変わることがあります。最新の条件は公式サイトで確認してください。</p>
+      <div className="sv-cta-row"><Cta service={s} env={env} placement="sim-detail" /></div>
+    </section>
+    <section className="sv-wrap sv-guide">
+      <h2>基本情報と特徴</h2>
+      <div className="sv-table-scroll"><table className="sv-table">
+        <tbody>
+          <tr><th scope="row">回線</th><td>{s.networkLabel}</td></tr>
+          <tr><th scope="row">店舗サポート</th><td>{s.store ? 'あり' : 'なし（オンライン中心）'}</td></tr>
+          <tr><th scope="row">通話</th><td>{CALLS[s.calls]}</td></tr>
+          <tr><th scope="row">特徴</th><td><ul>{s.facts.map(f => <li key={f}>{f}</li>)}</ul></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section className="sv-wrap sv-guide">
+      <h2>注意点</h2>
+      <ul>{s.cautions.map(c => <li key={c}>{c}</li>)}</ul>
+      <p className="sv-note">出典：<a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">公式情報 ↗</a>（確認日はページ上部に記載）</p>
+    </section>
+    <section className="sv-wrap sv-related">
+      <h2>条件で比べる・2社比較</h2>
+      <div><a href="/sim/"><strong>条件を入れて主要9社で比べる →</strong><span>データ量・通話・サポートから順位を出す無料ツール</span></a>
+        {pairs.map(p => <a key={p.slug} href={p.path}><strong>{p.title} →</strong><span>料金・通話・サポートの違い</span></a>)}</div>
+      <h2>ほかの格安SIMの料金・プラン</h2>
+      <div className="sv-link-list">{others.map(p => <a key={p.id} href={p.path}>{p.title}</a>)}</div>
+    </section>
+  </Shell>;
+}
+
+export function HikariServicePage({ id, env = {} }) {
+  const s = HIKARI_SERVICES.find(x => x.id === id);
+  const areaPages = AREA_PAGES.filter(p => s.areas === 'all' || s.areas.includes(p.area));
+  const others = HIKARI_DETAIL_PAGES.filter(p => p.id !== id);
+  const price = v => (v ? yen(v) + '（目安）' : '公式で確認');
+  return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/hikari/', '光回線比較'], [`/hikari/${id}/`, s.name]]}
+    kicker="HOME INTERNET" title={`${s.name}の料金・提供エリア・セット割`}
+    lead={s.summary}>
+    <section className="sv-wrap sv-guide">
+      <h2>{s.name}の月額料金（目安）</h2>
+      <div className="sv-table-scroll"><table className="sv-table">
+        <thead><tr><th scope="col">住まい</th><th scope="col">月額（税込・目安）</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">戸建て</th><td>{price(s.house)}</td></tr>
+          <tr><th scope="row">マンション</th><td>{price(s.mansion)}</td></tr>
+        </tbody>
+      </table></div>
+      <p className="sv-note">標準プランの月額目安（税込）です。キャッシュバック等の実質額は扱っていません。キャンペーン・割引は条件つきで、工事費・契約期間でも負担は変わります。申込前に公式の条件を確認してください。</p>
+      <div className="sv-cta-row"><Cta service={s} env={env} placement="hikari-detail" /></div>
+    </section>
+    <section className="sv-wrap sv-guide">
+      <h2>提供エリアとセット割</h2>
+      <div className="sv-table-scroll"><table className="sv-table">
+        <tbody>
+          <tr><th scope="row">提供エリア</th><td>{s.areas === 'all' ? '全国（フレッツ光エリア）' : s.areas.map(a => areaLabel(a)).join('・')}</td></tr>
+          <tr><th scope="row">セット割の対象スマホ</th><td>{s.bundle.map(c => CARRIERS.find(([cid]) => cid === c)?.[1]).join('、')}</td></tr>
+          <tr><th scope="row">特徴</th><td><ul>{s.facts.map(f => <li key={f}>{f}</li>)}</ul></td></tr>
+        </tbody>
+      </table></div>
+      <p className="sv-note">実際に申し込めるかは住所・建物で変わります。公式サイトで提供状況を確認してください。</p>
+    </section>
+    <section className="sv-wrap sv-guide">
+      <h2>注意点</h2>
+      <ul>{s.cautions.map(c => <li key={c}>{c}</li>)}</ul>
+      <p className="sv-note">出典：<a href={s.officialUrl} target="_blank" rel="noopener noreferrer">公式サイト ↗</a>（確認日はページ上部に記載）</p>
+    </section>
+    <section className="sv-wrap sv-related">
+      <h2>地域別に見る・ほかの光回線</h2>
+      <div><a href="/hikari/"><strong>条件を入れて光回線を比べる →</strong><span>住まい・地域・スマホから順位を出す無料ツール</span></a>
+        {areaPages.map(p => <a key={p.area} href={p.path}><strong>{p.title} →</strong><span>スマホ別のおすすめとセット割</span></a>)}
+        {others.map(p => <a key={p.id} href={p.path}><strong>{p.title} →</strong><span>月額目安と提供エリア</span></a>)}</div>
+    </section>
+  </Shell>;
+}
+
+export function CardServicePage({ id, env = {} }) {
+  const s = CARD_SERVICES.find(x => x.id === id);
+  const others = CARD_DETAIL_PAGES.filter(p => p.id !== id);
+  return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/card/', 'クレジットカード比較'], [`/card/${id}/`, s.name]]}
+    kicker="CREDIT CARD" title={`${s.name}の年会費・還元率・申込条件`}
+    lead={s.summary}>
+    <section className="sv-wrap sv-guide">
+      <h2>{s.name}の基本情報</h2>
+      <div className="sv-table-scroll"><table className="sv-table">
+        <tbody>
+          <tr><th scope="row">年会費</th><td>{s.fee}</td></tr>
+          <tr><th scope="row">基本還元率</th><td>{s.rate.toFixed(1)}%</td></tr>
+          <tr><th scope="row">特徴</th><td><ul>{s.facts.map(f => <li key={f}>{f}</li>)}</ul></td></tr>
+        </tbody>
+      </table></div>
+      <p className="sv-note">還元率は通常利用時の基本値です。キャンペーンや「最大◯%」の上乗せ還元は条件つきのため含んでいません。条件は各社の公式サイトで確認してください。</p>
+      <div className="sv-cta-row"><Cta service={s} env={env} placement="card-detail" /></div>
+    </section>
+    {s.details && <section className="sv-wrap sv-guide">
+      <h2>申込条件・詳細</h2>
+      <div className="sv-table-scroll"><table className="sv-table">
+        <tbody>{s.details.map(([label, value]) => <tr key={label}><th scope="row">{label}</th><td>{value}</td></tr>)}</tbody>
+      </table></div>
+    </section>}
+    <section className="sv-wrap sv-guide">
+      <h2>注意点</h2>
+      <ul>{s.cautions.map(c => <li key={c}>{c}</li>)}</ul>
+      <p className="sv-note">出典：<a href={s.sourceUrl || s.officialUrl} target="_blank" rel="noopener noreferrer">公式情報 ↗</a>（確認日はページ上部に記載）</p>
+    </section>
+    <section className="sv-wrap sv-related">
+      <h2>条件で比べる・ほかのカード</h2>
+      <div><a href="/card/"><strong>条件を入れてカードを比べる →</strong><span>よく使うサービス・年齢・重視することから順位を出す無料ツール</span></a>
+        {others.map(p => <a key={p.id} href={p.path}><strong>{p.title} →</strong><span>年会費・基本還元率・申込条件</span></a>)}</div>
     </section>
   </Shell>;
 }

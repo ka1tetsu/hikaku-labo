@@ -56,6 +56,8 @@ body{margin:0}
 .sv-price b{font:900 17px 'Noto Sans JP',sans-serif;color:#b8341b;white-space:nowrap}
 .sv-price span{font-size:11px;color:#2a7088;font-weight:800}
 .sv-summary{font-size:13px;color:#3d5868;margin:8px 0}
+.sv-detail{margin:0 0 8px}
+.sv-detail a{font-size:13px;font-weight:800;color:#1d6b8a;text-decoration:underline;text-underline-offset:2px}
 .sv-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sv-cols ul{margin:0;padding-left:18px;font-size:12px;line-height:1.75}
 .sv-good{color:#245a3e}.sv-caution{color:#7a4a12}
