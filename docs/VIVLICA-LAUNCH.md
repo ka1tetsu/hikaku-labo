@@ -99,6 +99,19 @@ npm run report:revenue -- /tmp/vivlica-logs.ndjson \
 
 2026-11-04 の Fix 5（guide_compare への `/card/` 追加、DecisionBar 表示イベント `decision_bar_shown` の追加）では計測項目の追加のみを行い、永続化のコード変更は含めていません。
 
+## 料金カタログの月次確認（鮮度運用）
+
+対象は `src/services/catalog.js`（SIM_SERVICES / HIKARI_SERVICES / CARD_SERVICES）の料金・還元率・年会費と、ページ上部に出る全体の確認日 `CHECKED_AT` です。料金の鮮度は比較の信頼そのものなので、月次で次の手順を定型作業として回します。
+
+1. 月初に、各サービスの出典（`sourceUrl`、光回線は `officialUrl`）の公式料金ページと公式発表を確認し、掲載値と差分がないかを見る。
+2. 変更があったサービスは、公式で確認できた新しい値だけを反映する。情報源どうしで値が食い違う場合は、推測で埋めず既存ルールどおり `price: null`（光は `house` / `mansion` を null）にして「公式で確認」に倒す。
+3. 確認したら、全体の `CHECKED_AT` を確認日に更新する。エントリ個別の `checkedAt` / `sourceUrl` があるサービスはそちらも同時に更新する。
+4. 注意書きに新しい日付つきの改定・見直し予告があれば、その日付を `priceRevisionFrom`（'YYYY-MM-DD'）に登録する。日付は注意書きに明記されているものだけを使い、推測で入れない。
+5. `priceRevisionFrom` が付いたサービスは、改定日までに必ず公式確認を行う。確認できたら新しい値に差し替え、`priceRevisionFrom` と古い予告の注意書きを外す。
+6. 変更はPRにし、`npm run test:all`、`npm run lint`、`npm run build`、`npm run verify:build` を通してから公開する。
+
+改定日を過ぎても確認が終わっていないサービスは、`src/services/freshness.js` の判定で表示・ランキング側が自動的に価格を未確認扱い（「公式で確認」）に落とすため、古い料金がそのまま出続けることはありません。ただし未確認のまま放置すると比較の質が落ちるので、改定日の前倒し確認を優先してください。改定後の料金は、公式で確認が取れるまで絶対に先回りして書かないこと。
+
 ## 検証範囲
 
 自動テスト、lint、ビルドと生成60ページのリンク・メタデータ検査、ブラウザでの家族分試算・支出増の表示・条件引継ぎ・モバイル表示を確認。

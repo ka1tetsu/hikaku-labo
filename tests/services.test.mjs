@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CARD_SERVICES, HIKARI_SERVICES, HOKEN_SERVICES, SIM_SERVICES, SERVICE_IDS, CHECKED_AT } from '../src/services/catalog.js';
 import { rankCards, rankHikari, rankSim, simPlanFor, sortByMonthlyPrice, sortCardsByFee, sortCardsByRate, cardFeeAmount } from '../src/services/score.js';
+import { priceRecheckRequired, detailValue } from '../src/services/freshness.js';
 import { affiliateEnvKey, serviceLink } from '../src/services/affiliate.js';
 import { validOutboundEvent, validFunnelEvent } from '../src/shared/outboundSchema.js';
 
@@ -81,10 +82,11 @@ test('cards expose verified application details and GOLD U stays a separate paid
   assert.equal(goldU.rate, 1.0);
   assert.ok(goldU.sourceUrl.startsWith('https://dcard.docomo.ne.jp/'));
   // 既存カードの相対順位は変えない（デフォルト条件での従来の並びを GOLD U を除いて維持）
-  const order = rankCards({}).map(r => r.service.id).filter(id => id !== 'd-card-gold-u');
+  // 日付は K4 の改定予告（2026-12-01）より前に固定する。以後の並びは K4 テストで検証する
+  const order = rankCards({}, '2026-11-04').map(r => r.service.id).filter(id => id !== 'd-card-gold-u');
   assert.deepEqual(order, ['recruit-card', 'aupay-card', 'd-card', 'jcb-w', 'paypay-card', 'rakuten-card', 'smbc-nl']);
   // 40歳以上では申込対象外として大きく減点される
-  assert.ok(rankCards({ age: 'o40' }).find(r => r.service.id === 'd-card-gold-u').score < 30);
+  assert.ok(rankCards({ age: 'o40' }, '2026-11-04').find(r => r.service.id === 'd-card-gold-u').score < 30);
 });
 
 test('display sorts are mechanical keys and never use fit scores (K2)', () => {
@@ -104,14 +106,15 @@ test('display sorts are mechanical keys and never use fit scores (K2)', () => {
   assert.deepEqual(sortCardsByFee(rows).map(r => r.service.name), ['A社', 'B社', 'C社']);
   assert.deepEqual(sortCardsByRate(rows).map(r => r.service.name), ['A社', 'C社', 'B社']);
   // 実カタログ：還元率順は全行で降順になり1位は最高還元率、年会費順の末尾は唯一の有料カード
-  const ranked = rankCards({});
-  const byRate = sortCardsByRate(ranked);
+  // 日付は K4 の改定予告（2026-12-01）より前に固定する
+  const ranked = rankCards({}, '2026-11-04');
+  const byRate = sortCardsByRate(ranked, '2026-11-04');
   assert.ok(byRate.every((r, i) => i === 0 || byRate[i - 1].service.rate >= r.service.rate));
   assert.equal(byRate[0].service.id, 'recruit-card');
   assert.equal(byRate.at(-1).service.id, 'smbc-nl');
-  assert.equal(sortCardsByFee(ranked).at(-1).service.id, 'd-card-gold-u');
+  assert.equal(sortCardsByFee(ranked, '2026-11-04').at(-1).service.id, 'd-card-gold-u');
   // SIM：価格順は選択データ量に合うプラン月額の昇順（合うプランのないサービスは月額なしで末尾）
-  const simByPrice = sortByMonthlyPrice(rankSim({ usage: 'unlimited' }));
+  const simByPrice = sortByMonthlyPrice(rankSim({ usage: 'unlimited' }, '2026-11-04'));
   const priced = simByPrice.filter(r => r.monthly !== null);
   assert.ok(priced.every((r, i) => i === 0 || priced[i - 1].monthly <= r.monthly));
   assert.equal(simByPrice.at(-1).monthly, null);
@@ -182,6 +185,86 @@ test('per-service detail pages cover only services with enough catalog facts (K1
   assert.equal(pageId('/hikari/au-hikari/'), 'hikari-service-au-hikari');
   assert.equal(pageId('/card/rakuten-card/'), 'card-service-rakuten-card');
   assert.equal(pageId('/hikari/eo-hikari/'), null);
+});
+
+test('catalog freshness flips revised prices to unconfirmed after the announced date (K4)', () => {
+  const BEFORE = '2026-11-30'; // 改定日の前日
+  const ON = '2026-12-01'; // 改定日
+  const TODAY = '2026-11-04'; // K4 導入時点の現在日付
+  const ahamo = SIM_SERVICES.find(s => s.id === 'ahamo');
+  const softbankHikari = HIKARI_SERVICES.find(s => s.id === 'softbank-hikari');
+  const dCard = CARD_SERVICES.find(s => s.id === 'd-card');
+  const goldU = CARD_SERVICES.find(s => s.id === 'd-card-gold-u');
+
+  // priceRevisionFrom は、注意書きに日付つきの改定・見直し予告が明記されている4サービスだけに付く
+  const flagged = [...SIM_SERVICES, ...HIKARI_SERVICES, ...CARD_SERVICES].filter(s => s.priceRevisionFrom);
+  assert.deepEqual(flagged.map(s => s.id).sort(), ['ahamo', 'd-card', 'd-card-gold-u', 'softbank-hikari']);
+  assert.ok(flagged.every(s => s.priceRevisionFrom === '2026-12-01'));
+  // 根拠は各サービスの注意書きの日付表記そのもの（推測で入れた日付ではないこと）
+  assert.ok(ahamo.cautions.some(c => c.includes('2026年12月1日')));
+  assert.ok(softbankHikari.cautions.some(c => c.includes('2026年12月利用分から')));
+  for (const card of [dCard, goldU]) assert.ok(card.cautions.some(c => c.includes('2026年12月以降')));
+
+  // 境界：前日までは要再確認にならず、改定日当日から要再確認になる
+  for (const s of flagged) {
+    assert.equal(priceRecheckRequired(s, BEFORE), false, s.id);
+    assert.equal(priceRecheckRequired(s, ON), true, s.id);
+    assert.equal(priceRecheckRequired(s, '2027-01-15'), true, s.id);
+  }
+  // 予告のないサービスは将来の日付でも要再確認にならない
+  assert.equal(priceRecheckRequired(SIM_SERVICES.find(s => s.id === 'iijmio'), '2027-01-15'), false);
+  // Date でも判定できる（日付は東京時間で読む）
+  assert.equal(priceRecheckRequired(ahamo, new Date('2026-11-30T12:00:00+09:00')), false);
+  assert.equal(priceRecheckRequired(ahamo, new Date('2026-12-01T00:30:00+09:00')), true);
+
+  // SIM：改定前は通常表示、改定後はプラン価格が未確認になる。サービス自体は一覧から消えない
+  assert.equal(simPlanFor(ahamo, '30', BEFORE).price, 2970);
+  assert.equal(simPlanFor(ahamo, '30', ON), null);
+  const simBefore = rankSim({ usage: '30' }, BEFORE).find(r => r.service.id === 'ahamo');
+  assert.equal(simBefore.monthly, 2970);
+  assert.equal(simBefore.priceRecheck, false);
+  const simAfter = rankSim({ usage: '30' }, ON);
+  assert.equal(simAfter.length, SIM_SERVICES.length);
+  const ahamoAfter = simAfter.find(r => r.service.id === 'ahamo');
+  assert.equal(ahamoAfter.monthly, null);
+  assert.equal(ahamoAfter.plan, null);
+  assert.equal(ahamoAfter.priceRecheck, true);
+  assert.ok(ahamoAfter.cautions.some(c => c.includes('再確認中')));
+
+  // 光：改定後は月額が未確認になり、理由に改定前の金額が出ない
+  const hikariBefore = rankHikari({ housing: 'house' }, BEFORE).find(r => r.service.id === 'softbank-hikari');
+  assert.equal(hikariBefore.monthly, 5720);
+  const hikariAfter = rankHikari({ housing: 'house' }, ON).find(r => r.service.id === 'softbank-hikari');
+  assert.equal(hikariAfter.monthly, null);
+  assert.equal(hikariAfter.priceRecheck, true);
+  assert.ok(!hikariAfter.reasons.some(r => r.includes('5,720')));
+
+  // カード：改定後は還元率・年会費を理由にもスコアにも使わない。予告のない他社は影響を受けない
+  const cardBefore = rankCards({}, BEFORE).find(r => r.service.id === 'd-card');
+  assert.ok(cardBefore.reasons.some(r => r.includes('基本還元率 1.0%')));
+  const cardsAfter = rankCards({}, ON);
+  assert.equal(cardsAfter.length, CARD_SERVICES.length);
+  const dAfter = cardsAfter.find(r => r.service.id === 'd-card');
+  assert.equal(dAfter.priceRecheck, true);
+  assert.ok(!dAfter.reasons.some(r => r.includes('1.0%')));
+  assert.ok(dAfter.cautions.some(c => c.includes('再確認中')));
+  const recruitAfter = cardsAfter.find(r => r.service.id === 'recruit-card');
+  assert.equal(recruitAfter.priceRecheck, false);
+  assert.ok(recruitAfter.reasons.some(r => r.includes('基本還元率 1.2%')));
+  // 表示ソートでも、未確認のカードは末尾に寄る
+  assert.equal(sortCardsByRate(cardsAfter, ON).at(-1).priceRecheck, true);
+  assert.equal(sortCardsByFee(cardsAfter, ON).at(-1).priceRecheck, true);
+
+  // 詳細行のマスク：価格性の行だけが「公式で確認」になり、それ以外はカタログのまま
+  assert.equal(detailValue(dCard, ['年会費', '永年無料'], BEFORE), '永年無料');
+  assert.equal(detailValue(dCard, ['年会費', '永年無料'], ON), '公式で確認');
+  assert.equal(detailValue(dCard, ['基本還元率', '1.0%（100円につき1ポイント）'], ON), '公式で確認');
+  assert.equal(detailValue(dCard, ['国際ブランド', 'Visa／Mastercard'], ON), 'Visa／Mastercard');
+
+  // 導入日（2026-11-04）時点では、改定日を過ぎていないため全サービス通常表示のまま
+  assert.ok(![...SIM_SERVICES, ...HIKARI_SERVICES, ...CARD_SERVICES].some(s => priceRecheckRequired(s, TODAY)));
+  assert.equal(rankSim({ usage: '30' }, TODAY).find(r => r.service.id === 'ahamo').monthly, 2970);
+  assert.equal(rankHikari({ housing: 'house' }, TODAY).find(r => r.service.id === 'softbank-hikari').monthly, 5720);
 });
 
 test('long-tail pages cover every SIM pair and every region once', async () => {

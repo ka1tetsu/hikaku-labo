@@ -5,6 +5,7 @@ import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { CHECKED_AT, HOKEN_SERVICES } from './catalog.js';
+import { detailValue } from './freshness.js';
 import { rankCards, rankHikari, rankSim, sortByMonthlyPrice, sortCardsByFee, sortCardsByRate } from './score.js';
 import { serviceLink } from './affiliate.js';
 import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS } from './pages.js';
@@ -56,7 +57,7 @@ const CATEGORY_PAGES = {
       { id: 'age', label: '年齢', options: [['u39', '39歳以下'], ['o40', '40歳以上']] },
       { id: 'priority', label: '重視すること', options: [['rate', '還元率'], ['conveni', 'コンビニ・飲食店'], ['simple', 'どこでも同じ還元']] },
     ],
-    rank: rankCards, priceLabel: row => `還元率 ${row.service.rate.toFixed(1)}%`,
+    rank: rankCards, priceLabel: row => (row.priceRecheck ? '公式で確認' : `還元率 ${row.service.rate.toFixed(1)}%`),
     sorts: [
       { id: 'fit', label: 'おすすめ順（適合度）' },
       { id: 'fee', label: '年会費の安い順', apply: sortCardsByFee, caption: '年会費が安い順です。年会費が同額の場合は基本還元率が高い順に並びます。' },
@@ -127,8 +128,8 @@ function Selector({ category }) {
             <ul className="sv-good">{[...row.reasons, ...(row.service.facts || [])].slice(0, 4).map(text => <li key={text}>{text}</li>)}</ul>
             <ul className="sv-caution">{row.cautions.slice(0, 3).map(text => <li key={text}>{text}</li>)}</ul>
           </div>
-          {row.service.plans && <details className="sv-plans"><summary>料金表を見る</summary><table><tbody>{row.service.plans.map(plan => <tr key={plan.gb + '-' + plan.price}><th>{plan.label || (Number.isFinite(plan.gb) ? plan.gb + 'GB' : '無制限')}</th><td>{yen(plan.price)}</td></tr>)}</tbody></table></details>}
-          {row.service.details && <details className="sv-plans"><summary>申込条件・詳細を見る</summary><table><tbody>{row.service.details.map(([label, value]) => <tr key={label}><th>{label}</th><td>{value}</td></tr>)}</tbody></table></details>}
+          {row.service.plans && <details className="sv-plans"><summary>料金表を見る</summary><table><tbody>{row.service.plans.map(plan => <tr key={plan.gb + '-' + plan.price}><th>{plan.label || (Number.isFinite(plan.gb) ? plan.gb + 'GB' : '無制限')}</th><td>{row.priceRecheck ? '公式で確認' : yen(plan.price)}</td></tr>)}</tbody></table></details>}
+          {row.service.details && <details className="sv-plans"><summary>申込条件・詳細を見る</summary><table><tbody>{row.service.details.map(pair => <tr key={pair[0]}><th>{pair[0]}</th><td>{detailValue(row.service, pair)}</td></tr>)}</tbody></table></details>}
           <ServiceLink service={row.service} placement={category + '-rank'} />
         </li>)}</ol>
       </div>

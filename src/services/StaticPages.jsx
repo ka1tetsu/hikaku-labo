@@ -3,6 +3,7 @@ import SiteFooter from '../shared/SiteFooter.jsx';
 // the header "AIに相談" button and click tracking — come from conciergeMount.jsx.
 import SiteHeader from '../shared/SiteHeader.jsx';
 import { CARD_SERVICES, CHECKED_AT, HIKARI_SERVICES, SIM_SERVICES } from './catalog.js';
+import { detailValue, priceRecheckRequired } from './freshness.js';
 import { rankHikari, simPlanFor } from './score.js';
 import { serviceLink } from './affiliate.js';
 import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS, areaLabel } from './pages.js';
@@ -76,7 +77,7 @@ export function SimPairPage({ a, b, env = {} }) {
           {row('回線', s => s.networkLabel)}
           {row('店舗サポート', s => (s.store ? 'あり' : 'なし（オンライン中心）'))}
           {row('通話', s => CALLS[s.calls])}
-          {row('料金プラン', s => <ul>{s.plans.map(p => <li key={p.gb + '-' + p.price}>{p.label || (Number.isFinite(p.gb) ? p.gb + 'GB' : '無制限')}：{yen(p.price)}</li>)}</ul>)}
+          {row('料金プラン', s => <ul>{s.plans.map(p => <li key={p.gb + '-' + p.price}>{p.label || (Number.isFinite(p.gb) ? p.gb + 'GB' : '無制限')}：{priceRecheckRequired(s) ? '公式で確認（改定後の料金を確認中）' : yen(p.price)}</li>)}</ul>)}
           {row('特徴', s => <ul>{s.facts.map(f => <li key={f}>{f}</li>)}</ul>)}
           {row('注意点', s => <ul>{s.cautions.map(f => <li key={f}>{f}</li>)}</ul>)}
           {row('出典', s => <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">公式情報 ↗</a>)}
@@ -128,7 +129,7 @@ export function HikariAreaPage({ area, env = {} }) {
       <h2>{label}で申し込める主な光回線</h2>
       <ul className="sv-area-list">{available.map(s => <li key={s.id} id={`service-${s.id}`}>
         <strong>{s.name}</strong><span>{s.summary}</span>
-        <small>戸建て：{s.house ? yen(s.house) + '（目安）' : '公式で確認'} ／ マンション：{s.mansion ? yen(s.mansion) + '（目安）' : '公式で確認'}</small>
+        <small>戸建て：{s.house && !priceRecheckRequired(s) ? yen(s.house) + '（目安）' : '公式で確認'} ／ マンション：{s.mansion && !priceRecheckRequired(s) ? yen(s.mansion) + '（目安）' : '公式で確認'}</small>
         <small>セット割：{s.bundle.map(c => CARRIERS.find(([id]) => id === c)?.[1]).join('、')}</small>
         <Cta service={s} env={env} placement="hikari-area" />
       </li>)}</ul>
@@ -149,14 +150,16 @@ export function SimServicePage({ id, env = {} }) {
   const s = SIM_SERVICES.find(x => x.id === id);
   const pairs = SIM_PAIRS.filter(p => p.a === id || p.b === id);
   const others = SIM_DETAIL_PAGES.filter(p => p.id !== id);
+  const recheck = priceRecheckRequired(s);
   return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/sim/', '格安SIM比較'], [`/sim/${id}/`, s.name]]}
     kicker="MOBILE PLAN" title={`${s.name}の料金プラン・特徴・注意点`}
     lead={s.summary}>
     <section className="sv-wrap sv-guide">
       <h2>{s.name}の料金プラン（全プラン）</h2>
+      {recheck && <p className="sv-note">料金改定日を過ぎたため、改定後の料金を確認中です。最新の月額は公式サイトで確認してください。</p>}
       <div className="sv-table-scroll"><table className="sv-table">
         <thead><tr><th scope="col">プラン</th><th scope="col">月額（税込）</th></tr></thead>
-        <tbody>{s.plans.map(p => <tr key={p.gb + '-' + p.price}><th scope="row">{p.label || (Number.isFinite(p.gb) ? p.gb + 'GB' : '無制限')}</th><td>{yen(p.price)}</td></tr>)}</tbody>
+        <tbody>{s.plans.map(p => <tr key={p.gb + '-' + p.price}><th scope="row">{p.label || (Number.isFinite(p.gb) ? p.gb + 'GB' : '無制限')}</th><td>{recheck ? '公式で確認' : yen(p.price)}</td></tr>)}</tbody>
       </table></div>
       <p className="sv-note">税込・割引前の基本料金です（通話料・オプション・端末代は含みません）。キャンペーン・割引は条件つきで、内容は変わることがあります。最新の条件は公式サイトで確認してください。</p>
       <div className="sv-cta-row"><Cta service={s} env={env} placement="sim-detail" /></div>
@@ -191,12 +194,14 @@ export function HikariServicePage({ id, env = {} }) {
   const s = HIKARI_SERVICES.find(x => x.id === id);
   const areaPages = AREA_PAGES.filter(p => s.areas === 'all' || s.areas.includes(p.area));
   const others = HIKARI_DETAIL_PAGES.filter(p => p.id !== id);
-  const price = v => (v ? yen(v) + '（目安）' : '公式で確認');
+  const recheck = priceRecheckRequired(s);
+  const price = v => (!recheck && v ? yen(v) + '（目安）' : '公式で確認');
   return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/hikari/', '光回線比較'], [`/hikari/${id}/`, s.name]]}
     kicker="HOME INTERNET" title={`${s.name}の料金・提供エリア・セット割`}
     lead={s.summary}>
     <section className="sv-wrap sv-guide">
       <h2>{s.name}の月額料金（目安）</h2>
+      {recheck && <p className="sv-note">料金改定日を過ぎたため、改定後の料金を確認中です。最新の月額は公式サイトで確認してください。</p>}
       <div className="sv-table-scroll"><table className="sv-table">
         <thead><tr><th scope="col">住まい</th><th scope="col">月額（税込・目安）</th></tr></thead>
         <tbody>
@@ -235,15 +240,17 @@ export function HikariServicePage({ id, env = {} }) {
 export function CardServicePage({ id, env = {} }) {
   const s = CARD_SERVICES.find(x => x.id === id);
   const others = CARD_DETAIL_PAGES.filter(p => p.id !== id);
+  const recheck = priceRecheckRequired(s);
   return <Shell crumbs={[['/', 'Vivlica'], ['/life/', '通信・お金'], ['/card/', 'クレジットカード比較'], [`/card/${id}/`, s.name]]}
     kicker="CREDIT CARD" title={`${s.name}の年会費・還元率・申込条件`}
     lead={s.summary}>
     <section className="sv-wrap sv-guide">
       <h2>{s.name}の基本情報</h2>
+      {recheck && <p className="sv-note">還元率・進呈条件・年会費の見直し予定日を過ぎたため、見直し後の内容を確認中です。最新の条件は公式サイトで確認してください。</p>}
       <div className="sv-table-scroll"><table className="sv-table">
         <tbody>
-          <tr><th scope="row">年会費</th><td>{s.fee}</td></tr>
-          <tr><th scope="row">基本還元率</th><td>{s.rate.toFixed(1)}%</td></tr>
+          <tr><th scope="row">年会費</th><td>{recheck ? '公式で確認' : s.fee}</td></tr>
+          <tr><th scope="row">基本還元率</th><td>{recheck ? '公式で確認' : s.rate.toFixed(1) + '%'}</td></tr>
           <tr><th scope="row">特徴</th><td><ul>{s.facts.map(f => <li key={f}>{f}</li>)}</ul></td></tr>
         </tbody>
       </table></div>
@@ -253,7 +260,7 @@ export function CardServicePage({ id, env = {} }) {
     {s.details && <section className="sv-wrap sv-guide">
       <h2>申込条件・詳細</h2>
       <div className="sv-table-scroll"><table className="sv-table">
-        <tbody>{s.details.map(([label, value]) => <tr key={label}><th scope="row">{label}</th><td>{value}</td></tr>)}</tbody>
+        <tbody>{s.details.map(pair => <tr key={pair[0]}><th scope="row">{pair[0]}</th><td>{detailValue(s, pair)}</td></tr>)}</tbody>
       </table></div>
     </section>}
     <section className="sv-wrap sv-guide">
