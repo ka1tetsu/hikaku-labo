@@ -10,3 +10,14 @@
 @media(max-width:380px){.vl-savings-fields{grid-template-columns:1fr}.vl-savings-result strong{font-size:24px}}
 
 .vl-savings-result a.vl-savings-compare{display:block;padding:8px 0;font-weight:650}.vl-savings-official small{margin-left:8px;color:#fff}
+.vl-savings-candidates{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:14px}
+.vl-savings-candidate{border-top:1px solid #dcebe1;padding-top:14px}
+.vl-savings-candidate-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.vl-savings-candidate-head strong{font-size:16px}
+.vl-savings-candidate-head span{font-size:12px;color:#435f52}
+.vl-savings-candidate p{margin:8px 0 0;font-size:13px;line-height:1.8}
+.vl-savings-candidate p b{font-size:17px}
+.vl-savings-candidate p small{display:block;font-size:12px;line-height:1.8;color:#435f52}
+.vl-savings-result a.vl-savings-official-alt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border:1px solid #155f48;border-radius:9px;background:#fff;color:#155f48;font:700 13px/1.6 'Noto Sans JP',system-ui,sans-serif;text-decoration:none}
+.vl-savings-result a.vl-savings-official-alt:hover{background:#edf6ef}
+.vl-savings-official-alt small{color:#155f48}
