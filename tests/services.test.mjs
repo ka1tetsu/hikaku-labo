@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { CARD_SERVICES, HIKARI_SERVICES, HOKEN_SERVICES, SIM_SERVICES, SERVICE_IDS, CHECKED_AT } from '../src/services/catalog.js';
-import { rankCards, rankHikari, rankSim, simPlanFor } from '../src/services/score.js';
+import { rankCards, rankHikari, rankSim, simPlanFor, sortByMonthlyPrice, sortCardsByFee, sortCardsByRate, cardFeeAmount } from '../src/services/score.js';
 import { affiliateEnvKey, serviceLink } from '../src/services/affiliate.js';
-import { validOutboundEvent } from '../src/shared/outboundSchema.js';
+import { validOutboundEvent, validFunnelEvent } from '../src/shared/outboundSchema.js';
 
 test('every service has an official https source and unique id', () => {
   assert.match(CHECKED_AT, /^\d{4}-\d{2}-\d{2}$/);
@@ -59,6 +59,46 @@ test('cards expose verified application details and GOLD U stays a separate paid
   assert.deepEqual(order, ['recruit-card', 'aupay-card', 'd-card', 'jcb-w', 'paypay-card', 'rakuten-card', 'smbc-nl']);
   // 40歳以上では申込対象外として大きく減点される
   assert.ok(rankCards({ age: 'o40' }).find(r => r.service.id === 'd-card-gold-u').score < 30);
+});
+
+test('display sorts are mechanical keys and never use fit scores (K2)', () => {
+  // 適合度スコアと逆転する並びでも、表示ソートはキーだけで決まること
+  const rows = [
+    { service: { name: 'B社', rate: 0.5, fee: '永年無料' }, monthly: 3000, score: 99 },
+    { service: { name: 'A社', rate: 1.2, fee: '永年無料' }, monthly: 1000, score: 10 },
+    { service: { name: 'C社', rate: 1.0, fee: '3,300円（税込）' }, monthly: null, score: 80 },
+  ];
+  // 価格順：月額の昇順、月額なしは末尾。入力配列は変更しない
+  assert.deepEqual(sortByMonthlyPrice(rows).map(r => r.service.name), ['A社', 'B社', 'C社']);
+  assert.deepEqual(rows.map(r => r.service.name), ['B社', 'A社', 'C社']);
+  // 年会費はカタログの fee 表記から読むだけ（無料=0、金額はその数値）
+  assert.equal(cardFeeAmount({ fee: '永年無料' }), 0);
+  assert.equal(cardFeeAmount({ fee: '3,300円（税込）' }), 3300);
+  // カード：年会費順は同額なら基本還元率の高い順、還元率順は基本還元率の降順のみ
+  assert.deepEqual(sortCardsByFee(rows).map(r => r.service.name), ['A社', 'B社', 'C社']);
+  assert.deepEqual(sortCardsByRate(rows).map(r => r.service.name), ['A社', 'C社', 'B社']);
+  // 実カタログ：還元率順は全行で降順になり1位は最高還元率、年会費順の末尾は唯一の有料カード
+  const ranked = rankCards({});
+  const byRate = sortCardsByRate(ranked);
+  assert.ok(byRate.every((r, i) => i === 0 || byRate[i - 1].service.rate >= r.service.rate));
+  assert.equal(byRate[0].service.id, 'recruit-card');
+  assert.equal(byRate.at(-1).service.id, 'smbc-nl');
+  assert.equal(sortCardsByFee(ranked).at(-1).service.id, 'd-card-gold-u');
+  // SIM：価格順は選択データ量に合うプラン月額の昇順（合うプランのないサービスは月額なしで末尾）
+  const simByPrice = sortByMonthlyPrice(rankSim({ usage: 'unlimited' }));
+  const priced = simByPrice.filter(r => r.monthly !== null);
+  assert.ok(priced.every((r, i) => i === 0 || priced[i - 1].monthly <= r.monthly));
+  assert.equal(simByPrice.at(-1).monthly, null);
+});
+
+test('sort toggle is measured like selector_change and the SIM lead matches the fit order (K2)', () => {
+  for (const page of ['sim', 'hikari', 'card']) assert.equal(validFunnelEvent({ event: 'funnel', page, action: 'sort_change' }), true, page);
+  const page = readFileSync(new URL('../src/services/ServicesPage.jsx', import.meta.url), 'utf8');
+  // 旧リード文（価格順と誤認させる文言）は残っていないこと
+  assert.ok(!page.includes('月額の安いプランを順に並べます'));
+  assert.match(page, /並び替え/);
+  assert.match(page, /おすすめ順（適合度）/);
+  assert.match(page, /recordFunnelEvent\('sort_change'\)/);
 });
 
 test('service links are sponsored only with an approved ASP tracking URL', () => {

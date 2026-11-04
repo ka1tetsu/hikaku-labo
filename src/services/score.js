@@ -66,6 +66,32 @@ export function rankCards({ ecosystem = 'none', age = 'u39', priority = 'rate' }
   return finalize(rows);
 }
 
+// Display-only reordering for the ranking list (K2). Keys come only from listed
+// catalog values — monthly price, annual fee text, basic rate. Fit scores and
+// affiliate data are never used here, and the input rows are not mutated.
+const byServiceName = (a, b) => a.service.name.localeCompare(b.service.name, 'ja');
+
+export function sortByMonthlyPrice(rows) {
+  return [...rows].sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity) || byServiceName(a, b));
+}
+
+// Annual fee amount read from the catalog fee text ('永年無料' → 0).
+// Returns null when the fee text carries no amount; never invents a number.
+export function cardFeeAmount(service) {
+  if (service.fee.includes('無料')) return 0;
+  const digits = service.fee.replace(/[^0-9]/g, '');
+  return digits ? Number(digits) : null;
+}
+
+export function sortCardsByFee(rows) {
+  return [...rows].sort((a, b) => (cardFeeAmount(a.service) ?? Infinity) - (cardFeeAmount(b.service) ?? Infinity)
+    || b.service.rate - a.service.rate || byServiceName(a, b));
+}
+
+export function sortCardsByRate(rows) {
+  return [...rows].sort((a, b) => b.service.rate - a.service.rate || byServiceName(a, b));
+}
+
 function finalize(rows) {
   return rows.map(row => ({ ...row, score: Math.max(0, Math.min(100, row.points)) }))
     .sort((a, b) => b.score - a.score || (a.monthly ?? Infinity) - (b.monthly ?? Infinity) || a.service.name.localeCompare(b.service.name, 'ja'));
