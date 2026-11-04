@@ -14,6 +14,11 @@ export function runConciergeAction(action) {
     window.location.href = '/?keyword=' + encodeURIComponent(action.keyword) + '#results';
   } else if (action.type === 'tools') {
     window.location.href = action.url;
+  } else if (action.type === 'life') {
+    // Pages that can apply the conditions in place (the /sim/ /hikari/ /card/
+    // selectors) may preventDefault() on the event above; everywhere else we
+    // navigate to the selector with the conditions in the query string.
+    window.location.href = action.url;
   }
 }
 
