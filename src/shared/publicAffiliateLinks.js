@@ -12,4 +12,7 @@ export const PUBLIC_AFFILIATE_LINKS = Object.freeze({
   // A8.net text link for Docomo Hikari via the GMO Tokutoku BB program (approved 2026-11-04).
   // New-use reward ¥9,000 (2 Gbps plan ¥13,000 / 10 Gbps plan ¥17,000).
   'docomo-hikari': 'https://px.a8.net/svt/ejp?a8mat=4BGD79+F468GQ+50+54MIOY',
+  // Rakuten Affiliate text link for Rakuten Card (vivlica.com registered as a site 2026-11-04).
+  // Reward is Rakuten Cash ¥1,500 per newly issued card.
+  'rakuten-card': 'https://hb.afl.rakuten.co.jp/hsc/483a330d.4f37b651.433ccf31.62544894/?link_type=text&rafst=rc',
 });
