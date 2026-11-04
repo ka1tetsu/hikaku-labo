@@ -42,7 +42,7 @@ const CATEGORY_PAGES = {
   },
   card: {
     path: '/card/', kicker: 'CREDIT CARD', title: 'クレジットカード比較', h1: ['年会費無料カードを、', 'よく使うお店で選ぶ。'],
-    lead: '年会費無料の主要カードを、基本還元率とポイント経済圏・年齢条件で比較します。「最大◯%」ではなく、どこで使っても付く基本還元率を基準にしています。',
+    lead: '年会費無料の主要カードを、基本還元率とポイント経済圏・年齢条件で比較します。29歳以下限定で、条件を満たすと年会費が実質無料になるゴールドカードも1枚掲載しています。「最大◯%」ではなく、どこで使っても付く基本還元率を基準にしています。',
     questions: [
       { id: 'ecosystem', label: 'よく使うサービス', options: [['none', '特になし'], ['rakuten', '楽天'], ['paypay', 'PayPay・Yahoo!'], ['docomo', 'ドコモ・dポイント'], ['au', 'au・Ponta'], ['vpoint', 'コンビニ・Vポイント']] },
       { id: 'age', label: '年齢', options: [['u39', '39歳以下'], ['o40', '40歳以上']] },
@@ -99,6 +99,7 @@ function Selector({ category }) {
             <ul className="sv-caution">{row.cautions.slice(0, 3).map(text => <li key={text}>{text}</li>)}</ul>
           </div>
           {row.service.plans && <details className="sv-plans"><summary>料金表を見る</summary><table><tbody>{row.service.plans.map(plan => <tr key={plan.gb + '-' + plan.price}><th>{plan.label || (Number.isFinite(plan.gb) ? plan.gb + 'GB' : '無制限')}</th><td>{yen(plan.price)}</td></tr>)}</tbody></table></details>}
+          {row.service.details && <details className="sv-plans"><summary>申込条件・詳細を見る</summary><table><tbody>{row.service.details.map(([label, value]) => <tr key={label}><th>{label}</th><td>{value}</td></tr>)}</tbody></table></details>}
           <ServiceLink service={row.service} placement={category + '-rank'} />
         </li>)}</ol>
       </div>
