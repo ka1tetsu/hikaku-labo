@@ -85,6 +85,31 @@ export const HIKARI_SERVICES = [
   { id: 'commufa-hikari', name: 'コミュファ光', bundle: ['au'], areas: ['tokai'], house: null, mansion: null,
     summary: '東海エリアの独自回線。au・UQモバイルのセット割対象。', facts: ['東海エリア限定', 'au／UQモバイルとセット割'],
     cautions: ['料金はプラン・建物で異なるため公式で確認'], officialUrl: 'https://www.commufa.jp/' },
+  // K3（2026-11-04追加）フレッツ系のプロバイダ型回線。数値は各社の公式サイト・公式規約で
+  // 2026-11-04 に確認したもの（各エントリの checkedAt / sourceUrl に保持）。
+  // GMOとくとくBB光は公式ページごと（特典ページ・通常料金ページ・FAQ）に月額が異なり単一の
+  // 金額に定まらないため、So-net光は S／M／L の3プランで月額が分かれるため、いずれも
+  // house / mansion を null にして「公式で確認」運用とし、個別ページも作らない（K1の除外ルール）。
+  { id: 'biglobe-hikari', name: 'BIGLOBE光', bundle: ['au'], areas: 'all', house: 5478, mansion: 4378,
+    summary: 'KDDI系の光コラボ。1ギガは3年プランで、au・UQモバイルのセット割対象。',
+    facts: ['au／UQモバイルとセット割（BIGLOBE光電話の申込が条件）', '全国（フレッツ光エリア）で利用可'],
+    cautions: ['月額は1ギガ・3年プランの金額。2年プラン・10ギガは料金が異なる'],
+    officialUrl: 'https://join.biglobe.ne.jp/ftth/hikari/', sourceUrl: 'https://join.biglobe.ne.jp/ftth/hikari/', checkedAt: '2026-11-04' },
+  { id: 'nifty-hikari', name: '@nifty光', bundle: ['au'], areas: 'all', house: 5720, mansion: 4378,
+    summary: 'ニフティの光コラボ。auスマートバリュー・UQ mobile自宅セット割の対象。',
+    facts: ['au／UQモバイルとセット割（@nifty光電話の申込が条件）', '全国（フレッツ光エリア）で利用可'],
+    cautions: ['月額は1ギガの通常料金（22カ月目以降）。開始から21カ月目までは割引料金が適用される'],
+    officialUrl: 'https://setsuzoku.nifty.com/niftyhikari/', sourceUrl: 'https://setsuzoku.nifty.com/niftyhikari/', checkedAt: '2026-11-04' },
+  { id: 'sonet-hikari', name: 'So-net光', bundle: [], areas: 'all', house: null, mansion: null,
+    summary: 'ソニー系の光コラボ。S／M／Lの3プランから選ぶ。',
+    facts: ['S／M／Lの3プラン制（戸建て月4,500円／5,995円／7,095円、マンション月3,400円／4,895円／5,995円）', '全国（フレッツ光エリア）で利用可'],
+    cautions: ['プランで月額が異なるため、目安は公式で確認'],
+    officialUrl: 'https://www.so-net.ne.jp/access/hikari/', sourceUrl: 'https://www.so-net.ne.jp/signup/kiyaku/collaboration_rule01.html', checkedAt: '2026-11-04' },
+  { id: 'gmo-hikari', name: 'GMOとくとくBB光', bundle: [], areas: 'all', house: null, mansion: null,
+    summary: 'GMOとくとくBBの光コラボ。スマホとのセット割はなく、契約期間の縛りがない。',
+    facts: ['スマホとのセット割は提供されていない（公式FAQ）', '契約期間の縛り・解約違約金なし', '全国（フレッツ光エリア）で利用可'],
+    cautions: ['月額は申込窓口により異なるため、目安は公式で確認'],
+    officialUrl: 'https://gmobb.jp/lp/gmohikari/', sourceUrl: 'https://gmobb.jp/lp/gmohikari_change/support/faq/', checkedAt: '2026-11-04' },
 ];
 
 // クレジットカード：年会費と「基本」還元率のみ比較（上限値の「最大◯%」は条件つきなので注記扱い）。
