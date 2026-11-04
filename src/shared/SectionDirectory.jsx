@@ -10,7 +10,7 @@ export default function SectionDirectory() {
       </div>
       <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較・調査カテゴリ</span><small>商品・IT・旅行・通信・企業データ</small></div>
     </div>
-    <div className="hl-directory-start"><a href="#savings">スマホ代の年間差額を診断 →</a><a href="/compare/">型番で商品価格を比較 →</a></div>
+    <div className="hl-directory-start"><a href="#savings">スマホ代の年間差額を診断 →</a><a href="/compare/">型番で商品価格を比較 →</a><a href="/sim/">格安SIMの料金を比べる →</a></div>
     <div className="hl-directory-grid">
       {SITE_SECTIONS.map(section => <a key={section.id}
         className={'hl-directory-card hl-directory-' + section.id}
