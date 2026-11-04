@@ -79,12 +79,18 @@ test('insurance page compares no insurance products and lists services without r
   assert.deepEqual(HOKEN_SERVICES.map(s => s.id), ['hoken-clinic', 'hokennomadoguchi', 'hoken-minaoshi-lab']);
   assert.match(page, /sv-hoken-table/);
   assert.match(page, /hoken: \[\['\/life\/'/);
-  // 表の事実項目は summary の記載範囲だけを使う（未確認の項目はフィールドを持たない）
+  // 表の事実項目は各社の公式サイトで確認できた事実だけを使う（未確認の項目はフィールドを持たない）
   const clinic = HOKEN_SERVICES.find(s => s.id === 'hoken-clinic');
-  assert.equal(clinic.feature, '複数の保険会社の商品を取り扱う');
-  assert.ok(!('consultMethods' in clinic) && !('storeNetwork' in clinic));
+  assert.equal(clinic.consultMethods, '店舗・オンライン');
+  assert.equal(clinic.storeNetwork, '全国309店舗');
+  assert.equal(clinic.feature, '取扱保険会社は約50社（店舗により異なる）');
+  const madoguchi = HOKEN_SERVICES.find(s => s.id === 'hokennomadoguchi');
+  assert.equal(madoguchi.consultMethods, '店舗・オンライン');
+  assert.equal(madoguchi.feature, '取扱保険会社は40社以上、300商品以上');
   const lab = HOKEN_SERVICES.find(s => s.id === 'hoken-minaoshi-lab');
   assert.equal(lab.consultMethods, '訪問・オンライン');
+  assert.equal(lab.storeNetwork, '全国に約60拠点（2025年4月時点）');
+  assert.equal(lab.feature, '取扱保険会社は42社（2026年9月時点）');
   assert.ok(HOKEN_SERVICES.every(s => s.fee === '無料'));
 });
 
