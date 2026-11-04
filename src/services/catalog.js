@@ -2,6 +2,12 @@
 // 料金は 2026-10-17 に公式サイト・公式Q&A・各社発表、または複数の最新記事が一致した値だけを載せる。
 // 情報源どうしで食い違う値（例：LINEMOベストプランV、NURO光マンション）は price: null にして
 // 「公式で確認」と表示する。推測で埋めないこと。更新時は checkedAt と sourceUrl を必ず更新する。
+// 鮮度運用（K4）：月次の公式確認フローは docs/VIVLICA-LAUNCH.md「料金カタログの月次確認
+// （鮮度運用）」に従う。注意書きに日付つきの料金改定・見直し予告があるサービスには
+// priceRevisionFrom（'YYYY-MM-DD'）を持たせる。その日を過ぎると表示・ランキング側で
+// 価格を未確認扱い（「公式で確認」）に自動で落とす（src/services/freshness.js）。
+// 改定後の料金を公式で確認できたら、数値を更新し、priceRevisionFrom と古い予告の
+// 注意書きを外すこと。日付は注意書きに明記されているものだけを使い、推測で入れない。
 export const CHECKED_AT = '2026-10-17';
 const INF = Number.POSITIVE_INFINITY;
 
@@ -10,6 +16,8 @@ export const SIM_SERVICES = [
     summary: '30GBと5分かけ放題がセット。手続きはオンライン中心。',
     plans: [{ gb: 30, price: 2970, label: '30GB（5分かけ放題込み）' }, { gb: 110, price: 4950, label: '大盛り 110GB' }],
     calls: '5min', facts: ['5分以内の国内通話無料', 'オンライン専用（店舗サポートは有料）'],
+    // priceRevisionFrom: 注意書きの「2026年12月1日の料金改定」告知に基づく（K4）。
+    priceRevisionFrom: '2026-12-01',
     cautions: ['公式サイトで2026年12月1日の料金改定が告知済み。改定後の料金を確認', '2026年8〜11月は30GB→40GBの増量キャンペーン中'],
     officialUrl: 'https://ahamo.com/', sourceUrl: 'https://ahamo.com/special/lp/001.html' },
   { id: 'povo', name: 'povo2.0', network: 'au', networkLabel: 'au回線', store: false,
@@ -69,6 +77,8 @@ export const HIKARI_SERVICES = [
     cautions: ['プロバイダにより月額・特典が異なる'], officialUrl: 'https://www.docomo.ne.jp/hikari/' },
   { id: 'softbank-hikari', name: 'ソフトバンク光', bundle: ['softbank'], areas: 'all', house: 5720, mansion: 4180,
     summary: 'ソフトバンク・ワイモバイルの「おうち割 光セット」対象。', facts: ['ソフトバンク／ワイモバイルとセット割', '全国（フレッツ光エリア）で利用可'],
+    // priceRevisionFrom: 注意書きの「2026年12月利用分から月額改定」に基づき、2026-12-01 を境にする（K4）。
+    priceRevisionFrom: '2026-12-01',
     cautions: ['2026年12月利用分から月額改定の告知あり（戸建て6,050円／マンション4,510円）'], officialUrl: 'https://www.softbank.jp/internet/sbhikari/' },
   { id: 'au-hikari', name: 'auひかり', bundle: ['au'], areas: ['hokkaido', 'tohoku', 'kanto', 'hokuriku', 'chugoku', 'shikoku', 'kyushu'], house: 5610, mansion: null,
     summary: '独自回線。au・UQモバイルとのセット割。', facts: ['au／UQモバイルとセット割', 'マンションは建物の設備で料金が変わるため公式で確認'],
@@ -138,6 +148,8 @@ export const CARD_SERVICES = [
     officialUrl: 'https://www.paypay-card.co.jp/' },
   { id: 'd-card', name: 'dカード', ecosystem: 'docomo', fee: '永年無料', rate: 1.0,
     summary: 'dポイントを貯める人、ドコモユーザー向け。', facts: ['基本還元率1.0%（dポイント）'],
+    // priceRevisionFrom: 注意書きの「2026年12月以降に…見直し予定」に基づき、2026-12-01 を境にする（K4）。
+    priceRevisionFrom: '2026-12-01',
     cautions: ['電気・ガス・水道料金は2026年2月から原則0.5%', '2026年12月以降に還元率・進呈条件・年会費の見直し予定が公式で告知されている'],
     details: [['申込条件', '満18歳以上（高校生を除く）。個人名義で、本人名義の口座を支払口座に設定'], ['年会費', '永年無料'], ['基本還元率', '1.0%（100円につき1ポイント）'], ['国際ブランド', 'Visa／Mastercard'], ['ドコモ料金の還元', '対象のドコモ利用料金は1,000円（税抜）ごとに1%還元']],
     officialUrl: 'https://dcard.docomo.ne.jp/' },
@@ -156,6 +168,8 @@ export const CARD_SERVICES = [
   { id: 'd-card-gold-u', name: 'dカード GOLD U', ecosystem: 'docomo', fee: '3,300円（税込）', rate: 1.0, maxAge: 29,
     summary: '29歳以下限定のゴールドカード。dカード（通常版）とは別商品で、ドコモの利用料金の還元がある。',
     facts: ['ドコモのケータイ／ドコモ光の利用料金は1,000円（税抜）ごとに5%還元', '年会費は条件を満たすと翌年の請求時に前年分が減算され、実質無料になる', 'ケータイ補償は購入から3年以内・最大10万円'],
+    // priceRevisionFrom: 注意書きの「2026年12月以降に…見直し予定」に基づき、2026-12-01 を境にする（K4）。
+    priceRevisionFrom: '2026-12-01',
     cautions: ['満30歳以降のカード有効期限満了時に、審査のうえ年会費11,000円（税込）のdカード GOLDに切りかわる', '2026年12月以降に還元率・進呈条件・年会費の見直し予定が公式で告知されている'],
     details: [['申込条件', '入会申込み日時点で満18歳以上29歳以下（高校生を除く）。個人名義で、本人名義の口座を支払口座に設定'], ['年会費', '3,300円（税込）。満22歳以下、年間30万円以上の利用、対象ドコモプランの契約＋支払い設定（初年度のみ）のいずれかで、翌年の年会費請求時に前年分が減算され実質無料'], ['基本還元率', '1.0%（100円につき1ポイント）'], ['ドコモ料金の還元', '対象のケータイ／ドコモ光の利用料金1,000円（税抜）ごとに5%（ドコモ mini・irumo・ahamo・ahamo光、端末代金・手数料等は対象外）'], ['国際ブランド', 'Visa／Mastercard'], ['家族カード', '年会費1,100円（税込）／枚'], ['ケータイ補償', '購入から3年以内・最大10万円']],
     officialUrl: 'https://dcard.docomo.ne.jp/', sourceUrl: 'https://dcard.docomo.ne.jp/st/dcard_lineup/index.html' },
