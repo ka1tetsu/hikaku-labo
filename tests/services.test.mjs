@@ -41,6 +41,26 @@ test('card ranking applies age limits and ecosystems', () => {
   assert.equal(rankCards({ priority: 'conveni' })[0].service.id, 'smbc-nl');
 });
 
+test('cards expose verified application details and GOLD U stays a separate paid product', () => {
+  // (c) 全カードに申込条件等の details があり、年会費の行を必ず含む
+  for (const s of CARD_SERVICES) {
+    assert.ok(Array.isArray(s.details) && s.details.length >= 3, s.id);
+    assert.ok(s.details.some(([label]) => label === '年会費'), s.id);
+  }
+  // (b) dカード GOLD U は通常版とは別商品：年会費は金額明記、年齢条件は maxAge で扱う
+  const goldU = CARD_SERVICES.find(s => s.id === 'd-card-gold-u');
+  assert.ok(goldU);
+  assert.match(goldU.fee, /3,300円/);
+  assert.equal(goldU.maxAge, 29);
+  assert.equal(goldU.rate, 1.0);
+  assert.ok(goldU.sourceUrl.startsWith('https://dcard.docomo.ne.jp/'));
+  // 既存カードの相対順位は変えない（デフォルト条件での従来の並びを GOLD U を除いて維持）
+  const order = rankCards({}).map(r => r.service.id).filter(id => id !== 'd-card-gold-u');
+  assert.deepEqual(order, ['recruit-card', 'aupay-card', 'd-card', 'jcb-w', 'paypay-card', 'rakuten-card', 'smbc-nl']);
+  // 40歳以上では申込対象外として大きく減点される
+  assert.ok(rankCards({ age: 'o40' }).find(r => r.service.id === 'd-card-gold-u').score < 30);
+});
+
 test('service links are sponsored only with an approved ASP tracking URL', () => {
   const iij = SIM_SERVICES.find(s => s.id === 'iijmio');
   assert.equal(affiliateEnvKey('rakuten-mobile'), 'VITE_AFF_URL_RAKUTEN_MOBILE');

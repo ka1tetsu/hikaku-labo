@@ -88,28 +88,52 @@ export const HIKARI_SERVICES = [
 ];
 
 // クレジットカード：年会費と「基本」還元率のみ比較（上限値の「最大◯%」は条件つきなので注記扱い）。
+// details は申込条件等の詳細表示用。2026-11-04 に各社の公式ページ（dカードは公式のカード一覧ページ）で
+// 確認できた事実だけを載せる。公式で確認できなかった項目は行自体を持たせない（推測で埋めない）。
 export const CARD_SERVICES = [
   { id: 'rakuten-card', name: '楽天カード', ecosystem: 'rakuten', fee: '永年無料', rate: 1.0,
     summary: '楽天市場・楽天モバイルなど楽天経済圏の基本カード。', facts: ['基本還元率1.0%（楽天ポイント）', '楽天市場ではSPUで還元率アップ'],
-    cautions: ['楽天市場の上乗せ還元は条件つき'], officialUrl: 'https://www.rakuten-card.co.jp/' },
+    cautions: ['楽天市場の上乗せ還元は条件つき'],
+    details: [['申込条件', '満18歳以上の方（申込には本人名義の楽天IDが必要）'], ['年会費', '永年無料'], ['基本還元率', '1.0%（100円につき1ポイント）'], ['国際ブランド', 'Visa／Mastercard／JCB／American Express から選択'], ['ポイント', '楽天ポイント（1ポイント＝1円相当として利用可）']],
+    officialUrl: 'https://www.rakuten-card.co.jp/' },
   { id: 'smbc-nl', name: '三井住友カード（NL）', ecosystem: 'vpoint', fee: '永年無料', rate: 0.5, conveni: true,
     summary: '対象のコンビニ・飲食店でスマホのタッチ決済を使う人向け。', facts: ['通常は0.5%（200円につき1ポイント）', '対象のコンビニ・飲食店でスマホのタッチ決済・モバイルオーダーなら最大7%'],
-    cautions: ['カード現物のタッチ決済・iD・差し込みは7%の対象外'], officialUrl: 'https://www.smbc-card.com/nyukai/card/numberless.jsp' },
+    cautions: ['カード現物のタッチ決済・iD・差し込みは7%の対象外'],
+    details: [['申込条件', '満18歳以上の方（高校生は除く）'], ['年会費', '永年無料（家族カードも永年無料）'], ['基本還元率', '0.5%（200円につき1ポイント）'], ['国際ブランド', 'Visa／Mastercard'], ['保険', '海外旅行傷害保険 最高2,000万円（利用付帯）']],
+    officialUrl: 'https://www.smbc-card.com/nyukai/card/numberless.jsp' },
   { id: 'jcb-w', name: 'JCB CARD W', ecosystem: 'jcb', fee: '永年無料', rate: 1.0, maxAge: 39,
     summary: '39歳以下が申込可能。基本還元率1.0%で優待店でさらにアップ。', facts: ['申込は18〜39歳（40歳以降も年会費無料で継続可）', '基本還元率1.0%、優待店でポイントアップ'],
-    cautions: ['還元率は交換先により異なる'], officialUrl: 'https://www.jcb.co.jp/ordercard/kojin_card/os_card_w.html' },
+    cautions: ['還元率は交換先により異なる'],
+    details: [['申込条件', '18〜39歳（40歳以降も年会費無料で継続可）'], ['年会費', '永年無料'], ['基本還元率', '1.0%（優待店でポイントアップ）']],
+    officialUrl: 'https://www.jcb.co.jp/ordercard/kojin_card/os_card_w.html' },
   { id: 'paypay-card', name: 'PayPayカード', ecosystem: 'paypay', fee: '永年無料', rate: 1.0,
     summary: 'PayPayやYahoo!ショッピングをよく使う人向け。', facts: ['基本還元率1.0%', '公共料金・税金は0.5%'],
-    cautions: ['交通系ICへのチャージはポイント対象外', 'ポイントアップ条件は改定があるため公式で確認'], officialUrl: 'https://www.paypay-card.co.jp/' },
+    cautions: ['交通系ICへのチャージはポイント対象外', 'ポイントアップ条件は改定があるため公式で確認'],
+    details: [['申込条件', '満18歳以上（高校生を除く）。申込にはYahoo! JAPAN IDとスマートフォンが必要'], ['年会費', '永年無料'], ['基本還元率', '1.0%'], ['国際ブランド', 'Visa／Mastercard／JCB（初回申込はVisaのみ）']],
+    officialUrl: 'https://www.paypay-card.co.jp/' },
   { id: 'd-card', name: 'dカード', ecosystem: 'docomo', fee: '永年無料', rate: 1.0,
     summary: 'dポイントを貯める人、ドコモユーザー向け。', facts: ['基本還元率1.0%（dポイント）'],
-    cautions: ['電気・ガス・水道料金は2026年2月から原則0.5%'], officialUrl: 'https://dcard.docomo.ne.jp/' },
+    cautions: ['電気・ガス・水道料金は2026年2月から原則0.5%', '2026年12月以降に還元率・進呈条件・年会費の見直し予定が公式で告知されている'],
+    details: [['申込条件', '満18歳以上（高校生を除く）。個人名義で、本人名義の口座を支払口座に設定'], ['年会費', '永年無料'], ['基本還元率', '1.0%（100円につき1ポイント）'], ['国際ブランド', 'Visa／Mastercard'], ['ドコモ料金の還元', '対象のドコモ利用料金は1,000円（税抜）ごとに1%還元']],
+    officialUrl: 'https://dcard.docomo.ne.jp/' },
   { id: 'aupay-card', name: 'au PAYカード', ecosystem: 'au', fee: '永年無料', rate: 1.0,
     summary: 'au・UQモバイル利用者、Pontaポイントを貯める人向け。', facts: ['2024年6月から全員年会費永年無料', '公共料金も1.0%'],
-    cautions: ['ポイント加算条件は公式で確認'], officialUrl: 'https://www.kddi-fs.com/' },
+    cautions: ['ポイント加算条件は公式で確認'],
+    details: [['年会費', '永年無料（2024年6月から全員）'], ['基本還元率', '1.0%（公共料金も1.0%）'], ['ポイント', 'Pontaポイント']],
+    officialUrl: 'https://www.kddi-fs.com/' },
   { id: 'recruit-card', name: 'リクルートカード', ecosystem: 'recruit', fee: '永年無料', rate: 1.2,
     summary: '基本還元率1.2%。特定の経済圏にこだわらない人向け。', facts: ['基本還元率1.2%', '電気・ガス・水道もポイント加算対象'],
-    cautions: ['電子マネーチャージは対象・上限に条件あり'], officialUrl: 'https://recruit-card.jp/' },
+    cautions: ['電子マネーチャージは対象・上限に条件あり'],
+    details: [['年会費', '永年無料'], ['基本還元率', '1.2%（10,000円の利用で120ポイント）'], ['ポイント', 'リクルートポイント（1ポイント＝1円分）。Pontaポイント・dポイントへ交換可']],
+    officialUrl: 'https://recruit-card.jp/' },
+  // dカード GOLD U は dカード（通常版）とは別商品。年会費がかかるため fee は金額を明記し、年齢条件は maxAge で扱う。
+  // 数値は 2026-11-04 に dカード公式のカード一覧ページで確認したもの（sourceUrl）。
+  { id: 'd-card-gold-u', name: 'dカード GOLD U', ecosystem: 'docomo', fee: '3,300円（税込）', rate: 1.0, maxAge: 29,
+    summary: '29歳以下限定のゴールドカード。dカード（通常版）とは別商品で、ドコモの利用料金の還元がある。',
+    facts: ['ドコモのケータイ／ドコモ光の利用料金は1,000円（税抜）ごとに5%還元', '年会費は条件を満たすと翌年の請求時に前年分が減算され、実質無料になる', 'ケータイ補償は購入から3年以内・最大10万円'],
+    cautions: ['満30歳以降のカード有効期限満了時に、審査のうえ年会費11,000円（税込）のdカード GOLDに切りかわる', '2026年12月以降に還元率・進呈条件・年会費の見直し予定が公式で告知されている'],
+    details: [['申込条件', '入会申込み日時点で満18歳以上29歳以下（高校生を除く）。個人名義で、本人名義の口座を支払口座に設定'], ['年会費', '3,300円（税込）。満22歳以下、年間30万円以上の利用、対象ドコモプランの契約＋支払い設定（初年度のみ）のいずれかで、翌年の年会費請求時に前年分が減算され実質無料'], ['基本還元率', '1.0%（100円につき1ポイント）'], ['ドコモ料金の還元', '対象のケータイ／ドコモ光の利用料金1,000円（税抜）ごとに5%（ドコモ mini・irumo・ahamo・ahamo光、端末代金・手数料等は対象外）'], ['国際ブランド', 'Visa／Mastercard'], ['家族カード', '年会費1,100円（税込）／枚'], ['ケータイ補償', '購入から3年以内・最大10万円']],
+    officialUrl: 'https://dcard.docomo.ne.jp/', sourceUrl: 'https://dcard.docomo.ne.jp/st/dcard_lineup/index.html' },
 ];
 
 // 保険：商品の比較・推奨は保険募集に当たるおそれがあるため行わない。無料相談サービスの紹介のみ（順位なし・五十音順）。
