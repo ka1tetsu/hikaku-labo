@@ -111,7 +111,7 @@ const RELATED = {
   sim: [['/guides/sim-guide/', '格安SIMの選び方ガイド', 'データ量・通話・サポートを決めてから比べる'], ['/hikari/', '光回線もセット割で見直す', 'UQモバイル・ワイモバイルは自宅の光回線とのセット割あり']],
   hikari: [['/guides/hikari-guide/', '光回線の選び方ガイド', '提供エリア・建物・セット割を先に確認する'], ['/sim/', 'スマホ代も一緒に見直す', 'セット割の対象ブランドに乗り換えると合計が下がることも']],
   card: [['/guides/card-guide/', 'クレジットカードの選び方ガイド', '基本還元率とポイント経済圏で候補を絞る'], ['/sim/', '経済圏をそろえてスマホ代も見直す', '楽天・PayPay・ドコモ・auなど同じポイントで貯める']],
-  hoken: [['/card/', '固定費の支払いカードも見直す', '保険料・通信費をポイント還元のあるカードで支払う']],
+  hoken: [['/life/', '固定費をまとめて見直す', 'スマホ・光回線・カードの比較と、スマホ代の見直し診断はこちら'], ['/card/', '固定費の支払いカードも見直す', '保険料・通信費をポイント還元のあるカードで支払う']],
   life: [],
 };
 
@@ -140,8 +140,19 @@ function InsurancePage() {
     <section className="sv-wrap sv-guide" aria-labelledby="sv-soudan-title">
       <h2 id="sv-soudan-title">無料の保険相談サービス</h2>
       <p>複数の保険会社の商品を扱う相談窓口では、ファイナンシャルプランナー等に無料で相談できます。相談窓口は契約が成立すると保険会社から手数料を受け取る仕組みのため、提案理由と他の選択肢を必ず確認しましょう。</p>
-      <ul className="sv-soudan">{HOKEN_SERVICES.map(service => <li key={service.id}><strong>{service.name}</strong><span>{service.summary}</span><ServiceLink service={service} placement="hoken-list" label="公式サイトで相談方法を確認" /></li>)}</ul>
-      <p className="sv-note">掲載は五十音順で、順位やおすすめ度ではありません。Vivlicaは特定の保険商品の比較・推奨・募集は行いません。取扱保険会社数や相談方法は変わることがあるため、各公式サイトで確認してください。</p>
+      <p>相談方法や窓口の形はサービスごとに異なります。当サイトで確認できた事実だけを、表に整理しました。</p>
+      <div className="sv-table-scroll"><table className="sv-table sv-hoken-table">
+        <thead><tr><th scope="col">サービス</th><th scope="col">相談方法</th><th scope="col">店舗網</th><th scope="col">取扱いの特徴</th><th scope="col">相談料</th><th scope="col">公式サイト</th></tr></thead>
+        <tbody>{HOKEN_SERVICES.map(service => <tr key={service.id}>
+          <th scope="row">{service.name}</th>
+          <td>{service.consultMethods || '―'}</td>
+          <td>{service.storeNetwork || '―'}</td>
+          <td>{service.feature || '―'}</td>
+          <td>{service.fee}</td>
+          <td><ServiceLink service={service} placement="hoken-list" label="公式サイトで相談方法を確認" /></td>
+        </tr>)}</tbody>
+      </table></div>
+      <p className="sv-note">掲載は五十音順で、順位やおすすめ度ではありません。Vivlicaは特定の保険商品の比較・推奨・募集は行いません。表の「―」は当サイトの確認データに記載がない項目です。取扱保険会社数や相談方法は変わることがあるため、各公式サイトで確認してください。</p>
     </section>
   </>;
 }

@@ -113,10 +113,12 @@ export const CARD_SERVICES = [
 ];
 
 // 保険：商品の比較・推奨は保険募集に当たるおそれがあるため行わない。無料相談サービスの紹介のみ（順位なし・五十音順）。
+// consultMethods / storeNetwork / feature / fee は、各 summary に記載がある事実だけを表表示用に切り出したもの。
+// summary に記載がない項目はフィールド自体を持たせない（推測で埋めない）。
 export const HOKEN_SERVICES = [
-  { id: 'hoken-clinic', name: '保険クリニック', summary: '複数の保険会社の商品を扱う無料相談サービス。', officialUrl: 'https://www.hoken-clinic.com/' },
-  { id: 'hokennomadoguchi', name: 'ほけんの窓口', summary: '全国に店舗がある無料保険相談サービス。', officialUrl: 'https://www.hokennomadoguchi.com/' },
-  { id: 'hoken-minaoshi-lab', name: '保険見直しラボ', summary: '訪問・オンラインで相談できる無料保険相談サービス。', officialUrl: 'https://www.hoken-minaoshi-lab.jp/' },
+  { id: 'hoken-clinic', name: '保険クリニック', summary: '複数の保険会社の商品を扱う無料相談サービス。', feature: '複数の保険会社の商品を取り扱う', fee: '無料', officialUrl: 'https://www.hoken-clinic.com/' },
+  { id: 'hokennomadoguchi', name: 'ほけんの窓口', summary: '全国に店舗がある無料保険相談サービス。', consultMethods: '店舗', storeNetwork: '全国に店舗がある', fee: '無料', officialUrl: 'https://www.hokennomadoguchi.com/' },
+  { id: 'hoken-minaoshi-lab', name: '保険見直しラボ', summary: '訪問・オンラインで相談できる無料保険相談サービス。', consultMethods: '訪問・オンライン', fee: '無料', officialUrl: 'https://www.hoken-minaoshi-lab.jp/' },
 ];
 
 export const SERVICE_IDS = Object.freeze([...SIM_SERVICES, ...HIKARI_SERVICES, ...CARD_SERVICES, ...HOKEN_SERVICES].map(s => s.id));
