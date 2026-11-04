@@ -9,4 +9,7 @@ export const PUBLIC_AFFILIATE_LINKS = Object.freeze({
   // Chosen over the also-approved ValueCommerce link because its per-activation
   // reward (¥30,000) is higher than ValueCommerce's (¥25,300 tax incl.).
   'au-hikari': 'https://px.a8.net/svt/ejp?a8mat=4BGD79+EJC2AI+42Y0+5YRHE',
+  // A8.net text link for Docomo Hikari via the GMO Tokutoku BB program (approved 2026-11-04).
+  // New-use reward ¥9,000 (2 Gbps plan ¥13,000 / 10 Gbps plan ¥17,000).
+  'docomo-hikari': 'https://px.a8.net/svt/ejp?a8mat=4BGD79+F468GQ+50+54MIOY',
 });
