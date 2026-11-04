@@ -38,6 +38,10 @@ body{margin:0}
 .sv-options button.active{border-color:#1d6b8a;background:#e6f2f8;color:#124861}
 .sv-form-note{font-size:11px;color:#68808f;margin:6px 0 0}
 .sv-note{font-size:12px;color:#55707f;background:#eef5f9;border:1px solid #d7e7f0;border-radius:10px;padding:9px 12px;margin:0 0 12px}
+.sv-sort{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px}
+.sv-sort span{font-size:12px;font-weight:850;color:#21445a;margin-right:2px}
+.sv-sort button{border:1px solid #d3e0e8;background:#fff;color:#2c4d61;border-radius:9px;padding:8px 11px;font:700 12px 'Noto Sans JP',sans-serif;cursor:pointer;min-height:40px}
+.sv-sort button.active{border-color:#1d6b8a;background:#e6f2f8;color:#124861}
 .sv-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
 .sv-item{background:#fff;border:1px solid #dbe5ec;border-radius:16px;padding:16px 18px;box-shadow:0 6px 18px #16324a0c}
 .sv-item.is-top{border-color:#1d6b8a;box-shadow:0 0 0 2px #cfe6f1}

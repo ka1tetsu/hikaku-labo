@@ -5,7 +5,7 @@ import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
 import { recordOutboundClick } from '../shared/outboundClient.js';
 import { CHECKED_AT, HOKEN_SERVICES } from './catalog.js';
-import { rankCards, rankHikari, rankSim } from './score.js';
+import { rankCards, rankHikari, rankSim, sortByMonthlyPrice, sortCardsByFee, sortCardsByRate } from './score.js';
 import { serviceLink } from './affiliate.js';
 import { AREA_PAGES, SIM_PAIRS } from './pages.js';
 import SavingsPlanner from './SavingsPlanner.jsx';
@@ -19,7 +19,7 @@ const yen = n => n.toLocaleString('ja-JP') + '円';
 const CATEGORY_PAGES = {
   sim: {
     path: '/sim/', kicker: 'MOBILE PLAN', title: '格安SIM・スマホ料金比較', h1: ['毎月のスマホ代を、', '使い方に合わせて最安に。'],
-    lead: 'データ量・通話・店舗サポートを選ぶだけで、主要9社の公式料金から月額の安いプランを順に並べます。',
+    lead: 'データ量・通話・店舗サポートを選ぶと、主要9社の公式料金から、条件への適合度が高い順に並べます。並び替えで価格の安い順にもできます。',
     questions: [
       { id: 'usage', label: '毎月のデータ量', options: [['3', '〜3GB（あまり使わない）'], ['10', '〜10GB（SNS・地図）'], ['30', '〜30GB（動画もよく見る）'], ['unlimited', '無制限・大容量']] },
       { id: 'calls', label: '通話', options: [['few', 'ほとんどしない'], ['5min', '短い通話が多い'], ['unlimited', '長電話もする']] },
@@ -27,6 +27,10 @@ const CATEGORY_PAGES = {
       { id: 'carrier', label: '自宅の光回線', options: [['none', 'なし・わからない'], ['au', 'au系（auひかり等）'], ['softbank', 'ソフトバンク系']] },
     ],
     rank: rankSim, priceLabel: row => (row.monthly !== null ? `月額 ${yen(row.monthly)}` : '公式で確認'),
+    sorts: [
+      { id: 'fit', label: 'おすすめ順（適合度）' },
+      { id: 'price', label: '価格の安い順', apply: sortByMonthlyPrice, caption: '選択したデータ量に合う掲載プランの月額が安い順です。合うプランが掲載されていないサービスは末尾に並びます。' },
+    ],
     note: '料金は税込・割引前の基本料金です（通話料・オプション・端末代は含みません）。',
   },
   hikari: {
@@ -38,6 +42,10 @@ const CATEGORY_PAGES = {
       { id: 'area', label: '地域', options: [['hokkaido', '北海道'], ['tohoku', '東北'], ['kanto', '関東'], ['hokuriku', '北陸・甲信越'], ['tokai', '東海'], ['kansai', '関西'], ['chugoku', '中国'], ['shikoku', '四国'], ['kyushu', '九州'], ['okinawa', '沖縄']] },
     ],
     rank: rankHikari, priceLabel: row => (row.monthly ? `月額目安 ${yen(row.monthly)}` : '公式で確認'),
+    sorts: [
+      { id: 'fit', label: 'おすすめ順（適合度）' },
+      { id: 'price', label: '価格の安い順', apply: sortByMonthlyPrice, caption: '選択した住まい（戸建て／マンション）の月額目安が安い順です。月額目安が掲載されていないサービスは末尾に並びます。' },
+    ],
     note: '月額は標準プランの目安（税込）です。キャッシュバック・工事費・契約期間で実質負担は大きく変わるため、申込前に公式の条件を確認してください。',
   },
   card: {
@@ -49,6 +57,11 @@ const CATEGORY_PAGES = {
       { id: 'priority', label: '重視すること', options: [['rate', '還元率'], ['conveni', 'コンビニ・飲食店'], ['simple', 'どこでも同じ還元']] },
     ],
     rank: rankCards, priceLabel: row => `還元率 ${row.service.rate.toFixed(1)}%`,
+    sorts: [
+      { id: 'fit', label: 'おすすめ順（適合度）' },
+      { id: 'fee', label: '年会費の安い順', apply: sortCardsByFee, caption: '年会費が安い順です。年会費が同額の場合は基本還元率が高い順に並びます。' },
+      { id: 'rate', label: '還元率順', apply: sortCardsByRate, caption: '基本還元率が高い順です。条件つきの「最大◯%」上乗せは含みません。' },
+    ],
     note: '還元率は通常利用時の基本値です。キャンペーンや「最大◯%」の上乗せは条件つきのため、各社公式で確認してください。',
   },
 };
@@ -63,7 +76,10 @@ function ServiceLink({ service, placement, label = '公式サイトで確認' })
 function Selector({ category }) {
   const config = CATEGORY_PAGES[category];
   const [answers, setAnswers] = useState(() => selectorAnswers(config.questions, category, typeof window === 'undefined' ? '' : window.location.search));
+  const [sort, setSort] = useState('fit');
   const ranking = useMemo(() => config.rank(answers), [config, answers]);
+  const activeSort = config.sorts.find(s => s.id === sort) || config.sorts[0];
+  const displayRows = activeSort.apply ? activeSort.apply(ranking) : ranking;
   const top = ranking[0];
   const recommendationRef = useRef(null);
   return <section className="sv-wrap sv-selector" id="selector" aria-labelledby="sv-selector-title">
@@ -86,8 +102,14 @@ function Selector({ category }) {
         <p className="sv-form-note">広告掲載の有無や紹介報酬額は、順位の計算に使いません。</p>
       </aside>
       <div className="sv-results" aria-live="polite">
+        <div className="sv-sort" role="group" aria-label="並び替え">
+          <span>並び替え</span>
+          {config.sorts.map(s => <button type="button" key={s.id} aria-pressed={activeSort.id === s.id} className={activeSort.id === s.id ? 'active' : ''}
+            onClick={() => { setSort(s.id); recordFunnelEvent('sort_change'); }}>{s.label}</button>)}
+        </div>
         <p className="sv-note">{config.note}</p>
-        <ol className="sv-list">{ranking.map((row, index) => <li key={row.service.id} className={'sv-item' + (index === 0 ? ' is-top' : '') + (row.score < 30 ? ' is-dim' : '')}>
+        {activeSort.caption && <p className="sv-note">{activeSort.caption}</p>}
+        <ol className="sv-list">{displayRows.map((row, index) => <li key={row.service.id} className={'sv-item' + (activeSort.id === 'fit' && index === 0 ? ' is-top' : '') + (row.score < 30 ? ' is-dim' : '')}>
           <div className="sv-item-head">
             <span className="sv-rank">{index + 1}</span>
             <div><strong>{row.service.name}</strong><small>{row.service.networkLabel || (row.service.fee ? '年会費 ' + row.service.fee : '')}</small></div>
