@@ -18,6 +18,7 @@
     "test:all": "node --test tests/*.test.mjs",
     "audit:affiliate": "node scripts/audit-affiliate.mjs",
     "report:revenue": "node scripts/revenue-report.mjs",
+ "report:fetch-logs": "node scripts/fetch-track-logs.mjs",
     "verify:build": "node scripts/verify-build.mjs",
     "audit:live": "node scripts/audit-live.mjs",
     "ads:import": "node scripts/import-travel-ad.mjs",
