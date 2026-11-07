@@ -32,8 +32,9 @@ export async function persistEvent(record, { env = process.env, fetchImpl = fetc
   const config = sinkConfig(env);
   if (!config) return false;
   const controller = new AbortController();
+  // Keep the timer referenced: a hung append must still be aborted even when
+  // nothing else holds the event loop open. It is always cleared below.
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-  timer.unref?.();
   try {
     const response = await fetchImpl(config.url, {
       method: 'POST',
