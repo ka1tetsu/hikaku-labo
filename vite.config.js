@@ -30,6 +30,7 @@ export default defineConfig({
         'guide-sim-guide': fileURLToPath(new URL('./guides/sim-guide/index.html', import.meta.url)),
         'guide-hikari-guide': fileURLToPath(new URL('./guides/hikari-guide/index.html', import.meta.url)),
         'guide-card-guide': fileURLToPath(new URL('./guides/card-guide/index.html', import.meta.url)),
+        'guide-shinkansen-reservation': fileURLToPath(new URL('./guides/shinkansen-reservation/index.html', import.meta.url)),
       },
     },
   },
