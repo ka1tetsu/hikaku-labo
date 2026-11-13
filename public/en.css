@@ -1,0 +1,11 @@
+/* English section additions, layered on top of /guides.css (loaded after it). */
+/* English prose reads better with a slightly tighter leading than Japanese text. */
+body{line-height:1.75}
+article p,article li{line-height:1.8}
+
+/* Standard FTC affiliate disclosure block for English articles.
+   Reuse verbatim at the top of every /en/ article, right after the hero. */
+.disclosure{border:1px solid #c1ddcc;background:#f2f7f3;padding:16px 18px;font-size:13.5px;color:#344d40;margin:0 0 26px}
+.disclosure strong{color:#18462f}
+.disclosure p{margin:0}
+.disclosure p+p{margin-top:8px}

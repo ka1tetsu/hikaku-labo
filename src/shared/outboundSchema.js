@@ -32,6 +32,7 @@ export const PAGE_IDS = Object.freeze({
   '/guides/expressway-holiday/': 'guide-expressway-holiday',
   '/guides/sim-guide/': 'guide-sim-guide', '/guides/hikari-guide/': 'guide-hikari-guide', '/guides/card-guide/': 'guide-card-guide',
   '/guides/shinkansen-reservation/': 'guide-shinkansen-reservation',
+  '/en/': 'en', '/en/systeme-io-vs-thinkific/': 'en-systeme-io-vs-thinkific',
   ...Object.fromEntries(SIM_PAIRS.map(pair => [pair.path, 'sim-vs-' + pair.slug])),
   ...Object.fromEntries(AREA_PAGES.map(page => [page.path, 'hikari-area-' + page.area])),
   ...Object.fromEntries(SIM_DETAIL_PAGES.map(page => [page.path, 'sim-service-' + page.id])),
