@@ -9,3 +9,8 @@ article p,article li{line-height:1.8}
 .disclosure strong{color:#18462f}
 .disclosure p{margin:0}
 .disclosure p+p{margin-top:8px}
+
+/* Provider CTA row under a verdict: one official-pricing link per provider.
+   The anchors carry data-provider so they can be swapped for approved
+   affiliate URLs later without touching the article body again. */
+.cta-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 6px}
