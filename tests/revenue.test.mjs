@@ -98,6 +98,11 @@ test('page attribution and funnel schema reject identifiers and financial inputs
   const event = {event:'funnel',page:'home',action:'savings_complete'};
   assert.equal(validFunnelEvent(event),true);
   for(const extra of [{monthly:6000},{email:'person@example.com'},{query:'private'},{action:'anything'}]) assert.equal(validFunnelEvent({...event,...extra}),false);
+  // savings_complete may name the presented service (catalog ID only); the
+  // merchant key is rejected on every other action and for unknown IDs.
+  assert.equal(validFunnelEvent({...event,merchant:'iijmio'}),true);
+  assert.equal(validFunnelEvent({...event,merchant:'not-a-service'}),false);
+  assert.equal(validFunnelEvent({event:'funnel',page:'home',action:'savings_compare',merchant:'iijmio'}),false);
   assert.equal(validOutboundEvent({event:'outbound',section:'life',merchant:'iijmio',placement:'sim-rank',sponsored:false,page:'sim'}),true);
   assert.equal(validOutboundEvent({event:'outbound',section:'life',merchant:'iijmio',placement:'sim-rank',sponsored:false,page:'/sim/?secret=1'}),false);
 });
@@ -121,6 +126,21 @@ test('revenue report keeps legacy clicks, placement attribution and missing view
   assert.equal(result.ignoredRecords,2);
   assert.equal(result.financials,null);
   assert.equal(result.placements[0].clicks,2);
+});
+
+test('revenue report attributes savings completions to the presented service when recorded', () => {
+  const result = revenueReport([
+    {type:'hikaku_funnel',page:'home',action:'savings_complete',merchant:'nihontsushin',timestamp},
+    {type:'hikaku_funnel',page:'home',action:'savings_complete',merchant:'nihontsushin',timestamp},
+    {type:'hikaku_funnel',page:'life',action:'savings_complete',merchant:'iijmio',timestamp},
+    {type:'hikaku_funnel',page:'life',action:'savings_complete',timestamp},
+    {type:'hikaku_funnel',page:'life',action:'savings_complete',merchant:'bogus',timestamp},
+  ],{from:'2026-10-18T00:00:00Z',to:'2026-10-19T00:00:00Z'});
+  assert.deepEqual(result.savingsPresentations,[{merchant:'nihontsushin',presentations:2},{merchant:'iijmio',presentations:1}]);
+  // The legacy event without a merchant still counts as a completion; the
+  // event with an unknown merchant is rejected by the schema and ignored.
+  assert.equal(result.pages.find(row=>row.page==='life').savingsCompleted,2);
+  assert.equal(result.ignoredRecords,1);
 });
 
 test('profits require settlement and cost totals for the same explicit interval', () => {
@@ -168,6 +188,9 @@ test('tracking endpoint records only enum milestones and enforces actual body si
   try {
     assert.equal(request({event:'funnel',page:'home',action:'savings_complete'}),204);
     assert.deepEqual(Object.keys(events[0]).sort(),['type','timestamp','page','action'].sort());
+    assert.equal(request({event:'funnel',page:'home',action:'savings_complete',merchant:'iijmio'}),204);
+    assert.equal(events.at(-1).merchant,'iijmio');
+    assert.equal(request({event:'funnel',page:'home',action:'savings_complete',merchant:'bogus'}),400);
     assert.equal(request({event:'funnel',page:'home',action:'savings_complete',current:6000}),400);
     assert.equal(request({payload:'x'.repeat(513)}),413);
   } finally {console.info=original}

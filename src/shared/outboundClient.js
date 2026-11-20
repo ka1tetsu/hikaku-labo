@@ -27,8 +27,10 @@ export function recordOutboundClick({ section, merchant, placement, sponsored })
 }
 
 // Enum-only milestones: never include bill amounts, answers or identity.
-export function recordFunnelEvent(action) {
+// savings_complete may add the presented service's catalog ID so the revenue
+// report can attribute completions per service.
+export function recordFunnelEvent(action, merchant) {
   if (typeof window === 'undefined') return;
   const page = pageId(window.location.pathname);
-  if (page) send(JSON.stringify({ event: 'funnel', page, action }));
+  if (page) send(JSON.stringify({ event: 'funnel', page, action, ...(merchant ? { merchant } : {}) }));
 }

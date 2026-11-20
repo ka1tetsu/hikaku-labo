@@ -54,5 +54,13 @@ export function validPageId(page) {
 }
 export const FUNNEL_ACTIONS = Object.freeze(['savings_complete', 'savings_compare', 'selector_change', 'sort_change', 'guide_compare', 'decision_bar_shown', 'travel_quote_ready', 'travel_cancellation_review', 'product_manual_ready', 'product_search', 'product_results_ready', 'product_offer_selected', 'product_target_saved']);
 export function validFunnelEvent(body) {
-  return Boolean(body && typeof body === 'object' && !Array.isArray(body) && body.event === 'funnel' && validPageId(body.page) && FUNNEL_ACTIONS.includes(body.action) && (!['travel_quote_ready','travel_cancellation_review'].includes(body.action) || body.page === 'travel') && (!body.action.startsWith('product_') || body.page === 'compare') && Object.keys(body).every(key => ['event', 'page', 'action'].includes(key)));
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return false;
+  if (body.event !== 'funnel' || !validPageId(body.page) || !FUNNEL_ACTIONS.includes(body.action)) return false;
+  if (['travel_quote_ready', 'travel_cancellation_review'].includes(body.action) && body.page !== 'travel') return false;
+  if (body.action.startsWith('product_') && body.page !== 'compare') return false;
+  // Only savings_complete may name the service it presented: an enumerated
+  // catalog ID (the cheapest candidate; price order is unchanged). Funnel
+  // events never carry amounts, answers or identifiers.
+  if (body.merchant !== undefined && (body.action !== 'savings_complete' || !SERVICE_IDS.includes(body.merchant))) return false;
+  return Object.keys(body).every(key => ['event', 'page', 'action', 'merchant'].includes(key));
 }
