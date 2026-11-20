@@ -20,7 +20,7 @@ export default function SavingsPlanner() {
     const estimate = savingsEstimate({ current, lines, usage, support, switchingCost });
     setResult(estimate);
     setError(estimate ? '' : '料金は0〜1,000,000円の整数、回線数は1〜6回線で入力してください。');
-    if (estimate) recordFunnelEvent('savings_complete');
+    if (estimate) recordFunnelEvent('savings_complete', estimate.service.id);
   }
   function edit(setter) { return event => { setter(event.target.value); setResult(null); setError(''); }; }
   return <section className="vl-savings" id="savings" aria-labelledby="vl-savings-title">

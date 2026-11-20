@@ -25,7 +25,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
   const start = from === undefined ? -Infinity : Date.parse(from);
   const end = to === undefined ? Infinity : Date.parse(to);
   if (Number.isNaN(start) || Number.isNaN(end) || start >= end) throw new Error('Use a valid time interval: from < to (end exclusive).');
-  const pages = new Map(), placements = new Map(), merchants = new Map();
+  const pages = new Map(), placements = new Map(), merchants = new Map(), savingsPresentations = new Map();
   let unattributedClicks = 0, ignoredRecords = 0, includedRecords = 0;
   const rowFor = page => {
     if (!pages.has(page)) pages.set(page, { page, views: 0, outboundClicks: 0, sponsoredClicks: 0, savingsCompleted: 0, savingsComparisons: 0, savingsDirectClicks: 0, selectorChanges: 0, sortChanges: 0, guideComparisons: 0, decisionBarShown: 0, travelQuotesReady: 0, travelQuoteBookingClicks: 0, travelCancellationReviews: 0, productManualReady: 0, productManualResearchClicks: 0, productManualResultClicks: 0, travelDirectSearchClicks: 0, productSearches: 0, productResultsReady: 0, productOffersSelected: 0, productTargetsSaved: 0 });
@@ -59,6 +59,9 @@ export function revenueReport(events, { from, to, finance } = {}) {
       const counter = { savings_complete: 'savingsCompleted', savings_compare: 'savingsComparisons', selector_change: 'selectorChanges', sort_change: 'sortChanges', guide_compare: 'guideComparisons', decision_bar_shown: 'decisionBarShown', travel_quote_ready: 'travelQuotesReady', travel_cancellation_review: 'travelCancellationReviews', product_manual_ready: 'productManualReady', product_search: 'productSearches', product_results_ready: 'productResultsReady', product_offer_selected: 'productOffersSelected', product_target_saved: 'productTargetsSaved' }[fields.action];
       if (counter) row[counter]++;
        else { ignoredRecords++; continue; }
+      // savings_complete may name the presented (cheapest) service; legacy
+      // events without a merchant still count toward the page totals above.
+      if (fields.action === 'savings_complete' && fields.merchant) savingsPresentations.set(fields.merchant, (savingsPresentations.get(fields.merchant) || 0) + 1);
     } else { ignoredRecords++; continue; }
     includedRecords++;
   }
@@ -91,6 +94,7 @@ export function revenueReport(events, { from, to, finance } = {}) {
     pages: [...pages.values()].map(row => ({ ...row, outboundClicksPer100Views: row.views ? Math.round(row.outboundClicks / row.views * 10000) / 100 : null })),
     placements: [...placements.values()].sort((a, b) => b.clicks - a.clicks),
     merchants: [...merchants.values()].sort((a, b) => b.clicks - a.clicks),
+    savingsPresentations: [...savingsPresentations.entries()].map(([merchant, presentations]) => ({ merchant, presentations })).sort((a, b) => b.presentations - a.presentations),
     nextActions,
     financials,
     merchantFinancials: settlement,

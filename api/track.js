@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
   if (Buffer.byteLength(JSON.stringify(body) || '', 'utf8') > 512) return res.status(413).json({ error: 'body_too_large' });
   if (validFunnelEvent(body)) {
-    const record = { type: 'hikaku_funnel', page: body.page, action: body.action, timestamp: new Date().toISOString() };
+    const record = { type: 'hikaku_funnel', page: body.page, action: body.action, ...(body.merchant ? { merchant: body.merchant } : {}), timestamp: new Date().toISOString() };
     console.info(JSON.stringify(record));
     return respond(res, record);
   }
