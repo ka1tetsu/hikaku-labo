@@ -43,22 +43,24 @@ test('K3 provider-type hikari entries carry official sources and honest null pri
   const added = ['biglobe-hikari', 'nifty-hikari', 'sonet-hikari', 'gmo-hikari']
     .map(id => HIKARI_SERVICES.find(s => s.id === id));
   assert.ok(added.every(Boolean));
-  // 確認日はエントリごとに保持する（BIGLOBE・@nifty は 2026-11-25 に再確認、他2社は 2026-11-04）
-  const checkedAtById = { 'biglobe-hikari': '2026-11-25', 'nifty-hikari': '2026-11-25', 'sonet-hikari': '2026-11-04', 'gmo-hikari': '2026-11-04' };
+  // 確認日はエントリごとに保持する（BIGLOBE・@nifty は 2026-11-25、So-net・GMO は 2026-11-26 に再確認）
+  const checkedAtById = { 'biglobe-hikari': '2026-11-25', 'nifty-hikari': '2026-11-25', 'sonet-hikari': '2026-11-26', 'gmo-hikari': '2026-11-26' };
   for (const s of added) {
     // フレッツ系コラボは全国（フレッツ光エリア）で、公式で確認した出典を持つ
     assert.equal(s.areas, 'all', s.id);
     assert.equal(s.checkedAt, checkedAtById[s.id], s.id);
     assert.ok(s.sourceUrl.startsWith('https://'), s.id);
   }
-  // 公式で単一の金額を確認できた2社だけ月額を持つ
+  // 公式で単一の金額を確認できた社だけ月額を持つ
   assert.equal(HIKARI_SERVICES.find(s => s.id === 'biglobe-hikari').house, 5478);
   assert.equal(HIKARI_SERVICES.find(s => s.id === 'biglobe-hikari').mansion, 4378);
   assert.equal(HIKARI_SERVICES.find(s => s.id === 'nifty-hikari').house, 5720);
   assert.equal(HIKARI_SERVICES.find(s => s.id === 'nifty-hikari').mansion, 4378);
-  // 金額が定まらない2社は null のまま「公式で確認」に倒す
+  // GMOは公式LPで1ギガの税込価格を確認できたため月額を持つ（2026-11-26確認）
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'gmo-hikari').house, 4818);
+  assert.equal(HIKARI_SERVICES.find(s => s.id === 'gmo-hikari').mansion, 3773);
+  // プラン制で金額が1つに定まらない So-net は null のまま「公式で確認」に倒す
   assert.equal(HIKARI_SERVICES.find(s => s.id === 'sonet-hikari').house, null);
-  assert.equal(HIKARI_SERVICES.find(s => s.id === 'gmo-hikari').mansion, null);
   // セット割の有無も公式確認どおり（BIGLOBE・@nifty は au、So-net・GMO はなし）
   assert.deepEqual(HIKARI_SERVICES.find(s => s.id === 'biglobe-hikari').bundle, ['au']);
   assert.deepEqual(HIKARI_SERVICES.find(s => s.id === 'gmo-hikari').bundle, []);
@@ -153,7 +155,7 @@ test('insurance page compares no insurance products and lists services without r
   // 表の事実項目は各社の公式サイトで確認できた事実だけを使う（未確認の項目はフィールドを持たない）
   const clinic = HOKEN_SERVICES.find(s => s.id === 'hoken-clinic');
   assert.equal(clinic.consultMethods, '店舗・オンライン');
-  assert.equal(clinic.storeNetwork, '全国309店舗');
+  assert.equal(clinic.storeNetwork, '全国312店舗');
   assert.equal(clinic.feature, '取扱保険会社は約50社（店舗により異なる）');
   const madoguchi = HOKEN_SERVICES.find(s => s.id === 'hokennomadoguchi');
   assert.equal(madoguchi.consultMethods, '店舗・オンライン');
@@ -167,12 +169,12 @@ test('insurance page compares no insurance products and lists services without r
 
 test('per-service detail pages cover only services with enough catalog facts (K1)', async () => {
   const { SIM_DETAIL_PAGES, HIKARI_DETAIL_PAGES, CARD_DETAIL_PAGES, SIM_PAIRS, AREA_PAGES } = await import('../src/services/pages.js');
-  // SIM・カードは全サービスに個別ページ。光は料金が確認できる7社だけ（K3でBIGLOBE光・@nifty光を追加）
+  // SIM・カードは全サービスに個別ページ。光は料金が確認できる社だけ（K3でBIGLOBE光・@nifty光、2026-11-26に公式LPで価格確認できたGMOとくとくBB光を追加）
   assert.equal(SIM_DETAIL_PAGES.length, SIM_SERVICES.length);
   assert.equal(CARD_DETAIL_PAGES.length, CARD_SERVICES.length);
-  assert.deepEqual(HIKARI_DETAIL_PAGES.map(p => p.id), ['docomo-hikari', 'softbank-hikari', 'au-hikari', 'nuro-hikari', 'rakuten-hikari', 'biglobe-hikari', 'nifty-hikari']);
-  // 料金が null の eo光・コミュファ光・So-net光・GMOとくとくBB光は薄いページになるため作らず、地域ページに統合したままにする
-  assert.ok(!HIKARI_DETAIL_PAGES.some(p => p.id === 'eo-hikari' || p.id === 'commufa-hikari' || p.id === 'sonet-hikari' || p.id === 'gmo-hikari'));
+  assert.deepEqual(HIKARI_DETAIL_PAGES.map(p => p.id), ['docomo-hikari', 'softbank-hikari', 'au-hikari', 'nuro-hikari', 'rakuten-hikari', 'biglobe-hikari', 'nifty-hikari', 'gmo-hikari']);
+  // 料金が null の eo光・コミュファ光・So-net光は薄いページになるため作らず、地域ページに統合したままにする
+  assert.ok(!HIKARI_DETAIL_PAGES.some(p => p.id === 'eo-hikari' || p.id === 'commufa-hikari' || p.id === 'sonet-hikari'));
   const all = [...SIM_DETAIL_PAGES, ...HIKARI_DETAIL_PAGES, ...CARD_DETAIL_PAGES];
   assert.equal(new Set(all.map(p => p.path)).size, all.length);
   assert.ok(all.every(p => /^\/(sim|hikari|card)\/[a-z0-9-]+\/$/.test(p.path)));
