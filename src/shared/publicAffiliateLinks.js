@@ -14,6 +14,16 @@ export const PUBLIC_AFFILIATE_LINKS = Object.freeze({
   'docomo-hikari': 'https://px.a8.net/svt/ejp?a8mat=4BGD79+F468GQ+50+54MIOY',
   // A8.net text link for NURO Hikari via the Sony Network Communications program (approved 2026-11-18).
   'nuro-hikari': 'https://px.a8.net/svt/ejp?a8mat=4BGD79+ESUZYY+2VMU+64C3M',
+  // A8.net text links for the securities section (websiteId=002 for Vivlica,
+  // materials issued 2026-11-26 in the A8 console; programs already approved).
+  // DMM FX material 054: new registration + deposit + first trade conditions apply.
+  'dmm-fx': 'https://px.a8.net/svt/ejp?a8mat=3Z0VIB+8OKM56+1WP2+69WPU',
+  // DMM Kabu (stocks) material 011: new registration + first deposit + stock trade.
+  'dmm-kabu': 'https://px.a8.net/svt/ejp?a8mat=455JZI+DJM1ZU+1WP2+15QP82',
+  // DMM CFD material 001: new registration + deposit + first trade conditions apply.
+  'dmm-cfd': 'https://px.a8.net/svt/ejp?a8mat=455JZI+DIF6SA+1WP2+NTJWY',
+  // Matsui Securities material 028: new account opening completed within 30 days.
+  'matsui': 'https://px.a8.net/svt/ejp?a8mat=455IFN+FHBA2+3XCC+64C3M',
   // Rakuten Affiliate text link for Rakuten Card (vivlica.com registered as a site 2026-11-04).
   // Reward is Rakuten Cash ¥1,500 per newly issued card.
   'rakuten-card': 'https://hb.afl.rakuten.co.jp/hsc/483a330d.4f37b651.433ccf31.62544894/?link_type=text&rafst=rc',

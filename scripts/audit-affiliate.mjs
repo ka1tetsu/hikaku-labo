@@ -5,6 +5,7 @@ import { APPROVED_AFFILIATE_LINKS, outboundLink } from '../src/tools/affiliate.j
 import { A8_AD_PLACEMENTS } from '../src/tools/a8Placements.js';
 import { SERVICES } from '../src/tools/catalog.js';
 import { SIM_SERVICES, HIKARI_SERVICES, CARD_SERVICES, HOKEN_SERVICES } from '../src/services/catalog.js';
+import { SERVICES as SECURITIES_SERVICES } from '../src/securities/catalog.js';
 import { affiliateEnvKey, serviceLink } from '../src/services/affiliate.js';
 import { YAHOO_TRAVEL_A8_CREATIVES, travelAffiliateEnabled } from '../src/travel/a8TravelAds.js';
 import { affiliateBundle, affiliateCandidate } from '../src/shared/affiliateConfig.js';
@@ -12,7 +13,7 @@ import { SITE_ORIGIN, siteOrigin } from '../src/shared/site.js';
 
 const cwd = fileURLToPath(new URL('../', import.meta.url));
 const env = { ...loadEnv('production', cwd, 'VITE_'), ...process.env, VITE_SITE_ORIGIN: siteOrigin(process.env.SITE_ORIGIN || SITE_ORIGIN) };
-const groups = { sim: SIM_SERVICES, hikari: HIKARI_SERVICES, card: CARD_SERVICES, hoken: HOKEN_SERVICES, tools: SERVICES };
+const groups = { sim: SIM_SERVICES, hikari: HIKARI_SERVICES, card: CARD_SERVICES, hoken: HOKEN_SERVICES, tools: SERVICES, securities: SECURITIES_SERVICES };
 const rows = Object.entries(groups).flatMap(([section, services]) => services.map(service => {
   const link = section === 'tools' ? outboundLink(service, env) : serviceLink(service, env);
   const html = section === 'tools' && typeof A8_AD_PLACEMENTS[service.id] === 'string' && Boolean(A8_AD_PLACEMENTS[service.id].trim());

@@ -1,13 +1,15 @@
 import { SERVICE_IDS } from '../services/catalog.js';
+import { SERVICES as SECURITIES_SERVICES } from '../securities/catalog.js';
 import { TRAVEL_PROVIDERS } from '../travel/providers.js';
 import { AREA_PAGES, CARD_DETAIL_PAGES, HIKARI_DETAIL_PAGES, SIM_DETAIL_PAGES, SIM_PAIRS } from '../services/pages.js';
 
 // First-party, cookie-free event logger for deliberate outbound clicks.
 // No IP, user agent, session IDs, search terms, destination URLs or query strings.
-export const ANALYTICS_SECTIONS = Object.freeze(['products', 'tools', 'travel', 'life']);
+export const ANALYTICS_SECTIONS = Object.freeze(['products', 'tools', 'travel', 'life', 'securities']);
+export const SECURITIES_MERCHANTS = Object.freeze(SECURITIES_SERVICES.map(service => service.id));
 export const TRAVEL_MERCHANTS = Object.freeze(['yahoo-travel', 'rakuten-travel', 'trip-com', 'skyscanner', 'expedia', 'booking', 'google-flights', 'google-maps', ...TRAVEL_PROVIDERS.map(p => p.id)].filter((id, i, all) => all.indexOf(id) === i));
 export const STORE_MERCHANTS = Object.freeze(['rakuten', 'amazon', 'yahoo-shopping', 'au-pay', 'qoo10', 'yodobashi', 'biccamera', 'apple', 'iherb', 'mercari', 'rakuma', 'paypay-fleamarket', 'edion', 'joshin', 'nojima', 'sofmap', 'kojima', 'tsukumo', 'google']);
-export const ANALYTICS_MERCHANTS = Object.freeze([...STORE_MERCHANTS, 'studio', 'wix', 'base', 'shopify', 'xserver-wp', 'kinsta', ...TRAVEL_MERCHANTS, ...SERVICE_IDS]);
+export const ANALYTICS_MERCHANTS = Object.freeze([...STORE_MERCHANTS, 'studio', 'wix', 'base', 'shopify', 'xserver-wp', 'kinsta', ...TRAVEL_MERCHANTS, ...SERVICE_IDS, ...SECURITIES_MERCHANTS]);
 
 export function validOutboundEvent(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return false;
@@ -19,6 +21,7 @@ export function validOutboundEvent(body) {
   if (body.section === 'products' && !STORE_MERCHANTS.includes(body.merchant)) return false;
   if (body.section === 'life' && !SERVICE_IDS.includes(body.merchant)) return false;
   if (body.section === 'tools' && !['studio', 'wix', 'base', 'shopify', 'xserver-wp', 'kinsta'].includes(body.merchant)) return false;
+  if (body.section === 'securities' && !SECURITIES_MERCHANTS.includes(body.merchant)) return false;
   if (body.page !== undefined && !validPageId(body.page)) return false;
   return Object.keys(body).every(key => ['event','section','merchant','sponsored','placement','page'].includes(key));
 }
@@ -26,7 +29,7 @@ export function validOutboundEvent(body) {
 // Page views (no identifiers) so outbound clicks can be turned into a click-through rate.
 export const PAGE_IDS = Object.freeze({
   '/about/': 'about', '/editorial-policy/': 'editorial-policy', '/privacy/': 'privacy',
-  '/': 'home', '/compare/': 'compare', '/tools/': 'tools', '/life/': 'life', '/sim/': 'sim', '/hikari/': 'hikari',
+  '/': 'home', '/compare/': 'compare', '/tools/': 'tools', '/securities/': 'securities', '/life/': 'life', '/sim/': 'sim', '/hikari/': 'hikari',
   '/card/': 'card', '/hoken/': 'hoken', '/travel/': 'travel', '/guides/travel-budget/': 'guide-travel-budget', '/guides/travel-total-cost/': 'guide-travel-total-cost', '/guides/website-tools/': 'guide-website-tools',
   '/guides/hotel-cancellation/': 'guide-hotel-cancellation', '/guides/lodging-tax/': 'guide-lodging-tax', '/guides/long-weekends/': 'guide-long-weekends',
   '/guides/expressway-holiday/': 'guide-expressway-holiday',
