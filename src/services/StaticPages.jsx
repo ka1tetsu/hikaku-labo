@@ -179,6 +179,7 @@ export function SimServicePage({ id, env = {} }) {
       <h2>注意点</h2>
       <ul>{s.cautions.map(c => <li key={c}>{c}</li>)}</ul>
       <p className="sv-note">出典：<a href={s.sourceUrl} target="_blank" rel="noopener noreferrer">公式情報 ↗</a>（確認日はページ上部に記載）</p>
+      <div className="sv-cta-row"><Cta service={s} env={env} placement="sim-detail-bottom" /></div>
     </section>
     <section className="sv-wrap sv-related">
       <h2>条件で比べる・2社比較</h2>
@@ -227,6 +228,7 @@ export function HikariServicePage({ id, env = {} }) {
       <h2>注意点</h2>
       <ul>{s.cautions.map(c => <li key={c}>{c}</li>)}</ul>
       <p className="sv-note">出典：<a href={s.officialUrl} target="_blank" rel="noopener noreferrer">公式サイト ↗</a>（確認日はページ上部に記載）</p>
+      <div className="sv-cta-row"><Cta service={s} env={env} placement="hikari-detail-bottom" /></div>
     </section>
     <section className="sv-wrap sv-related">
       <h2>地域別に見る・ほかの光回線</h2>
@@ -267,6 +269,7 @@ export function CardServicePage({ id, env = {} }) {
       <h2>注意点</h2>
       <ul>{s.cautions.map(c => <li key={c}>{c}</li>)}</ul>
       <p className="sv-note">出典：<a href={s.sourceUrl || s.officialUrl} target="_blank" rel="noopener noreferrer">公式情報 ↗</a>（確認日はページ上部に記載）</p>
+      <div className="sv-cta-row"><Cta service={s} env={env} placement="card-detail-bottom" /></div>
     </section>
     <section className="sv-wrap sv-related">
       <h2>条件で比べる・ほかのカード</h2>
