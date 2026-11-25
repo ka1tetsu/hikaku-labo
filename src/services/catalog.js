@@ -1,5 +1,5 @@
 // 通信・お金のサービス比較データ。
-// 料金は 2026-10-17 に公式サイト・公式Q&A・各社発表、または複数の最新記事が一致した値だけを載せる。
+// 料金は公式サイト・公式Q&A・各社発表で確認できた値だけを載せる（全体の最終確認日は CHECKED_AT、各エントリの確認日は checkedAt）。
 // 情報源どうしで食い違う値（例：LINEMOベストプランV、NURO光マンション）は price: null にして
 // 「公式で確認」と表示する。推測で埋めないこと。更新時は checkedAt と sourceUrl を必ず更新する。
 // 鮮度運用（K4）：月次の公式確認フローは docs/VIVLICA-LAUNCH.md「料金カタログの月次確認
@@ -8,7 +8,7 @@
 // 価格を未確認扱い（「公式で確認」）に自動で落とす（src/services/freshness.js）。
 // 改定後の料金を公式で確認できたら、数値を更新し、priceRevisionFrom と古い予告の
 // 注意書きを外すこと。日付は注意書きに明記されているものだけを使い、推測で入れない。
-export const CHECKED_AT = '2026-10-17';
+export const CHECKED_AT = '2026-11-26';
 const INF = Number.POSITIVE_INFINITY;
 
 export const SIM_SERVICES = [
@@ -116,12 +116,12 @@ export const HIKARI_SERVICES = [
     summary: 'ソニー系の光コラボ。S／M／Lの3プランから選ぶ。',
     facts: ['S／M／Lの3プラン制（戸建て月4,500円／5,995円／7,095円、マンション月3,400円／4,895円／5,995円）', '全国（フレッツ光エリア）で利用可'],
     cautions: ['プランで月額が異なるため、目安は公式で確認'],
-    officialUrl: 'https://www.so-net.ne.jp/access/hikari/', sourceUrl: 'https://www.so-net.ne.jp/signup/kiyaku/collaboration_rule01.html', checkedAt: '2026-11-04' },
-  { id: 'gmo-hikari', name: 'GMOとくとくBB光', bundle: [], areas: 'all', house: null, mansion: null,
+    officialUrl: 'https://www.so-net.ne.jp/access/hikari/', sourceUrl: 'https://www.so-net.ne.jp/access/hikari/1g/', checkedAt: '2026-11-26' },
+  { id: 'gmo-hikari', name: 'GMOとくとくBB光', bundle: [], areas: 'all', house: 4818, mansion: 3773,
     summary: 'GMOとくとくBBの光コラボ。スマホとのセット割はなく、契約期間の縛りがない。',
-    facts: ['スマホとのセット割は提供されていない（公式FAQ）', '契約期間の縛り・解約違約金なし', '全国（フレッツ光エリア）で利用可'],
-    cautions: ['月額は申込窓口により異なるため、目安は公式で確認'],
-    officialUrl: 'https://gmobb.jp/lp/gmohikari/', sourceUrl: 'https://gmobb.jp/lp/gmohikari_change/support/faq/', checkedAt: '2026-11-04' },
+    facts: ['1ギガの月額は戸建て4,818円／マンション3,773円（税込・公式LP）', 'スマホ料金の割引型セット割はない（mineo申込時のデータ増量特典はあり）', '契約期間の縛り・解約違約金なし', '全国（フレッツ光エリア）で利用可'],
+    cautions: ['別途、契約事務手数料3,300円（税込）', '10ギガは戸建て・マンションとも月額5,940円（税込）'],
+    officialUrl: 'https://gmobb.jp/lp/gmohikari/', sourceUrl: 'https://gmobb.jp/lp/gmohikari/', checkedAt: '2026-11-26' },
 ];
 
 // クレジットカード：年会費と「基本」還元率のみ比較（上限値の「最大◯%」は条件つきなので注記扱い）。
@@ -182,7 +182,7 @@ export const CARD_SERVICES = [
 // 公式で確認できなかった項目はフィールド自体を持たせない（推測で埋めない）。数値の時点・条件の注記は公式表記に合わせ、確認先は sourceUrl に残す。
 // ほけんの窓口の総店舗数は、時点の異なる数値しか公式に確認できなかったため定性表記のままにしている（オンライン相談は企業サイトのプレスリリースと公式店舗ページで確認）。
 export const HOKEN_SERVICES = [
-  { id: 'hoken-clinic', name: '保険クリニック', summary: '複数の保険会社の商品を扱う無料相談サービス。', consultMethods: '店舗・オンライン', storeNetwork: '全国309店舗', feature: '取扱保険会社は約50社（店舗により異なる）', fee: '無料', officialUrl: 'https://www.hoken-clinic.com/', sourceUrl: 'https://www.hoken-clinic.com/' },
+  { id: 'hoken-clinic', name: '保険クリニック', summary: '複数の保険会社の商品を扱う無料相談サービス。', consultMethods: '店舗・オンライン', storeNetwork: '全国312店舗', feature: '取扱保険会社は約50社（店舗により異なる）', fee: '無料', officialUrl: 'https://www.hoken-clinic.com/', sourceUrl: 'https://www.hoken-clinic.com/' },
   { id: 'hokennomadoguchi', name: 'ほけんの窓口', summary: '全国に店舗がある無料保険相談サービス。', consultMethods: '店舗・オンライン', storeNetwork: '全国に店舗がある', feature: '取扱保険会社は40社以上、300商品以上', fee: '無料', officialUrl: 'https://www.hokennomadoguchi.com/', sourceUrl: 'https://www.hokennomadoguchi.com/' },
   { id: 'hoken-minaoshi-lab', name: '保険見直しラボ', summary: '訪問・オンラインで相談できる無料保険相談サービス。', consultMethods: '訪問・オンライン', storeNetwork: '全国に約60拠点（2025年4月時点）', feature: '取扱保険会社は42社（2026年9月時点）', fee: '無料', officialUrl: 'https://www.hoken-minaoshi-lab.jp/', sourceUrl: 'https://www.hoken-minaoshi-lab.jp/' },
 ];

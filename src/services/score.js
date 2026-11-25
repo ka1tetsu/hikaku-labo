@@ -56,7 +56,9 @@ export function rankHikari({ housing = 'house', carrier = 'none', area = 'kanto'
     const monthly = recheck ? null : (service[housing] ?? null);
     if (recheck) { cautions.unshift(PRICE_RECHECK_CAUTION); reasons.push('月額は改定後の金額を確認中（公式で確認）'); }
     else if (monthly) reasons.push(`${housing === 'house' ? '戸建て' : 'マンション'}の月額目安 ${monthly.toLocaleString('ja-JP')}円`);
-    else reasons.push('月額は住所・建物で異なるため公式で確認');
+    // 月額を確認できていない候補は、確認できる候補より少し後ろに置く
+    // （価格の正規化レンジが変わっても未確認候補が上位に浮くことを防ぐ）
+    else { points -= 5; reasons.push('月額は住所・建物で異なるため公式で確認'); }
     if (service.areas !== 'all' && available) { points += 5; reasons.push('エリア限定の独自回線'); }
     return { service, monthly, points, reasons, cautions, available, priceRecheck: recheck };
   });
