@@ -100,7 +100,7 @@ body{margin:0}
 .sv-table tbody th{background:#f7fafc;color:#21445a;width:130px}
 .sv-table ul{margin:0;padding-left:16px}
 .sv-table small{color:#55707f}
-.sv-table .sv-service-link{color:#15344a;text-decoration:underline;text-underline-offset:2px}
+.sv-service-link{color:#15344a;text-decoration:underline;text-underline-offset:2px}
 .sv-area-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .sv-area-list li{border:1px solid #dbe5ec;border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:4px}
 .sv-area-list li[id]{scroll-margin-top:12px}
