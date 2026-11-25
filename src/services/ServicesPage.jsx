@@ -96,6 +96,7 @@ function Selector({ category }) {
       <b>{config.priceLabel(top)}</b>
       <small>{top.reasons[0]}</small>
       <ServiceLink service={top.service} placement={category + '-toppick'} label="公式サイトで条件を確認" />
+      {detailPath(category, top.service.id) && <a className="sv-top-more" href={detailPath(category, top.service.id)}>{top.service.name}の詳細（{DETAIL_LABELS[category]}）を見る →</a>}
       <a className="sv-top-more" href="#sv-selector-title">条件を変えて比べる ↓</a>
     </div>
     <div className="sv-selector-grid">

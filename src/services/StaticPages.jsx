@@ -128,7 +128,9 @@ export function HikariAreaPage({ area, env = {} }) {
     <section className="sv-wrap sv-guide">
       <h2>{label}で申し込める主な光回線</h2>
       <ul className="sv-area-list">{available.map(s => <li key={s.id} id={`service-${s.id}`}>
-        <strong>{s.name}</strong><span>{s.summary}</span>
+        {HIKARI_DETAIL_PAGES.some(p => p.id === s.id)
+          ? <a className="sv-service-link" href={`/hikari/${s.id}/`}><strong>{s.name}</strong></a>
+          : <strong>{s.name}</strong>}<span>{s.summary}</span>
         <small>戸建て：{s.house && !priceRecheckRequired(s) ? yen(s.house) + '（目安）' : '公式で確認'} ／ マンション：{s.mansion && !priceRecheckRequired(s) ? yen(s.mansion) + '（目安）' : '公式で確認'}</small>
         <small>セット割：{s.bundle.map(c => CARRIERS.find(([id]) => id === c)?.[1]).join('、')}</small>
         <Cta service={s} env={env} placement="hikari-area" />
