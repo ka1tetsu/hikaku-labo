@@ -43,10 +43,12 @@ test('K3 provider-type hikari entries carry official sources and honest null pri
   const added = ['biglobe-hikari', 'nifty-hikari', 'sonet-hikari', 'gmo-hikari']
     .map(id => HIKARI_SERVICES.find(s => s.id === id));
   assert.ok(added.every(Boolean));
+  // 確認日はエントリごとに保持する（BIGLOBE・@nifty は 2026-11-25 に再確認、他2社は 2026-11-04）
+  const checkedAtById = { 'biglobe-hikari': '2026-11-25', 'nifty-hikari': '2026-11-25', 'sonet-hikari': '2026-11-04', 'gmo-hikari': '2026-11-04' };
   for (const s of added) {
-    // フレッツ系コラボは全国（フレッツ光エリア）で、2026-11-04 に公式で確認した出典を持つ
+    // フレッツ系コラボは全国（フレッツ光エリア）で、公式で確認した出典を持つ
     assert.equal(s.areas, 'all', s.id);
-    assert.equal(s.checkedAt, '2026-11-04', s.id);
+    assert.equal(s.checkedAt, checkedAtById[s.id], s.id);
     assert.ok(s.sourceUrl.startsWith('https://'), s.id);
   }
   // 公式で単一の金額を確認できた2社だけ月額を持つ
@@ -196,17 +198,24 @@ test('catalog freshness flips revised prices to unconfirmed after the announced 
   const dCard = CARD_SERVICES.find(s => s.id === 'd-card');
   const goldU = CARD_SERVICES.find(s => s.id === 'd-card-gold-u');
 
-  // priceRevisionFrom は、注意書きに日付つきの改定・見直し予告が明記されている4サービスだけに付く
+  // priceRevisionFrom は、注意書きに日付つきの改定・見直し予告が明記されているサービスだけに付く
+  // （2026-12-01 改定組4件＋auひかりの2027-01-01値上げ告知。いずれも公式の告知が根拠）
   const flagged = [...SIM_SERVICES, ...HIKARI_SERVICES, ...CARD_SERVICES].filter(s => s.priceRevisionFrom);
-  assert.deepEqual(flagged.map(s => s.id).sort(), ['ahamo', 'd-card', 'd-card-gold-u', 'softbank-hikari']);
-  assert.ok(flagged.every(s => s.priceRevisionFrom === '2026-12-01'));
+  assert.deepEqual(flagged.map(s => s.id).sort(), ['ahamo', 'au-hikari', 'd-card', 'd-card-gold-u', 'softbank-hikari']);
+  const decGroup = flagged.filter(s => s.id !== 'au-hikari');
+  assert.ok(decGroup.every(s => s.priceRevisionFrom === '2026-12-01'));
   // 根拠は各サービスの注意書きの日付表記そのもの（推測で入れた日付ではないこと）
   assert.ok(ahamo.cautions.some(c => c.includes('2026年12月1日')));
   assert.ok(softbankHikari.cautions.some(c => c.includes('2026年12月利用分から')));
   for (const card of [dCard, goldU]) assert.ok(card.cautions.some(c => c.includes('2026年12月以降')));
+  const auHikari = HIKARI_SERVICES.find(s => s.id === 'au-hikari');
+  assert.equal(auHikari.priceRevisionFrom, '2027-01-01');
+  assert.ok(auHikari.cautions.some(c => c.includes('2027年1月')));
+  assert.equal(priceRecheckRequired(auHikari, '2026-12-31'), false);
+  assert.equal(priceRecheckRequired(auHikari, '2027-01-01'), true);
 
   // 境界：前日までは要再確認にならず、改定日当日から要再確認になる
-  for (const s of flagged) {
+  for (const s of decGroup) {
     assert.equal(priceRecheckRequired(s, BEFORE), false, s.id);
     assert.equal(priceRecheckRequired(s, ON), true, s.id);
     assert.equal(priceRecheckRequired(s, '2027-01-15'), true, s.id);
