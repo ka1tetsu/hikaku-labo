@@ -8,7 +8,7 @@ export default function SectionDirectory() {
         <h1 id="hl-directory-title">何にいくらかかる？<em>条件をそろえて比べる。</em></h1>
         <p>スマホの基本料金、同じ型番の販売価格、宿泊の支払総額。値段の意味が違うものを混ぜず、条件・出典・見落としやすい費用を確認できる{SITE_SECTIONS.length}つの入口です。</p>
       </div>
-      <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較・調査カテゴリ</span><small>商品・IT・旅行・通信・企業データ</small></div>
+      <div className="hl-directory-aside" aria-label="比較対象カテゴリ数"><strong>{String(SITE_SECTIONS.length).padStart(2, '0')}</strong><span>比較・調査カテゴリ</span><small>商品・IT・旅行・通信・証券・企業データ</small></div>
     </div>
     <div className="hl-directory-start"><a href="#savings">スマホ代の年間差額を診断 →</a><a href="/compare/">型番で商品価格を比較 →</a><a href="/sim/">格安SIMの料金を比べる →</a></div>
     <div className="hl-directory-grid">

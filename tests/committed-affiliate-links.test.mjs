@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SERVICE_IDS } from '../src/services/catalog.js';
 import { SERVICES } from '../src/tools/catalog.js';
+import { SERVICES as SECURITIES_SERVICES } from '../src/securities/catalog.js';
 import { serviceLink } from '../src/services/affiliate.js';
 import { affiliateCandidate } from '../src/shared/affiliateConfig.js';
 import { PUBLIC_AFFILIATE_LINKS } from '../src/shared/publicAffiliateLinks.js';
 
-const KNOWN = new Set([...SERVICE_IDS, ...SERVICES.map(s => s.id)]);
+const KNOWN = new Set([...SERVICE_IDS, ...SERVICES.map(s => s.id), ...SECURITIES_SERVICES.map(s => s.id)]);
 const RAKUTEN_LINK = 'https://hb.afl.rakuten.co.jp/hsc/TEST.TEST.TEST.TEST/?link_type=hybrid_url&ut=TEST';
 const A8_LINK = 'https://px.a8.net/svt/ejp?a8mat=TEST';
 const committed = { 'rakuten-mobile': RAKUTEN_LINK };

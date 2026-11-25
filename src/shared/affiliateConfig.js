@@ -1,8 +1,9 @@
 import { SERVICE_IDS } from '../services/catalog.js';
 import { SERVICES } from '../tools/catalog.js';
+import { SERVICES as SECURITIES_SERVICES } from '../securities/catalog.js';
 import { PUBLIC_AFFILIATE_LINKS } from './publicAffiliateLinks.js';
 
-const KNOWN_IDS = new Set([...SERVICE_IDS, ...SERVICES.map(service => service.id)]);
+const KNOWN_IDS = new Set([...SERVICE_IDS, ...SERVICES.map(service => service.id), ...SECURITIES_SERVICES.map(service => service.id)]);
 
 // Public ASP-issued URLs only. A single setting replaces dozens of separate
 // inputs; it never changes the catalog or ranking. Do not put API keys here.
