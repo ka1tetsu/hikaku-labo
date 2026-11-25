@@ -34,6 +34,7 @@ export const PAGE_IDS = Object.freeze({
   '/guides/hotel-cancellation/': 'guide-hotel-cancellation', '/guides/lodging-tax/': 'guide-lodging-tax', '/guides/long-weekends/': 'guide-long-weekends',
   '/guides/expressway-holiday/': 'guide-expressway-holiday',
   '/guides/sim-guide/': 'guide-sim-guide', '/guides/hikari-guide/': 'guide-hikari-guide', '/guides/card-guide/': 'guide-card-guide',
+  '/guides/nisa-guide/': 'guide-nisa-guide',
   '/guides/shinkansen-reservation/': 'guide-shinkansen-reservation',
   '/en/': 'en', '/en/systeme-io-vs-thinkific/': 'en-systeme-io-vs-thinkific',
   ...Object.fromEntries(SIM_PAIRS.map(pair => [pair.path, 'sim-vs-' + pair.slug])),
