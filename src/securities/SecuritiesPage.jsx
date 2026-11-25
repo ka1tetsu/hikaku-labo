@@ -84,6 +84,7 @@ export default function SecuritiesPage() {
             <li>株式・投資信託と、レバレッジ取引であるFX・CFDは、同じランキングに混ぜずグループを分けています。</li>
             <li>投資に「必ず利益が出る」ことはありません。申込前に各社の公式サイトで最新の条件とリスク説明を確認してください。</li>
             <li>新NISAの口座選びの観点（手数料無料の範囲・取扱商品・積立額）は<a href="/guides/nisa-guide/">新NISAの証券口座の選び方ガイド</a>で手順を整理しています。</li>
+            <li>FX・CFDの口座選びの観点（スプレッドの条件・取引単位・ロスカットの水準）は<a href="/guides/fx-guide/">FX口座の選び方ガイド</a>で手順を整理しています。</li>
           </ul>
         </section>
 
