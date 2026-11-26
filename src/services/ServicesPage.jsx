@@ -1,4 +1,5 @@
 import SiteFooter from '../shared/SiteFooter.jsx';
+import AdSlot from '../shared/AdSlot.jsx';
 import { useMemo, useRef, useState } from 'react';
 import DecisionBar from '../shared/DecisionBar.jsx';
 import SiteHeader from '../shared/SiteHeader.jsx';
@@ -236,6 +237,7 @@ function PageShell({ kicker, h1, lead, current, category, children }) {
       </section>
     </main>
     <SiteConcierge section="site" />
+    <AdSlot placement="footer" />
     <SiteFooter />
   </div>;
 }

@@ -1,4 +1,5 @@
 import SiteFooter from '../shared/SiteFooter.jsx';
+import AdSlot from '../shared/AdSlot.jsx';
 // Server-rendered long-tail pages (no hydration). Interactive bits — the concierge,
 // the header "AIに相談" button and click tracking — come from conciergeMount.jsx.
 import SiteHeader from '../shared/SiteHeader.jsx';
@@ -40,6 +41,7 @@ function Shell({ crumbs, kicker, title, lead, children }) {
         <p>料金・特典・条件は変更されることがあります。申込前に必ず各社の公式サイトで最新の内容を確認してください。</p>
       </section>
     </main>
+    <AdSlot placement="footer" />
     <SiteFooter />
   </div>;
 }

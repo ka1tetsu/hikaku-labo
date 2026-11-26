@@ -1,4 +1,5 @@
 import SiteFooter from '../shared/SiteFooter.jsx';
+import AdSlot from '../shared/AdSlot.jsx';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import { CHECKED_AT, GROUPS, getServices } from './catalog.js';
 import { outboundLink, recordOutbound } from './affiliate.js';
@@ -126,6 +127,7 @@ export default function SecuritiesPage() {
         </div>
         <div className="sc-wrap sc-footer-bottom">© 2026 Vivlica <a href="#main-content">ページ上部へ ↑</a></div>
       </footer>
+      <AdSlot placement="footer" />
       <SiteFooter />
     </div>
   );

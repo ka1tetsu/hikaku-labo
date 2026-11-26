@@ -1,5 +1,6 @@
 import DecisionEvidence from '../shared/DecisionEvidence.jsx';
 import SiteFooter from '../shared/SiteFooter.jsx';
+import AdSlot from '../shared/AdSlot.jsx';
 import { useEffect, useRef, useState } from 'react';
 import DecisionBar from '../shared/DecisionBar.jsx';
 import SiteHeader from '../shared/SiteHeader.jsx';
@@ -266,6 +267,7 @@ export default function ToolsPage() {
       </footer>
       <DecisionBar anchorRef={recommendationRef} name={ranking[0].name} detail={ranking[0].price.label} section="tools" merchant={ranking[0].id} link={outboundLink(ranking[0])} placement="tools-decision-bar" caution="年払い・手数料などの条件を確認" />
       <SiteConcierge section="tools" />
+    <AdSlot placement="footer" />
     <SiteFooter />
     </div>
   );

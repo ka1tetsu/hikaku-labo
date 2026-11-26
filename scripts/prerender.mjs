@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createServer } from 'vite';
 import { execFileSync } from 'node:child_process';
 import { SITE_ORIGIN, siteOrigin } from '../src/shared/site.js';
+import { adsenseConfig, adsenseHeadSnippet, adsenseAdsTxtLine } from '../src/shared/adsenseConfig.js';
 
 // SITE_ORIGIN (e.g. https://example.jp) switches canonical / OGP / sitemap URLs to a custom domain.
 const DEFAULT_ORIGIN = SITE_ORIGIN;
@@ -63,12 +64,43 @@ ${scripts}
   const extra = STATIC_PAGES.map(page => `  <url><loc>${SITE}${page.path}</loc></url>`).join('\n');
   await writeFile(sitemapPath, sitemap.replace('</urlset>', extra + '\n</urlset>'));
 
+  // AdSense: only when VITE_ADSENSE_PUBLISHER_ID is set at build time. Inject
+  // the verification snippet into every built page head and publish the
+  // ads.txt seller line. While unconfigured this is a complete no-op, so the
+  // built site carries no ad network references at all.
+  const adsense = adsenseConfig(process.env);
+  const snippet = adsenseHeadSnippet(adsense);
+  if (snippet) {
+    await injectAdsenseHead(new URL('../dist/', import.meta.url), snippet);
+    const line = adsenseAdsTxtLine(adsense);
+    const adsTxtPath = new URL('../dist/ads.txt', import.meta.url);
+    let existing = '';
+    try { existing = await readFile(adsTxtPath, 'utf8'); } catch { /* no ads.txt yet */ }
+    if (!existing.split('\n').some(row => row.trim() === line)) {
+      await writeFile(adsTxtPath, (existing && !existing.endsWith('\n') ? existing + '\n' : existing) + line + '\n');
+    }
+    console.log('adsense: head snippet + ads.txt enabled for', adsense.publisherId);
+  }
+
   if (SITE !== DEFAULT_ORIGIN) {
     await rewriteOrigin(new URL('../dist/', import.meta.url));
     console.log('site origin →', SITE);
   }
 } finally {
   await vite.close();
+}
+
+async function injectAdsenseHead(dir, snippet) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const path = new URL(entry.name + (entry.isDirectory() ? '/' : ''), dir);
+    if (entry.isDirectory()) await injectAdsenseHead(path, snippet);
+    else if (entry.name.endsWith('.html')) {
+      const html = await readFile(path, 'utf8');
+      if (!html.includes('pagead2.googlesyndication.com') && html.includes('</head>')) {
+        await writeFile(path, html.replace('</head>', snippet + '\n</head>'));
+      }
+    }
+  }
 }
 
 async function rewriteOrigin(dir) {

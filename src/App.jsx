@@ -1,4 +1,5 @@
 import SiteFooter from './shared/SiteFooter.jsx';
+import AdSlot from './shared/AdSlot.jsx';
 import { recordOutboundClick } from './shared/outboundClient.js';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
@@ -424,6 +425,7 @@ export default function App() {
       </main>
 
       <Footer />
+    <AdSlot placement="footer" />
     <SiteFooter />
       <SiteConcierge section="products" />
     </div>
