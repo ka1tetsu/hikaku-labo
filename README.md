@@ -30,6 +30,14 @@ npm run audit:affiliate
 公開前に [Vivlicaへの統合・収益運用](docs/VIVLICA-LAUNCH.md) を参照してください。
 
 広告URLは `VITE_AFFILIATE_LINKS` のJSONでまとめて設定できます。承認済みの公開成果URLだけを設定してください。
+
+Google AdSenseはコード側の準備のみ済んでおり、パブリッシャーID未設定の間は広告スクリプト・広告枠・ads.txtのいずれも出力されません。有効化するには、ビルド環境変数に次を設定して再ビルドします（設定は `src/shared/adsenseConfig.js` の1箇所だけが参照します）。
+
+- `VITE_ADSENSE_PUBLISHER_ID`: AdSense発行の `ca-pub-` + 16桁のID（必須。これが無い・形式が違う場合は全体が無効）
+- `VITE_ADSENSE_SLOT_FOOTER`: 比較ページ等のフッター直前枠の広告ユニットID（数字）
+- `VITE_ADSENSE_SLOT_GUIDE_MID` / `VITE_ADSENSE_SLOT_GUIDE_END`: ガイド記事の本文途中・末尾寄り枠の広告ユニットID（数字）
+
+ビルド時にIDが設定されていると、`scripts/prerender.mjs` が全ページのheadへ審査用スニペットを注入し、`dist/ads.txt` に `google.com, pub-<16桁>, DIRECT, f08c47fec0942fa0` の1行を生成します。枠はアフィリエイトCTAに隣接しない位置（フッター直前、ガイドの節見出し前）だけに置いています。
 楽天トラベルの施設別HTML素材は `npm run ads:import -- --file 素材.html` で旅行先の判定・掲載設定・クリック計測を自動登録できます。[広告HTMLの自動登録](docs/AD-IMPORT.md)を参照してください。
 送客レポートの `nextActions` は、通常リンクへの送客、診断結果からの移動、入力した確定報酬と実費に基づいて確認対象を示します。
 

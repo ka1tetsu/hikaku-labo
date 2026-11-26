@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteFooter from '../shared/SiteFooter.jsx';
+import AdSlot from '../shared/AdSlot.jsx';
 import YahooTravelAd from './YahooTravelAd.jsx';
 import { validHotelNo } from './hotelDetails.js';
 import { recordOutboundClick } from '../shared/outboundClient.js';
@@ -84,5 +85,5 @@ export default function HotelDetailPage(){
       <div className="ht-search-more"><h2>ほかの旅館・ホテルを探す</h2><p>都道府県・温泉地・駅名・宿名で検索できます。</p><a className="ht-cta" href="/travel/#stay-search">宿泊施設を検索する →</a></div>
       <p className="ht-note">実在する楽天トラベル掲載施設を公式APIで確認して表示しています。世界中すべての宿泊施設を網羅するものではなく、掲載件数・評価・料金は変動します。PR表示の広告経由で当サイトが紹介報酬を受け取る場合があります。</p>
     </div>
-  </main><SiteFooter/></div>;
+  </main><AdSlot placement="footer" /><SiteFooter/></div>;
 }

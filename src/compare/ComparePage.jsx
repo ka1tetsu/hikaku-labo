@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import SiteFooter from '../shared/SiteFooter.jsx';
+import AdSlot from '../shared/AdSlot.jsx';
 import { searchResponse } from '../shared/searchRequest.js';
 import SiteHeader from '../shared/SiteHeader.jsx';
 import SiteConcierge from '../shared/SiteConcierge.jsx';
@@ -320,6 +321,7 @@ export default function ComparePage() {
       </div>
     </main>
     {selectedOffers.length>0&&<aside className="cp-selection-tray" aria-label="選択した出品"><span><strong>{selectedOffers.length} / 4件</strong> を比較候補に選択中</span><button type="button" onClick={()=>revealComparisonSection('cp-shortlist-title')}>比較表を見る</button><button type="button" onClick={()=>setSelectedKeys([])}>解除</button></aside>}
+    <AdSlot placement="footer" />
     <SiteFooter />
     <SiteConcierge section="products" />
   </div>;
