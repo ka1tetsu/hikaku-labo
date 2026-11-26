@@ -2,9 +2,9 @@
 <!-- impeccable-disable flat-type-hierarchy: shared production stylesheet /guides.css provides h1 32-52px, h2 26px and h3 18px; static source scanner cannot resolve the root-relative linked asset -->
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145d48">
 <title>企業データを無料で調べる：EDINET・官公需・国会の出典つきデータの見方｜Vivlica</title>
-<meta name="description" content="企業データサービスvivldatabaseの無料範囲の案内。登録不要の社名検索、調査ファイル（各情報源の直近5件）、2社までの比較、官公需シグナルの無料版など、無料で確認できる範囲と、全件表示・CSV/JSON出力・API大量取得など有料の範囲を分けて整理します。">
+<meta name="description" content="企業データサービスvivldatabaseの無料範囲の案内。登録不要の社名検索、調査ファイル（各情報源の直近20件）、5社までの比較、官公需シグナルの無料版など、無料で確認できる範囲と、全件表示・CSV/JSON出力・API大量取得など有料の範囲を分けて整理します。">
 <link rel="canonical" href="https://vivlica.com/guides/database-free/">
-<meta property="og:type" content="article"><meta property="og:locale" content="ja_JP"><meta property="og:title" content="企業データを無料で調べる：EDINET・官公需・国会の出典つきデータの見方｜Vivlica"><meta property="og:description" content="vivldatabaseの無料範囲（社名検索・調査ファイルの直近5件・2社比較・官公需シグナル無料版）と、有料の範囲（全件表示・CSV/JSON出力・API）を分けて整理するガイド。">
+<meta property="og:type" content="article"><meta property="og:locale" content="ja_JP"><meta property="og:title" content="企業データを無料で調べる：EDINET・官公需・国会の出典つきデータの見方｜Vivlica"><meta property="og:description" content="vivldatabaseの無料範囲（社名検索・調査ファイルの直近20件・5社比較・官公需シグナル無料版）と、有料の範囲（全件表示・CSV/JSON出力・API）を分けて整理するガイド。">
 <link rel="icon" type="image/svg+xml" href="/icons/tabler/chart-bar.svg"><link rel="stylesheet" href="/guides.css"><meta property="og:site_name" content="Vivlica"/>
 <meta property="og:url" content="https://vivlica.com/guides/database-free/"/>
 <meta property="og:image" content="https://vivlica.com/og/default.png"/>
@@ -12,31 +12,31 @@
 <meta property="og:image:height" content="630"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Vivlica", "item": "https://vivlica.com/"}, {"@type": "ListItem", "position": 2, "name": "企業データを無料で調べる", "item": "https://vivlica.com/guides/database-free/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "企業データを無料で調べる：EDINET・官公需・国会の出典つきデータの見方", "description": "企業データサービスvivldatabaseの無料範囲の案内。登録不要の社名検索、調査ファイル（各情報源の直近5件）、2社までの比較、官公需シグナルの無料版など、無料で確認できる範囲と、全件表示・CSV/JSON出力・API大量取得など有料の範囲を分けて整理します。", "inLanguage": "ja", "dateModified": "2026-11-26", "mainEntityOfPage": "https://vivlica.com/guides/database-free/", "image": "https://vivlica.com/og/default.png", "author": {"@type": "Organization", "name": "Vivlica", "url": "https://vivlica.com/"}, "publisher": {"@type": "Organization", "name": "Vivlica", "url": "https://vivlica.com/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "企業データを無料で調べる：EDINET・官公需・国会の出典つきデータの見方", "description": "企業データサービスvivldatabaseの無料範囲の案内。登録不要の社名検索、調査ファイル（各情報源の直近20件）、5社までの比較、官公需シグナルの無料版など、無料で確認できる範囲と、全件表示・CSV/JSON出力・API大量取得など有料の範囲を分けて整理します。", "inLanguage": "ja", "dateModified": "2026-11-26", "mainEntityOfPage": "https://vivlica.com/guides/database-free/", "image": "https://vivlica.com/og/default.png", "author": {"@type": "Organization", "name": "Vivlica", "url": "https://vivlica.com/"}, "publisher": {"@type": "Organization", "name": "Vivlica", "url": "https://vivlica.com/"}}</script>
 </head>
 <body data-concierge-section="database"><a href="#article" class="skip">本文へ移動</a><nav><div class="wrap"><a class="logo" href="/">✳ Vivlica</a><div class="links"><a href="/">商品価格比較</a><a href="/tools/">ITツール診断</a><a href="/travel/">旅行予算</a></div></div></nav>
 <header class="hero"><div class="wrap"><div class="eyebrow">FREE DATA GUIDE</div><h1>企業データを無料で調べる：EDINET・官公需・国会の出典つきデータの見方</h1><p class="lead">上場企業の開示・官公需の落札・国会での言及といった公開情報は、企業データサービス「vivldatabase」で出典つきで確認できます。登録不要で使える無料の範囲と、全件表示や一括取得など有料の範囲は分かれています。このガイドでは、無料でどこまで調べられるかを先に整理します。</p><p class="note">このガイドは、企業データサービスvivldatabaseの無料・有料の範囲を案内するものです。有料プラン（OSINT Pro・API）の料金は各サービスのページが正本で、申し込みもそちらで行います。投資の推奨をするものではありません。</p><p class="meta">Vivlica編集ガイド / 更新 2026-11-26 / 無料・有料の範囲と料金は、2026-11-26にvivldatabaseの公開ページ（/database・/pricing）で確認した内容です。</p></div></header>
 <div class="wrap layout"><main id="article"><article><h2>無料でできること：登録不要の検索と調査ファイル</h2>
 <p>vivldatabaseの画面での調査は、登録不要で始められます。社名で検索すると、その企業の「調査ファイル」に、情報源ごとの記録が出典と更新日つきで並びます。無料の範囲は次のとおりです。</p>
 <table><thead><tr><th>項目</th><th>無料の範囲</th><th>有料（OSINT Pro）の範囲</th></tr></thead>
-<tbody><tr><td>調査ファイル</td><td>各情報源の直近5件まで表示</td><td>全件表示（時系列・官公需・国会・開示）</td></tr>
-<tr><td>並べて比較</td><td>2社まで</td><td>10社まで</td></tr>
+<tbody><tr><td>調査ファイル</td><td>各情報源の直近20件まで表示</td><td>全件表示（時系列・官公需・国会・開示）</td></tr>
+<tr><td>並べて比較</td><td>5社まで</td><td>10社まで</td></tr>
 <tr><td>ダウンロード</td><td>なし</td><td>CSV・JSON出力（原典URL・取得日時つき）</td></tr>
 <tr><td>官公需シグナル</td><td>無料版を閲覧可</td><td>有料版を含む</td></tr>
 <tr><td>料金（税込）</td><td>¥0（登録不要）</td><td>¥4,980 / 月・年額 ¥49,800、7日間トライアルあり</td></tr></tbody></table>
-<p>「まず無料で試す」範囲として、出典や更新日を確認しながら、直近の動きを追う用途までは無料でまかなえます。全期間の時系列をたどる、3社以上を並べる、ファイルとして持ち出す、といった使い方から有料になります。</p>
+<p>「まず無料で試す」範囲として、出典や更新日を確認しながら、直近の動きを追う用途までは無料でまかなえます。全期間の時系列をたどる、6社以上を並べる、ファイルとして持ち出す、といった使い方から有料になります。</p>
 <h2>集計・ランキングも無料で読める</h2>
 <p><a href="/database">企業データのトップページ</a>では、収録データから算出した集計も無料で公開しています。直近365日の官公需の落札額と前年比の伸び、国会会議録で社名が言及された発言の数などを、会社名と証券コードつきで確認できます。集計には計算方法と情報源が添えられていて、個別の記録からは原典へ戻れます。</p>
-<p>官公需の公告・落札を調べる入口は<a href="/osint/tenders">官公需・入札データ</a>、銘柄の指標で絞り込む入口は<a href="/screener">株式スクリーニング</a>と<a href="/rankings">ランキング</a>に分かれています。いずれも無料で開けます。</p>
+<p>官公需の公告・落札を調べる入口は<a href="/osint/tenders">官公需・入札データ</a>、銘柄の指標で絞り込む入口は<a href="/screener">株式スクリーニング</a>と<a href="/rankings">ランキング</a>に分かれています。いずれも無料で開けます。また、<a href="/samples">サンプルデータ</a>のページでは、各データセットの抜粋を無料で確認できます（掲載されているのは抜粋のみで、全件のCSV/JSONダウンロードは有料プランの範囲です）。</p>
 <h2>情報源と照合の方法</h2>
 <p>vivldatabaseが使うのは公開情報だけです。金融庁のEDINET（提出書類の一覧とコードリスト）、デジタル庁の調達ポータル（落札実績オープンデータ）、国立国会図書館の国会会議録検索システム、Wikidataを、取得日時とあわせて記録しています。上場企業への紐づけは法人番号で行い、法人番号のない国会会議録は社名で照合し、確度を明示します。各情報源の範囲・取得日・利用条件は<a href="/database">企業データのページ</a>の「Sources」にまとまっています。</p>
 <p class="note">注意：「見つからない」ことは「存在しない」ことを意味しません。収録範囲外、名義の違い、子会社での受注などでは記録に現れない場合があります。数値を判断に使うときは、調査ファイルの原典リンクから元の開示・公告を確認してください。</p>
 <h2>無料で調べる手順</h2>
 <ol><li><strong>社名または証券コードで検索する。</strong><a href="/database">企業データ</a>の検索から、調べたい企業の調査ファイルを開きます。</li>
-<li><strong>調査ファイルで直近の記録を見る。</strong>各情報源の直近5件までが無料で表示されます。出典と更新日を確認します。</li>
+<li><strong>調査ファイルで直近の記録を見る。</strong>各情報源の直近20件までが無料で表示されます。出典と更新日を確認します。</li>
 <li><strong>気になる記録は原典で確認する。</strong>各記録からEDINETの書類や調達ポータルの公告など原典へ戻れます。</li>
-<li><strong>競合と比べる。</strong>比較は2社まで無料です。並べる観点（官公需・開示・国会言及）をそろえて見ます。</li>
-<li><strong>足りない範囲を判断する。</strong>全件の時系列・3社以上の比較・CSV/JSON出力が必要なら有料プラン、プログラムからの取得ならAPI（月3,000回までの無料プランあり）を検討します。</li></ol>
+<li><strong>競合と比べる。</strong>比較は5社まで無料です。並べる観点（官公需・開示・国会言及）をそろえて見ます。</li>
+<li><strong>足りない範囲を判断する。</strong>全件の時系列・6社以上の比較・CSV/JSON出力が必要なら有料プラン、プログラムからの取得ならAPI（月3,000回までの無料プランあり）を検討します。</li></ol>
 <h2>大量取得・自動化はAPIで</h2>
 <p>画面での閲覧ではなく、プログラムから定期的にデータを取得する用途には、vivldatabase APIがあります。EDINETの提出書類の一覧、有価証券報告書から抽出した財務・非財務の数値、年次報告書・官公需入札公告・海外政策イベントをまとめたオルタナティブデータを、JSON / CSVで取得できます（オルタナティブデータは1リクエスト最大1,000件）。すべての記録に出典の書類IDと原典URLが付きます。APIには無料プラン（Free）もあり、メール登録のみで、クレジットカード不要で月3,000リクエストまで使えます（全エンドポイントとMCPが対象）。</p>
 <table><thead><tr><th>プラン</th><th>月額（税込）</th><th>月間リクエスト上限</th></tr></thead>
@@ -45,5 +45,5 @@
 <tr><td>Ultra</td><td>¥3,980</td><td>300,000</td></tr>
 <tr><td>Mega</td><td>¥9,800</td><td>2,000,000</td></tr></tbody></table>
 <p>Freeはメール登録のみで使え、月3,000リクエストまで料金はかかりません。有料プラン（Pro・Ultra・Mega）には7日間の無料トライアルがあります。エンドポイントと認証の仕様は<a href="/docs/api">APIドキュメント</a>、申し込みは<a href="/pricing">料金ページ</a>から確認できます。画面の無料範囲やFreeで足りる用途では、有料プランの契約は不要です。</p>
-<div class="endcta"><h3>登録不要で、企業の直近の動きを確認</h3><p>社名検索と調査ファイル（各情報源の直近5件）、2社までの比較、官公需シグナルの無料版が登録不要で使えます。</p><a class="cta" href="/database">企業データを無料で調べる →</a></div></article></main><aside aria-label="関連する無料の入口"><div class="card"><h2>企業データ（vivldatabase）</h2><p>社名検索・調査ファイル・集計を出典つきで。登録不要。</p><a class="cta" href="/database">企業データを開く →</a></div><div class="card"><h2>官公需・入札データ</h2><p>国の機関の調達公告と落札実績を企業ごとに確認。</p><a href="/osint/tenders">官公需・入札データへ</a></div><div class="card"><h2>株式スクリーニング</h2><p>収録銘柄の指標で候補を絞り込む入口。</p><a href="/screener">株式スクリーニングへ</a></div><div class="card"><h2>APIドキュメント</h2><p>大量取得・自動化が必要な場合のエンドポイント仕様。</p><a href="/docs/api">APIドキュメントへ</a></div></aside></div>
+<div class="endcta"><h3>登録不要で、企業の直近の動きを確認</h3><p>社名検索と調査ファイル（各情報源の直近20件）、5社までの比較、官公需シグナルの無料版が登録不要で使えます。</p><a class="cta" href="/database">企業データを無料で調べる →</a></div></article></main><aside aria-label="関連する無料の入口"><div class="card"><h2>企業データ（vivldatabase）</h2><p>社名検索・調査ファイル・集計を出典つきで。登録不要。</p><a class="cta" href="/database">企業データを開く →</a></div><div class="card"><h2>官公需・入札データ</h2><p>国の機関の調達公告と落札実績を企業ごとに確認。</p><a href="/osint/tenders">官公需・入札データへ</a></div><div class="card"><h2>株式スクリーニング</h2><p>収録銘柄の指標で候補を絞り込む入口。</p><a href="/screener">株式スクリーニングへ</a></div><div class="card"><h2>APIドキュメント</h2><p>大量取得・自動化が必要な場合のエンドポイント仕様。</p><a href="/docs/api">APIドキュメントへ</a></div></aside></div>
 <footer><div class="wrap">© 2026 Vivlica。広告リンクを含む場合があります。広告に依存せず比較条件を説明します。 <a href="/">サイトトップ</a></div><p><a href="/about/">Vivlicaについて</a> · <a href="/editorial-policy/">比較・広告の方針</a> · <a href="/privacy/">プライバシー</a></p></footer><script type="module" src="/src/shared/conciergeMount.jsx"></script><script type="module" src="/src/shared/adsenseGuide.js"></script></body></html>
