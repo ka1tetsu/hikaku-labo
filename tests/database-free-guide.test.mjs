@@ -41,11 +41,18 @@ test('database-free guide has Article structured data that matches the visible p
 });
 
 test('database-free guide states the verified free limits and keeps paid scope paid', () => {
-  // Free scope as published on the /database plan table (checked 2026-11-26).
-  assert.ok(html.includes('各情報源の直近5件'), 'free investigation file limit');
-  assert.ok(html.includes('2社まで'), 'free comparison limit');
+  // Free scope after the Worker-side relaxation (vividatabase PR #105, checked 2026-11-26).
+  assert.ok(html.includes('各情報源の直近20件'), 'free investigation file limit');
+  assert.ok(html.includes('5社まで'), 'free comparison limit');
   assert.ok(html.includes('登録不要'), 'no registration for the free scope');
   assert.ok(html.includes('官公需シグナル'), 'free signal edition mentioned');
+  // The pre-relaxation limits must not linger anywhere in the guide.
+  assert.ok(!html.includes('直近5件'), 'old investigation file limit removed');
+  assert.ok(!html.includes('2社まで'), 'old comparison limit removed');
+  assert.ok(!html.includes('比較は2社'), 'old comparison wording removed');
+  // Sample data is excerpts only; bulk download stays in the paid scope.
+  assert.ok(html.includes('href="/samples"'), 'samples page linked');
+  assert.ok(html.includes('抜粋'), 'samples described as excerpts');
   // Paid scope must not be described as free.
   assert.ok(html.includes('全件表示'), 'full listing named as the paid scope');
   assert.ok(html.includes('CSV・JSON'), 'downloads named');
