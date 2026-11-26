@@ -33,6 +33,7 @@ export default defineConfig({
         'guide-card-guide': fileURLToPath(new URL('./guides/card-guide/index.html', import.meta.url)),
         'guide-nisa-guide': fileURLToPath(new URL('./guides/nisa-guide/index.html', import.meta.url)),
         'guide-fx-guide': fileURLToPath(new URL('./guides/fx-guide/index.html', import.meta.url)),
+        'guide-stock-guide': fileURLToPath(new URL('./guides/stock-guide/index.html', import.meta.url)),
         'guide-hikari-single-guide': fileURLToPath(new URL('./guides/hikari-single-guide/index.html', import.meta.url)),
         'guide-database-free': fileURLToPath(new URL('./guides/database-free/index.html', import.meta.url)),
         en: fileURLToPath(new URL('./en/index.html', import.meta.url)),
