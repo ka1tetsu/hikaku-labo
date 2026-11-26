@@ -36,6 +36,7 @@ export const PAGE_IDS = Object.freeze({
   '/guides/sim-guide/': 'guide-sim-guide', '/guides/hikari-guide/': 'guide-hikari-guide', '/guides/card-guide/': 'guide-card-guide',
   '/guides/nisa-guide/': 'guide-nisa-guide',
   '/guides/fx-guide/': 'guide-fx-guide',
+  '/guides/stock-guide/': 'guide-stock-guide',
   '/guides/hikari-single-guide/': 'guide-hikari-single-guide',
   '/guides/database-free/': 'guide-database-free',
   '/guides/shinkansen-reservation/': 'guide-shinkansen-reservation',
