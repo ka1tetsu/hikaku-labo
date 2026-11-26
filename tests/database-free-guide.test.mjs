@@ -58,10 +58,15 @@ test('database-free guide prices match the published plan tables', () => {
   // OSINT Pro price from the /database plan table; API prices from the API plan table.
   assert.ok(html.includes('¥4,980 / 月'), 'OSINT Pro monthly price');
   assert.ok(html.includes('¥49,800'), 'OSINT Pro annual price');
-  assert.ok(html.includes('¥1,480'), 'API Pro price');
-  assert.ok(html.includes('¥14,800'), 'API Mega price');
-  assert.ok(html.includes('10,000'), 'API Pro monthly request cap');
-  assert.ok(html.includes('1,000,000'), 'API Mega monthly request cap');
+  assert.ok(html.includes('¥980'), 'API Pro price');
+  assert.ok(html.includes('¥3,980'), 'API Ultra price');
+  assert.ok(html.includes('¥9,800'), 'API Mega price');
+  assert.ok(html.includes('3,000'), 'API Free monthly request cap');
+  assert.ok(html.includes('30,000'), 'API Pro monthly request cap');
+  assert.ok(html.includes('2,000,000'), 'API Mega monthly request cap');
+  // Prices from the pre-2026-11-26 plan table must not linger.
+  assert.ok(!html.includes('¥1,480'), 'old API Pro price removed');
+  assert.ok(!html.includes('¥14,800'), 'old API Mega price removed');
   assert.ok(html.includes('1リクエスト最大1,000件'), 'alternative-data per-request cap');
   assert.ok(html.includes('7日間'), 'trial period stated');
 });
