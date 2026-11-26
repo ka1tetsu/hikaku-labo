@@ -34,6 +34,7 @@ export default defineConfig({
         'guide-nisa-guide': fileURLToPath(new URL('./guides/nisa-guide/index.html', import.meta.url)),
         'guide-fx-guide': fileURLToPath(new URL('./guides/fx-guide/index.html', import.meta.url)),
         'guide-hikari-single-guide': fileURLToPath(new URL('./guides/hikari-single-guide/index.html', import.meta.url)),
+        'guide-database-free': fileURLToPath(new URL('./guides/database-free/index.html', import.meta.url)),
         en: fileURLToPath(new URL('./en/index.html', import.meta.url)),
         'en-systeme-io-vs-thinkific': fileURLToPath(new URL('./en/systeme-io-vs-thinkific/index.html', import.meta.url)),
         'guide-shinkansen-reservation': fileURLToPath(new URL('./guides/shinkansen-reservation/index.html', import.meta.url)),

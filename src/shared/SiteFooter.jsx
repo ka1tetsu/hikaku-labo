@@ -7,5 +7,6 @@ export default function SiteFooter() {
     <a href="/privacy/">プライバシー</a>
     <a href="/life/#savings">固定費の診断</a>
     <a href="/database">企業データ</a>
+    <a href="/guides/database-free/">企業データの無料の調べ方</a>
   </nav><p className="vl-amazon-associate-notice">Amazonのアソシエイトとして、Vivlicaは適格販売により収入を得ています。</p></>;
 }
