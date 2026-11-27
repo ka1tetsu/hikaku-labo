@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { SITE_SECTIONS, isActiveSection } from '../src/shared/siteDirectory.js';
 
 const text = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
@@ -41,4 +41,14 @@ test('advertisement content remains independent from navigation and visual refre
   assert.match(travelPage, /PR・広告/);
   assert.match(text('src/tools/ToolsPage.jsx'), /A8_AD_PLACEMENTS/);
   assert.match(text('src/components/ProductCard.jsx'), /getOptimizedAffiliateRoute/);
+});
+
+test('every static guide header nav links to the securities hub', () => {
+  const guides = readdirSync(new URL('../guides/', import.meta.url), { withFileTypes: true })
+    .filter(entry => entry.isDirectory()).map(entry => entry.name);
+  assert.ok(guides.length >= 15);
+  for (const guide of guides) {
+    const html = text(`guides/${guide}/index.html`);
+    assert.ok(html.includes('<a href="/securities/">証券・FX比較</a>'), guide + ' nav must link to /securities/');
+  }
 });
