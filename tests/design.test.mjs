@@ -52,3 +52,9 @@ test('every static guide header nav links to the securities hub', () => {
     assert.ok(html.includes('<a href="/securities/">証券・FX比較</a>'), guide + ' nav must link to /securities/');
   }
 });
+
+test('life hub links to the securities hub', () => {
+  const page = text('src/services/ServicesPage.jsx');
+  assert.match(page, /\['\/securities\/', '📈', '証券口座・FX口座'/);
+  assert.match(page, /life: \[\['\/securities\/', '証券口座・FX口座も比べる'/);
+});
